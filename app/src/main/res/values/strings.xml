@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Racó</string>
+    <string name="avisos">Avisos</string>
+    <string name="horari">Horari</string>
+    <string name="notes">Notes</string>
+    <string name="menu">Menu</string>
+    <string name="tancar_sessio">Tancar sessió</string>
+    <string name="login">Iniciar sessió</string>
+    <string name="login_failed">No s\'ha pogut iniciar sessió</string>
 </resources>
