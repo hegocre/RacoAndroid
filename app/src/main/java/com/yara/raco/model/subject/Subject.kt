@@ -1,5 +1,6 @@
 package com.yara.raco.model.subject
 
+import androidx.room.Entity
 import kotlinx.serialization.Serializable
 
 /**
@@ -17,6 +18,7 @@ import kotlinx.serialization.Serializable
  * @param name Name of the subject.
  */
 @Serializable
+@Entity(tableName = "subjects", primaryKeys = ["id"])
 data class Subject (
     val id: String,
     val url: String,
