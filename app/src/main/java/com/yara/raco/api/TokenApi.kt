@@ -40,7 +40,6 @@ class TokenApi private constructor() {
         }
 
     } catch (e: Exception) {
-        e.printStackTrace()
         Result.Error(1)
     }
 

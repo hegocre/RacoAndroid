@@ -13,6 +13,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Access CLIENT_ID
+        env:
+          CLIENT_ID: $
+        run: echo CLIENT_ID=\"$CLIENT_ID\" > ./apikey.properties
+      - name: Access CLIENT_SECRET
+          env:
+            CLIENT_SECRET: $
+          run: echo CLIENT_SECRET=\"$CLIENT_SECRET\" >> ./apikey.properties
       - name: set up JDK 11
         uses: actions/setup-java@v1
         with:

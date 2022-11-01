@@ -14,7 +14,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val loggedIn: LiveData<Boolean?>
         get() = _loggedIn
 
-    val state = randomStringByKotlinRandom()
+    val state = randomString()
 
     fun processCredentials(url: String) {
         val matcher = "apifib:.*code=(.*)&state=(.*)".toRegex()
@@ -35,7 +35,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun randomStringByKotlinRandom() =
+    private fun randomString() =
         (1..STATE_LENGTH).map {
             Random.nextInt(0, charPool.size).let {
                 charPool[it]
