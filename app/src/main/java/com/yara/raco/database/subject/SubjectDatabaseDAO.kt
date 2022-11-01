@@ -6,7 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.yara.raco.data.subject.Subject
+import com.yara.raco.model.subject.Subject
 
 @Dao
 interface SubjectDatabaseDAO {
