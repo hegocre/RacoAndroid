@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.yara.raco.model.subject.SubjectController
 
 class RacoViewModel(application: Application) : AndroidViewModel(application) {
     private val userController = UserController.getInstance(application)
+    private val subjectController = SubjectController.getInstance(application)
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean>
@@ -28,6 +30,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     fun refresh() {
         viewModelScope.launch {
             _isRefreshing.emit(true)
+            subjectController.syncSubjects()
             delay(1000)
             _isRefreshing.emit(false)
         }
