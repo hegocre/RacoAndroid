@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
  * @param semestre Semester of the subject.
  * @param credits Credits of the subject.
  * @param vigent Whether the subject is active or not.
- * @param name Name of the subject.
+ * @param nom Name of the subject.
  */
 @Serializable
 @Entity(tableName = "subjects", primaryKeys = ["id"])
@@ -27,6 +27,6 @@ data class Subject (
     val sigles: String,
     val codi_upc: Int,
     val semestre: String?,
-    val credits: Int,
-    val vigent: Boolean,
-    val name: String)
+    val credits: Double,
+    val vigent: String,
+    val nom: String)

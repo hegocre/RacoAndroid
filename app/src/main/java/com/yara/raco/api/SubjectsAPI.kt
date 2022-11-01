@@ -1,5 +1,6 @@
 package com.yara.raco.api
 
+import android.util.Log
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.utils.Error
 import com.yara.raco.utils.OkHttpRequest
@@ -7,15 +8,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.Serializable
 
 class SubjectsAPI private constructor() {
 
     suspend fun getSubjects(accessToken: String): Result<List<Subject>> = try {
         val response = withContext(Dispatchers.IO) {
-            OkHttpRequest.getInstance().post(
+            OkHttpRequest.getInstance().get(
                 sUrl = SubjectsAPI.SUBJECT_URL,
-                body = String.format(SubjectsAPI.SUBJECT_BODY, accessToken),
-                mediaType = "application/x-www-form-urlencoded"
+                accessToken = accessToken,
             )
         }
 
@@ -29,7 +30,8 @@ class SubjectsAPI private constructor() {
         }
 
         if (statusCode == 200 && body != null) {
-            Result.Success(Json.decodeFromString(body))
+            var aux = Json.decodeFromString<SubjectResponse>(body).results
+            Result.Success(aux)
         }
         else {
             Result.Error(Error.API_BAD_RESPONSE)
@@ -37,14 +39,20 @@ class SubjectsAPI private constructor() {
 
     }
     catch (e: Exception) {
+        Log.d("ERROR", e.toString())
         Result.Error(Error.API_BAD_REQUEST)
     }
 
+    @Serializable
+    data class SubjectResponse (
+        val count: Int,
+        val results: List<Subject>
+    )
+
+
+
     companion object {
-        private const val SUBJECT_URL = "https://api.fib.upc.edu/v2/jo/assignatures/"
-        private const val SUBJECT_BODY = "Content-Type=application/json" +
-                "&redirect_uri=apifib://yara" +
-                "&Authorization=Bearer %s"
+        private const val SUBJECT_URL = "https://api.fib.upc.edu/v2/jo/assignatures/?format=json"
 
         private var INSTANCE: SubjectsAPI? = null
 

@@ -33,8 +33,7 @@ class ApiController private constructor() {
 
     suspend fun listSubjects(): Result<List<Subject>> {
         accessToken?.let {
-            val subjectList = subjectApi.getSubjects(it.accessToken)
-            return subjectList
+            return subjectApi.getSubjects(it.accessToken)
         } ?: return Result.Error(2)
     }
 
