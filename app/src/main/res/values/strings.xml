@@ -7,4 +7,12 @@
     <string name="tancar_sessio">Tancar sessió</string>
     <string name="login">Iniciar sessió</string>
     <string name="login_failed">No s\'ha pogut iniciar sessió</string>
+    <string name="about">Informació</string>
+    <string name="back">Enrere</string>
+    <string name="version">Versió</string>
+    <string name="source_code">Codi font</string>
+    <string name="api_raco_disclaimer">Aplicació desenvolupada utilitzant l\'API v2 del Racó de la FIB.</string>
+    <string name="authors">Autors</string>
+    <string name="licenses">Llicències</string>
+    <string name="help_suggestions">Ajuda i suggeriments</string>
 </resources>

@@ -33,6 +33,9 @@
         <activity
             android:name=".ui.activities.WebLoginActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.activities.AboutActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
