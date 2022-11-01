@@ -6,6 +6,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -86,11 +88,24 @@ fun RacoTheme(
         else -> LightColorScheme
     }
     val view = LocalView.current
+
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = Color.Transparent.toArgb()
+            val insetsController = getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = colorScheme.isLight()
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                if (colorScheme.isLight()) {
+                    window.navigationBarColor = Color.Black.copy(alpha = 0.3f).toArgb()
+                } else {
+                    window.navigationBarColor = Color.Transparent.toArgb()
+                }
+            } else {
+                insetsController.isAppearanceLightNavigationBars = colorScheme.isLight()
+                window.navigationBarColor = Color.Transparent.toArgb()
+            }
         }
     }
 
@@ -100,3 +115,6 @@ fun RacoTheme(
         content = content
     )
 }
+
+
+fun ColorScheme.isLight() = this.background.luminance() > 0.5

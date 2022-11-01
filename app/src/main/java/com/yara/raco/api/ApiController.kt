@@ -1,36 +1,43 @@
 package com.yara.raco.api
 
-import android.content.Context
-import android.util.Log
+import com.yara.raco.model.user.AccessToken
 
-/**
- * Class with methods used to interact with [the API](https://api.fib.upc.edu/v2/)
- * classes. This is a Singleton class and will have only one instance.
- *
- * @param context Context of the application.
- */
-class ApiController private constructor(context: Context){
+class ApiController private constructor() {
+    var accessToken: AccessToken? = null
+    private val tokenApi = TokenApi.getInstance()
 
+    suspend fun login(authorizationCode: String): Result<AccessToken> {
+        val loginResult = tokenApi.getToken(authorizationCode)
 
+        if (loginResult is Result.Success) {
+            accessToken = loginResult.data
+        }
 
+        return loginResult
+    }
 
+    suspend fun refreshToken(): Result<AccessToken> {
+        accessToken?.let {
+            val refreshResult = tokenApi.refreshToken(it.refreshToken)
+
+            if (refreshResult is Result.Success) {
+                accessToken = refreshResult.data
+            }
+
+            return refreshResult
+
+        } ?: return Result.Error(2)
+    }
 
     companion object {
         private var instance: ApiController? = null
-        private const val API_URL = "https://api.fib.upc.edu"
 
-        /**
-         * Get the instance of the [ApiController], and create it if null.
-         *
-         * @param context Context of the application.
-         * @return The instance of the controller.
-         */
-        fun getInstance(context: Context): ApiController {
+        fun getInstance(): ApiController {
             synchronized(this) {
                 var tempInstance = instance
 
                 if (tempInstance == null) {
-                    tempInstance = ApiController(context)
+                    tempInstance = ApiController()
                     instance = tempInstance
                 }
 
@@ -38,5 +45,4 @@ class ApiController private constructor(context: Context){
             }
         }
     }
-
 }
