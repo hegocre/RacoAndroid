@@ -67,18 +67,18 @@ class UserController private constructor(context: Context) {
     }
 
     companion object {
-        private var instance: UserController? = null
+        private var INSTANCE: UserController? = null
 
         fun getInstance(context: Context): UserController {
             synchronized(this) {
-                var tempInstance = instance
+                var instance = INSTANCE
 
-                if (tempInstance == null) {
-                    tempInstance = UserController(context)
-                    instance = tempInstance
+                if (instance == null) {
+                    instance = UserController(context)
+                    INSTANCE = instance
                 }
 
-                return tempInstance
+                return instance
             }
         }
     }
