@@ -1,6 +1,7 @@
 package com.yara.raco.model.subject
 
 import androidx.room.Entity
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -11,7 +12,7 @@ import kotlinx.serialization.Serializable
  * @param guia Url of the subject guide.
  * @param grup Group number.
  * @param sigles Acronym of the subject.
- * @param codi_upc Subject code.
+ * @param codiUpc Subject code.
  * @param semestre Semester of the subject.
  * @param credits Credits of the subject.
  * @param vigent Whether the subject is active or not.
@@ -20,13 +21,23 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "subjects", primaryKeys = ["id"])
 data class Subject (
+    @SerialName("id")
     val id: String,
+    @SerialName("url")
     val url: String,
+    @SerialName("guia")
     val guia: String,
+    @SerialName("grup")
     val grup: String,
+    @SerialName("sigles")
     val sigles: String,
-    val codi_upc: Int,
+    @SerialName("codi_upc")
+    val codiUpc: Int,
+    @SerialName("semestre")
     val semestre: String?,
+    @SerialName("credits")
     val credits: Double,
+    @SerialName("vigent")
     val vigent: String,
+    @SerialName("nom")
     val nom: String)

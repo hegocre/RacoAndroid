@@ -1,27 +1,28 @@
 package com.yara.raco.model.files
 
 import androidx.room.Entity
-import com.yara.raco.model.notices.Notice
+import kotlinx.serialization.SerialName
 
 /**
  * Class that represents a file.
  *
- * @param id Id of the file.
- * @param avis Notice that contains the file.
- * @param tipus_mime Mime type.
+ * @param tipusMime Mime type.
  * @param nom Name of the file.
  * @param url API URL of the file.
- * @param data_modificacio Date of modification.
+ * @param dataModificacio Date of modification.
  * @param mida Size of the file.
  */
 @kotlinx.serialization.Serializable
-@Entity(tableName = "files", primaryKeys = ["id"])
+@Entity(tableName = "files", primaryKeys = ["url"])
 data class File (
-    val id: String,
-    val avis: Notice,
-    val tipus_mime: String,
+    @SerialName("tipus_mime")
+    val tipusMime: String,
+    @SerialName("nom")
     val nom: String,
+    @SerialName("url")
     val url: String,
-    val data_modificacio: String,
+    @SerialName("data_modificacio")
+    val dataModificacio: String,
+    @SerialName("mida")
     val mida: Int
 )
