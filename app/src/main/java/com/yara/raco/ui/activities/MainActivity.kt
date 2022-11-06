@@ -17,6 +17,8 @@ class MainActivity : ComponentActivity() {
         if (!UserController.getInstance(this).isLoggedIn) {
             // Login activity
             launchLogin()
+            finish()
+            return
         }
 
         val racoViewModel by viewModels<RacoViewModel>()
