@@ -18,14 +18,15 @@ import com.yara.raco.R
 @Composable
 fun RacoMainTopAppBar(
     title: String,
-    scrollBehavior: TopAppBarScrollBehavior,
-    onLogOut: () -> Unit
+    onLogOut: () -> Unit,
+    onAbout: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     var menuExpanded by rememberSaveable {
         mutableStateOf(false)
     }
 
-    LargeTopAppBar(
+    CenterAlignedTopAppBar(
         title = { Text(text = title) },
         scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets.statusBars,
@@ -43,6 +44,13 @@ fun RacoMainTopAppBar(
                         text = { Text(text = stringResource(id = R.string.tancar_sessio)) },
                         onClick = {
                             onLogOut()
+                            menuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = stringResource(id = R.string.about)) },
+                        onClick = {
+                            onAbout()
                             menuExpanded = false
                         }
                     )
