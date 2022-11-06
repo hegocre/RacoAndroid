@@ -2,30 +2,30 @@ package com.yara.raco.model.subject
 
 import android.content.Context
 import com.yara.raco.api.ApiController
-import com.yara.raco.database.subject.SubjectDatabase
 import com.yara.raco.api.Result
+import com.yara.raco.database.RacoDatabase
 
 class SubjectController private constructor(context: Context)  {
-    private val subjectDatabase = SubjectDatabase.getInstance(context)
+    private val racoDatabase = RacoDatabase.getInstance(context)
     private val apiController = ApiController.getInstance()
 
     suspend fun syncSubjects() {
         val result = apiController.listSubjects()
         if (result is Result.Success) {
-            val savedSubjectSet = subjectDatabase.subjectDatabaseDAO.fetchAllSubjectIds().toHashSet()
+            val savedSubjectSet = racoDatabase.subjectDAO.fetchAllSubjectIds().toHashSet()
             for (subject in result.data) {
                 if (!savedSubjectSet.contains(subject.id)) {
-                    subjectDatabase.subjectDatabaseDAO.insertSubject(subject)
+                    racoDatabase.subjectDAO.insertSubject(subject)
                 }
                 savedSubjectSet.remove(subject.id)
             }
             for (id in savedSubjectSet) {
-                subjectDatabase.subjectDatabaseDAO.deleteSubject(id)
+                racoDatabase.subjectDAO.deleteSubject(id)
             }
         }
     }
 
-    fun getSubjects() = subjectDatabase.subjectDatabaseDAO.fetchAllSubjects()
+    fun getSubjects() = racoDatabase.subjectDAO.fetchAllSubjects()
 
     companion object {
         private var INSTANCE: SubjectController? = null
