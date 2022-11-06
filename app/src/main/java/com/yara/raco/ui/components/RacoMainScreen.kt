@@ -1,5 +1,6 @@
 package com.yara.raco.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -9,11 +10,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.yara.raco.ui.RacoScreen
+import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
 
@@ -29,10 +32,11 @@ fun RacoMainScreen(
         backStackEntry.value?.destination?.route
     )
 
-    val scrollBehavior =
-        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     val isRefreshing by racoViewModel.isRefreshing.collectAsState()
+
+    val context = LocalContext.current
 
     RacoTheme {
         Scaffold(
@@ -41,7 +45,10 @@ fun RacoMainScreen(
                 RacoMainTopAppBar(
                     title = stringResource(id = currentScreen.title),
                     scrollBehavior = scrollBehavior,
-                    onLogOut = onLogOut
+                    onLogOut = onLogOut,
+                    onAbout = {
+                        context.startActivity(Intent(context, AboutActivity::class.java))
+                    }
                 )
             },
             bottomBar = {

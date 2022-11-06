@@ -1,15 +1,11 @@
 package com.yara.raco.database.subject
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.yara.raco.model.subject.Subject
 
 @Dao
-interface SubjectDatabaseDAO {
+interface SubjectDAO {
     @Query("SELECT * FROM subjects")
     fun fetchAllSubjects(): LiveData<List<Subject>>
 
