@@ -1,6 +1,7 @@
 package com.yara.raco.model.notices
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import com.yara.raco.model.files.File
 import kotlinx.serialization.SerialName
 
@@ -18,9 +19,9 @@ import kotlinx.serialization.SerialName
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "notices", primaryKeys = ["id"])
-data class Notice (
+data class Notice @JvmOverloads constructor(
     @SerialName("id")
-    val id: String,
+    val id: Int,
     @SerialName("titol")
     val titol: String,
     @SerialName("codi_assig")
@@ -34,5 +35,6 @@ data class Notice (
     @SerialName("data_caducitat")
     val dataCaducitat: String,
     @SerialName("adjunts")
-    val adjunts: ArrayList<File>
+    @Ignore
+    val adjunts: ArrayList<File> = arrayListOf()
 )

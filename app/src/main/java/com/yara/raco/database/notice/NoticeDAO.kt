@@ -3,17 +3,19 @@ package com.yara.raco.database.notice
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.yara.raco.model.notices.Notice
+import com.yara.raco.model.notices.NoticesWithFiles
 
 @Dao
 interface NoticeDAO {
+    @Transaction
     @Query("SELECT * FROM notices")
-    fun fetchAllNotices(): LiveData<List<Notice>>
+    fun fetchAllNotices(): LiveData<List<NoticesWithFiles>>
 
     @Query("SELECT * FROM notices WHERE id = :id")
     suspend fun fetchNotice(id: String): Notice
 
     @Query("SELECT id FROM notices")
-    suspend fun fetchAllNoticeIds(): List<String>
+    suspend fun fetchAllNoticeIds(): List<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNotice(notice: Notice)
@@ -22,7 +24,7 @@ interface NoticeDAO {
     suspend fun deleteNotice(notice: Notice)
 
     @Query("DELETE FROM notices WHERE id = :id")
-    suspend fun deleteNotice(id: String)
+    suspend fun deleteNotice(id: Int)
 
     @Query("DELETE FROM notices")
     suspend fun deleteAllNotices()

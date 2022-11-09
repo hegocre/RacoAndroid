@@ -2,6 +2,7 @@ package com.yara.raco.model.files
 
 import androidx.room.Entity
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Transient
 
 /**
  * Class that represents a file.
@@ -14,7 +15,7 @@ import kotlinx.serialization.SerialName
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "files", primaryKeys = ["url"])
-data class File (
+data class File(
     @SerialName("tipus_mime")
     val tipusMime: String,
     @SerialName("nom")
@@ -24,5 +25,7 @@ data class File (
     @SerialName("data_modificacio")
     val dataModificacio: String,
     @SerialName("mida")
-    val mida: Int
+    val mida: Int,
+    @Transient
+    val noticeId: Int = 0
 )

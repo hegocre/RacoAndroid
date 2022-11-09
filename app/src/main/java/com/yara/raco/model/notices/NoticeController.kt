@@ -4,23 +4,31 @@ import android.content.Context
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
 import com.yara.raco.database.RacoDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NoticeController private constructor(context: Context)  {
     private val racoDatabase = RacoDatabase.getInstance(context)
     private val apiController = ApiController.getInstance()
 
     suspend fun syncNotices() {
-        val result = apiController.listNotices()
-        if (result is Result.Success) {
-            val savedNoticeSet = racoDatabase.noticeDAO.fetchAllNoticeIds().toHashSet()
-            for (notice in result.data) {
-                if (!savedNoticeSet.contains(notice.id)) {
-                    racoDatabase.noticeDAO.insertNotice(notice)
+        withContext(Dispatchers.IO) {
+            val result = apiController.listNotices()
+            if (result is Result.Success) {
+                val savedNoticeSet = racoDatabase.noticeDAO.fetchAllNoticeIds().toHashSet()
+                for (notice in result.data) {
+                    if (!savedNoticeSet.contains(notice.id)) {
+                        racoDatabase.noticeDAO.insertNotice(notice)
+                        notice.adjunts.forEach { file ->
+                            racoDatabase.fileDAO.insertFile(file.copy(noticeId = notice.id))
+                        }
+                    }
+                    savedNoticeSet.remove(notice.id)
                 }
-                savedNoticeSet.remove(notice.id)
-            }
-            for (id in savedNoticeSet) {
-                racoDatabase.noticeDAO.deleteNotice(id)
+                for (id in savedNoticeSet) {
+                    racoDatabase.noticeDAO.deleteNotice(id)
+                    racoDatabase.fileDAO.deleteNoticeFiles(id)
+                }
             }
         }
     }

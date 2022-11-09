@@ -1,6 +1,5 @@
 package com.yara.raco.api
 
-import android.util.Log
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.utils.Error
 import com.yara.raco.utils.OkHttpRequest
@@ -15,7 +14,7 @@ class NoticesApi private constructor() {
     suspend fun getNotices(accessToken: String): Result<List<Notice>> = try {
         val response = withContext(Dispatchers.IO) {
             OkHttpRequest.getInstance().get(
-                sUrl = NoticesApi.NOTICE_URL,
+                sUrl = NOTICE_URL,
                 accessToken = accessToken,
             )
         }
@@ -30,8 +29,7 @@ class NoticesApi private constructor() {
         }
 
         if (statusCode == 200 && body != null) {
-
-            var aux = Json.decodeFromString<NoticeResponse>(body).results
+            val aux = Json.decodeFromString<NoticeResponse>(body).results
             Result.Success(aux)
         }
         else {
@@ -40,7 +38,7 @@ class NoticesApi private constructor() {
 
     }
     catch (e: Exception) {
-        Log.d("ERROR", e.toString())
+        e.printStackTrace()
         Result.Error(Error.API_BAD_REQUEST)
     }
 
