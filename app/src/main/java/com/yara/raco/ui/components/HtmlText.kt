@@ -1,3 +1,8 @@
+/**
+ *  HTML Text Composable
+ *  Adapted from https://github.com/ch4rl3x/HtmlText
+ *  under the Apache 2.0 License
+ */
 package com.yara.raco.ui.components
 
 import android.graphics.Typeface
