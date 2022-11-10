@@ -17,6 +17,9 @@ interface NoticeDAO {
     @Query("SELECT id FROM notices")
     suspend fun fetchAllNoticeIds(): List<Int>
 
+    @Query("SELECT dataModificacio FROM notices WHERE id = :id")
+    suspend fun getNoticeModificationDate(id: Int): String
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNotice(notice: Notice)
 
