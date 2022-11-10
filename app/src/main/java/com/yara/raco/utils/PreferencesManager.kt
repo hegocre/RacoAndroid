@@ -20,6 +20,11 @@ class PreferencesManager private constructor(context: Context) {
         _sharedPreferences.edit()
             .putString("accessToken", accessToken?.let { Json.encodeToString(it) }).apply()
 
+    fun getUserLastLanguage(): String = _sharedPreferences.getString("last_language", "_") ?: "_"
+
+    fun setUserLastLanguage(language: String) = _sharedPreferences.edit()
+        .putString("last_language", language).apply()
+
     companion object {
         private var instance: PreferencesManager? = null
 

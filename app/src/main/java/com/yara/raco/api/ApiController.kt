@@ -8,6 +8,7 @@ import com.yara.raco.model.user.AccessToken
 
 class ApiController private constructor() {
     var accessToken: AccessToken? = null
+    var language = "ca"
     private val tokenApi = TokenApi.getInstance()
     private val subjectApi = SubjectsAPI.getInstance()
     private val noticeApi = NoticesApi.getInstance()
@@ -37,7 +38,7 @@ class ApiController private constructor() {
 
     suspend fun listSubjects(): Result<List<Subject>> {
         accessToken?.let {
-            return subjectApi.getSubjects(it.accessToken)
+            return subjectApi.getSubjects(it.accessToken, language)
         } ?: return Result.Error(2)
     }
 

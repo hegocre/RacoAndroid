@@ -23,7 +23,7 @@ class OkHttpRequest private constructor() {
         IllegalStateException::class
     )
     fun get(
-        sUrl: String, accessToken: String? = null,
+        sUrl: String, accessToken: String? = null, language: String? = null
     ): Response {
         val url = URL(sUrl)
 
@@ -31,6 +31,10 @@ class OkHttpRequest private constructor() {
 
         if (accessToken != null) {
             requestBuilder.addHeader("Authorization", "Bearer $accessToken")
+        }
+
+        if (language != null) {
+            requestBuilder.addHeader("Accept-Language", language)
         }
 
         val request = requestBuilder.build()
