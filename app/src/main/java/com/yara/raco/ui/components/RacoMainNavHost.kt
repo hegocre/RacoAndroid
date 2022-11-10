@@ -13,11 +13,15 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.yara.raco.model.files.File
+import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
 
 @Composable
 fun RacoMainNavHost(
     navHostController: NavHostController,
+    noticesWithFiles: List<NoticeWithFiles>,
+    onFileClick: (File) -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -29,9 +33,7 @@ fun RacoMainNavHost(
     ) {
         composable(RacoScreen.Avisos.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-
-                }
+                RacoNoticeList(noticesWithFiles = noticesWithFiles, onFileClick = onFileClick)
             }
         }
 

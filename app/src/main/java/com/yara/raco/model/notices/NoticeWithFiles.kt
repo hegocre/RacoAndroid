@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.yara.raco.model.files.File
 
-data class NoticesWithFiles(
+data class NoticeWithFiles(
     @Embedded val notice: Notice,
     @Relation(
         parentColumn = "id",

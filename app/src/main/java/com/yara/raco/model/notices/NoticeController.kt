@@ -18,7 +18,9 @@ class NoticeController private constructor(context: Context)  {
             if (result is Result.Success) {
                 val savedNoticeSet = racoDatabase.noticeDAO.fetchAllNoticeIds().toHashSet()
                 for (notice in result.data) {
-                    if (!savedNoticeSet.contains(notice.id)) {
+                    if (!savedNoticeSet.contains(notice.id) ||
+                        racoDatabase.noticeDAO.getNoticeModificationDate(notice.id) != notice.dataModificacio
+                    ) {
                         racoDatabase.noticeDAO.insertNotice(notice)
                         notice.adjunts.forEach { file ->
                             racoDatabase.fileDAO.insertFile(file.copy(noticeId = notice.id))
