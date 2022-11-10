@@ -58,6 +58,12 @@ fun RacoNoticeList(
     ) { paddingValues ->
         val coroutineScope = rememberCoroutineScope()
         val noticeListState = rememberLazyListState()
+        LaunchedEffect(key1 = filter) {
+            if (filter == null) noticeListState.animateScrollToItem(0)
+        }
+        LaunchedEffect(key1 = noticesWithFiles.firstOrNull()) {
+            noticeListState.animateScrollToItem(0)
+        }
         LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
