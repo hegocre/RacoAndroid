@@ -10,47 +10,126 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_OPTION_USE_CSS_COLORS
+import com.yara.raco.R
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.notices.NoticeWithFiles
+import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.theme.RacoTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RacoNoticeList(
     noticesWithFiles: List<NoticeWithFiles>,
+    subjects: List<Subject>,
     onFileClick: (File) -> Unit
 ) {
-    val noticeListState = rememberLazyListState()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        state = noticeListState
-    ) {
-        itemsIndexed(items = noticesWithFiles) { index, noticeWithFiles ->
-            val coroutineScope = rememberCoroutineScope()
-            NoticeWithFiles(
-                noticeWithFiles = noticeWithFiles,
-                onNoticeClose = {
-                    if (noticeListState.firstVisibleItemIndex == index) {
-                        coroutineScope.launch {
-                            noticeListState.scrollToItem(index)
+    val (filter, setFilter) = rememberSaveable { mutableStateOf<String?>(null) }
+    var showFilterDialog by rememberSaveable { mutableStateOf(false) }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showFilterDialog = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = stringResource(id = R.string.filter)
+                )
+            }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+    ) { paddingValues ->
+        val coroutineScope = rememberCoroutineScope()
+        val noticeListState = rememberLazyListState()
+        LazyColumn(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize(),
+            state = noticeListState,
+        ) {
+            itemsIndexed(
+                items = noticesWithFiles.filter {
+                    if (filter == null) true else it.notice.codiAssig == filter
+                },
+                key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
+            ) { index, noticeWithFiles ->
+                NoticeWithFiles(
+                    noticeWithFiles = noticeWithFiles,
+                    onNoticeClose = {
+                        if (noticeListState.firstVisibleItemIndex == index) {
+                            coroutineScope.launch {
+                                noticeListState.animateScrollToItem(index)
+                            }
+                        }
+                    },
+                    onFileClick = onFileClick,
+                )
+            }
+        }
+        if (showFilterDialog) {
+            Dialog(onDismissRequest = { showFilterDialog = false }) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column {
+                        subjects.forEach { subject ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        setFilter(subject.id)
+                                        showFilterDialog = false
+                                    }
+                                    .padding(all = 8.dp),
+                                verticalAlignment = CenterVertically
+                            ) {
+                                Text(
+                                    text = subject.nom,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(horizontal = 8.dp)
+                                )
+                                RadioButton(
+                                    selected = filter == subject.id,
+                                    onClick = {
+                                        setFilter(subject.id)
+                                        showFilterDialog = false
+                                    }
+                                )
+                            }
+                        }
+                        TextButton(
+                            onClick = {
+                                setFilter(null)
+                                showFilterDialog = false
+                            },
+                            modifier = Modifier
+                                .align(End)
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            Text(text = stringResource(R.string.clear))
                         }
                     }
-                },
-                onFileClick = onFileClick,
-            )
+                }
+            }
         }
     }
 }
@@ -60,7 +139,8 @@ fun RacoNoticeList(
 fun NoticeWithFiles(
     noticeWithFiles: NoticeWithFiles,
     onNoticeClose: () -> Unit,
-    onFileClick: (File) -> Unit
+    onFileClick: (File) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss", Locale.getDefault())
     val date =
@@ -78,7 +158,7 @@ fun NoticeWithFiles(
     var showDetails by rememberSaveable { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         onClick = {
