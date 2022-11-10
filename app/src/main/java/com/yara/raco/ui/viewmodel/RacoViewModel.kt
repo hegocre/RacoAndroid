@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.notices.NoticesWithFiles
 import com.yara.raco.model.subject.Subject
@@ -43,5 +44,9 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
             noticeController.syncNotices()
             _isRefreshing.emit(false)
         }
+    }
+
+    fun downloadFile(file: File) {
+        noticeController.downloadAttachment(getApplication(), file)
     }
 }
