@@ -6,7 +6,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.*
@@ -23,6 +24,7 @@ import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.theme.RacoTheme
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,11 +33,23 @@ fun RacoNoticeList(
     noticesWithFiles: List<NoticeWithFiles>,
     onFileClick: (File) -> Unit
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(items = noticesWithFiles) { noticeWithFiles ->
+    val noticeListState = rememberLazyListState()
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        state = noticeListState
+    ) {
+        itemsIndexed(items = noticesWithFiles) { index, noticeWithFiles ->
+            val coroutineScope = rememberCoroutineScope()
             NoticeWithFiles(
                 noticeWithFiles = noticeWithFiles,
-                onFileClick = onFileClick
+                onNoticeClose = {
+                    if (noticeListState.firstVisibleItemIndex == index) {
+                        coroutineScope.launch {
+                            noticeListState.scrollToItem(index)
+                        }
+                    }
+                },
+                onFileClick = onFileClick,
             )
         }
     }
@@ -45,6 +59,7 @@ fun RacoNoticeList(
 @Composable
 fun NoticeWithFiles(
     noticeWithFiles: NoticeWithFiles,
+    onNoticeClose: () -> Unit,
     onFileClick: (File) -> Unit
 ) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss", Locale.getDefault())
@@ -66,7 +81,11 @@ fun NoticeWithFiles(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        onClick = { showDetails = !showDetails }
+        onClick = {
+            showDetails = !showDetails
+            if (!showDetails)
+                onNoticeClose()
+        }
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
@@ -153,7 +172,8 @@ fun NoticeWithFilesPreview() {
                     )
                 )
             ),
-            onFileClick = {}
+            onFileClick = {},
+            onNoticeClose = {}
         )
     }
 }
