@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +20,7 @@ import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +34,7 @@ fun RacoMainScreen(
         backStackEntry.value?.destination?.route
     )
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val isRefreshing by racoViewModel.isRefreshing.collectAsState()
 
@@ -68,8 +70,12 @@ fun RacoMainScreen(
             },
             contentWindowInsets = WindowInsets.systemBars
         ) { paddingValues ->
+            val noticesWithFiles by racoViewModel.notices.observeAsState(initial = emptyList())
+            racoViewModel.subjects.observeAsState(initial = emptyList())
             RacoMainNavHost(
                 navHostController = navController,
+                noticesWithFiles = noticesWithFiles.sortedByDescending { it.notice.dataModificacio },
+                onFileClick = { file -> racoViewModel.downloadFile(file) },
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing

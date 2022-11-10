@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeController
-import com.yara.raco.model.notices.NoticesWithFiles
+import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
@@ -26,7 +26,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
 
     val subjects: LiveData<List<Subject>>
         get() = subjectController.getSubjects()
-    val notices: LiveData<List<NoticesWithFiles>>
+    val notices: LiveData<List<NoticeWithFiles>>
         get() = noticeController.getNotices()
 
     init {

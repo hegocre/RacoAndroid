@@ -3,13 +3,13 @@ package com.yara.raco.database.notice
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.yara.raco.model.notices.Notice
-import com.yara.raco.model.notices.NoticesWithFiles
+import com.yara.raco.model.notices.NoticeWithFiles
 
 @Dao
 interface NoticeDAO {
     @Transaction
     @Query("SELECT * FROM notices")
-    fun fetchAllNotices(): LiveData<List<NoticesWithFiles>>
+    fun fetchAllNotices(): LiveData<List<NoticeWithFiles>>
 
     @Query("SELECT * FROM notices WHERE id = :id")
     suspend fun fetchNotice(id: String): Notice
