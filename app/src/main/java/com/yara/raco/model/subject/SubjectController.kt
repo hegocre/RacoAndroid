@@ -4,23 +4,27 @@ import android.content.Context
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
 import com.yara.raco.database.RacoDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class SubjectController private constructor(context: Context)  {
     private val racoDatabase = RacoDatabase.getInstance(context)
     private val apiController = ApiController.getInstance()
 
     suspend fun syncSubjects() {
-        val result = apiController.listSubjects()
-        if (result is Result.Success) {
-            val savedSubjectSet = racoDatabase.subjectDAO.fetchAllSubjectIds().toHashSet()
-            for (subject in result.data) {
-                if (!savedSubjectSet.contains(subject.id)) {
-                    racoDatabase.subjectDAO.insertSubject(subject)
+        withContext(Dispatchers.IO) {
+            val result = apiController.listSubjects()
+            if (result is Result.Success) {
+                val savedSubjectSet = racoDatabase.subjectDAO.fetchAllSubjectIds().toHashSet()
+                for (subject in result.data) {
+                    if (!savedSubjectSet.contains(subject.id)) {
+                        racoDatabase.subjectDAO.insertSubject(subject)
+                    }
+                    savedSubjectSet.remove(subject.id)
                 }
-                savedSubjectSet.remove(subject.id)
-            }
-            for (id in savedSubjectSet) {
-                racoDatabase.subjectDAO.deleteSubject(id)
+                for (id in savedSubjectSet) {
+                    racoDatabase.subjectDAO.deleteSubject(id)
+                }
             }
         }
     }

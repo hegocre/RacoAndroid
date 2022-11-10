@@ -1,5 +1,6 @@
 package com.yara.raco.api
 
+import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.user.AccessToken
 
@@ -7,6 +8,7 @@ class ApiController private constructor() {
     var accessToken: AccessToken? = null
     private val tokenApi = TokenApi.getInstance()
     private val subjectApi = SubjectsAPI.getInstance()
+    private val noticeApi = NoticesApi.getInstance()
 
     suspend fun login(authorizationCode: String): Result<AccessToken> {
         val loginResult = tokenApi.getToken(authorizationCode)
@@ -34,6 +36,12 @@ class ApiController private constructor() {
     suspend fun listSubjects(): Result<List<Subject>> {
         accessToken?.let {
             return subjectApi.getSubjects(it.accessToken)
+        } ?: return Result.Error(2)
+    }
+
+    suspend fun listNotices(): Result<List<Notice>> {
+        accessToken?.let {
+            return noticeApi.getNotices(it.accessToken)
         } ?: return Result.Error(2)
     }
 
