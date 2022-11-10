@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="avisos">Avisos</string>
+    <string name="horari">Horario</string>
+    <string name="notes">Notas</string>
+    <string name="menu">Menú</string>
+    <string name="tancar_sessio">Cerrar sesión</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="login_failed">No se ha podido iniciar sesión</string>
+    <string name="about">Información</string>
+    <string name="back">Atrás</string>
+    <string name="version">Versión</string>
+    <string name="source_code">Código fuente</string>
+    <string name="api_raco_disclaimer">Aplicación desarollada usando la API v2 del Raco de la FIB.</string>
+    <string name="authors">Autores</string>
+    <string name="licenses">Licencias</string>
+    <string name="help_suggestions">Ayuda y sugerencias</string>
+    <string name="download_failed">La descarga ha fallado</string>
+    <string name="download_started">Se ha iniciado la descarga</string>
+    <string name="cannot_open_file">No se ha podido abrir el fichero</string>
+</resources>
