@@ -6,16 +6,16 @@ import com.yara.raco.utils.Error
 import com.yara.raco.utils.OkHttpRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.Serializable
 
 class SubjectsAPI private constructor() {
 
     suspend fun getSubjects(accessToken: String): Result<List<Subject>> = try {
         val response = withContext(Dispatchers.IO) {
             OkHttpRequest.getInstance().get(
-                sUrl = SubjectsAPI.SUBJECT_URL,
+                sUrl = SUBJECT_URL,
                 accessToken = accessToken,
             )
         }
@@ -30,7 +30,7 @@ class SubjectsAPI private constructor() {
         }
 
         if (statusCode == 200 && body != null) {
-            var aux = Json.decodeFromString<SubjectResponse>(body).results
+            val aux = Json.decodeFromString<SubjectResponse>(body).results
             Result.Success(aux)
         }
         else {

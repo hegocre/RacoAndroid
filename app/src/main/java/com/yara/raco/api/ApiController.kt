@@ -1,5 +1,7 @@
 package com.yara.raco.api
 
+import android.content.Context
+import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.user.AccessToken
@@ -42,6 +44,13 @@ class ApiController private constructor() {
     suspend fun listNotices(): Result<List<Notice>> {
         accessToken?.let {
             return noticeApi.getNotices(it.accessToken)
+        } ?: return Result.Error(2)
+    }
+
+    fun downloadAttachment(context: Context, file: File): Result<Nothing?> {
+        accessToken?.let {
+            noticeApi.getAttachment(context, file, it.accessToken)
+            return Result.Success(null)
         } ?: return Result.Error(2)
     }
 
