@@ -116,16 +116,27 @@ fun HtmlText(
             inlineContent = inlineContent,
             onTextLayout = {
                 clickableElements.forEach { url ->
-                    boxPosX.add(
-                        Pair(
-                            it.getBoundingBox(url.start).left,
-                            it.getBoundingBox(url.end - 1).right
+                    val startLine = it.getLineForOffset(url.start)
+                    val endLine = it.getLineForOffset(url.end - 1)
+                    if (startLine < endLine) {
+                        boxPosX.add(
+                            Pair(
+                                it.getBoundingBox(url.start).left,
+                                it.getBoundingBox(it.getLineEnd(startLine) - 1).right
+                            )
                         )
-                    )
+                    } else {
+                        boxPosX.add(
+                            Pair(
+                                it.getBoundingBox(url.start).left,
+                                it.getBoundingBox(url.end - 1).right
+                            )
+                        )
+                    }
                     boxPosY.add(
                         Pair(
                             it.getBoundingBox(url.start).top,
-                            it.getBoundingBox(url.end - 1).top
+                            it.getBoundingBox(url.end - 1).bottom
                         )
                     )
                 }
