@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -179,10 +179,7 @@ fun NoticeWithFiles(
                         )
                     }
                     if (noticeWithFiles.files.isNotEmpty()) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            ),
+                        OutlinedCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 16.dp)
@@ -196,7 +193,7 @@ fun NoticeWithFiles(
                                     verticalAlignment = CenterVertically
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.Description,
+                                        imageVector = Icons.Outlined.Description,
                                         contentDescription = file.nom,
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
