@@ -93,7 +93,7 @@ fun RacoNoticeList(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column {
-                        subjects.forEach { subject ->
+                        subjects.sortedBy { it.nom }.forEach { subject ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
