@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
@@ -67,23 +68,31 @@ fun RacoNoticeList(
                 .fillMaxSize(),
             state = noticeListState,
         ) {
-            itemsIndexed(
-                items = noticesWithFiles.filter {
-                    if (filter == null) true else it.notice.codiAssig == filter
-                },
-                key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
-            ) { index, noticeWithFiles ->
-                NoticeWithFiles(
-                    noticeWithFiles = noticeWithFiles,
-                    onNoticeClose = {
-                        if (noticeListState.firstVisibleItemIndex == index) {
-                            coroutineScope.launch {
-                                noticeListState.animateScrollToItem(index)
-                            }
-                        }
+            if (noticesWithFiles.isNotEmpty()) {
+                itemsIndexed(
+                    items = noticesWithFiles.filter {
+                        if (filter == null) true else it.notice.codiAssig == filter
                     },
-                    onFileClick = onFileClick,
-                )
+                    key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
+                ) { index, noticeWithFiles ->
+                    NoticeWithFiles(
+                        noticeWithFiles = noticeWithFiles,
+                        onNoticeClose = {
+                            if (noticeListState.firstVisibleItemIndex == index) {
+                                coroutineScope.launch {
+                                    noticeListState.animateScrollToItem(index)
+                                }
+                            }
+                        },
+                        onFileClick = onFileClick,
+                    )
+                }
+            } else {
+                item(key = "no_items") {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
+                        Text(text = stringResource(id = R.string.no_notices_yet))
+                    }
+                }
             }
         }
         if (showFilterDialog) {

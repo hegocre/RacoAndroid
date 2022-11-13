@@ -18,4 +18,5 @@
     <string name="download_failed">Download failed</string>
     <string name="download_started">Download started</string>
     <string name="cannot_open_file">Could not open file</string>
+    <string name="no_notices_yet">You have no notices yet</string>
 </resources>
