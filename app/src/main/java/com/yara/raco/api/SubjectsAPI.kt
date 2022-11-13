@@ -12,16 +12,18 @@ import kotlinx.serialization.json.Json
 
 class SubjectsAPI private constructor() {
 
-    suspend fun getSubjects(accessToken: String): Result<List<Subject>> = try {
-        val response = withContext(Dispatchers.IO) {
-            OkHttpRequest.getInstance().get(
-                sUrl = SUBJECT_URL,
-                accessToken = accessToken,
-            )
-        }
+    suspend fun getSubjects(accessToken: String, language: String = "ca"): Result<List<Subject>> =
+        try {
+            val response = withContext(Dispatchers.IO) {
+                OkHttpRequest.getInstance().get(
+                    sUrl = SUBJECT_URL,
+                    accessToken = accessToken,
+                    language = language
+                )
+            }
 
-        val statusCode = response.code
-        val body = withContext(Dispatchers.IO) {
+            val statusCode = response.code
+            val body = withContext(Dispatchers.IO) {
             response.body?.string()
         }
 
@@ -30,6 +32,7 @@ class SubjectsAPI private constructor() {
         }
 
         if (statusCode == 200 && body != null) {
+            Log.d("Response", body)
             val aux = Json.decodeFromString<SubjectResponse>(body).results
             Result.Success(aux)
         }
@@ -39,7 +42,7 @@ class SubjectsAPI private constructor() {
 
     }
     catch (e: Exception) {
-        Log.d("ERROR", e.toString())
+        e.printStackTrace()
         Result.Error(Error.API_BAD_REQUEST)
     }
 
