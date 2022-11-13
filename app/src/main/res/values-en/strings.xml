@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="avisos">Notes</string>
+    <string name="horari">Planning</string>
+    <string name="notes">Grades</string>
+    <string name="menu">Menu</string>
+    <string name="tancar_sessio">Log out</string>
+    <string name="login">Log in</string>
+    <string name="login_failed">Could not log in</string>
+    <string name="about">About</string>
+    <string name="back">Back</string>
+    <string name="version">Version</string>
+    <string name="source_code">Source code</string>
+    <string name="api_raco_disclaimer">App developed using API v2 from FIB\'s Racó.</string>
+    <string name="authors">Authors</string>
+    <string name="licenses">Licenses</string>
+    <string name="help_suggestions">Help and suggestions</string>
+    <string name="download_failed">Download failed</string>
+    <string name="download_started">Download started</string>
+    <string name="cannot_open_file">Could not open file</string>
+</resources>
