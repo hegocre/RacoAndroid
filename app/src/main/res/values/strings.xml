@@ -18,6 +18,6 @@
     <string name="download_failed">La descàrrega ha fallat</string>
     <string name="download_started">S\'ha iniciat la decàrrega</string>
     <string name="cannot_open_file">No s\'ha pogut obrir el fitxer</string>
-    <string name="filter">Filtre</string>
+    <string name="filter">Filtrar</string>
     <string name="clear">Netejar</string>
 </resources>
