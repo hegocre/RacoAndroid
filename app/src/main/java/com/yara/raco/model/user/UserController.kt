@@ -1,19 +1,40 @@
 package com.yara.raco.model.user
 
 import android.content.Context
+import android.util.Log
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
+import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.utils.PreferencesManager
 import kotlinx.coroutines.*
+import java.util.*
 
 class UserController private constructor(context: Context) {
     private val preferencesManager = PreferencesManager.getInstance(context)
     private val apiController = ApiController.getInstance()
+    private val subjectController = SubjectController.getInstance(context)
     val isLoggedIn: Boolean
         get() = apiController.accessToken != null
 
     init {
         apiController.accessToken = preferencesManager.getAccessToken()
+        val lastLanguage = preferencesManager.getUserLastLanguage()
+        val deviceLanguage = Locale.getDefault().language
+        Log.d("Language", deviceLanguage)
+        if (lastLanguage != deviceLanguage) {
+            CoroutineScope(Dispatchers.IO).launch {
+                //Delete databases which can be translated
+                subjectController.deleteAllSubjects()
+
+                //Update last language
+                preferencesManager.setUserLastLanguage(deviceLanguage)
+            }
+        }
+        if (deviceLanguage in listOf("ca", "es", "en")) {
+            apiController.language = deviceLanguage
+        } else {
+            apiController.language = "ca"
+        }
     }
 
     suspend fun logIn(authorizationCode: String): Boolean {

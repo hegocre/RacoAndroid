@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Racó</string>
     <string name="avisos">Avisos</string>
     <string name="horari">Horari</string>
     <string name="notes">Notes</string>
@@ -18,6 +18,4 @@
     <string name="download_failed">La descàrrega ha fallat</string>
     <string name="download_started">S\'ha iniciat la decàrrega</string>
     <string name="cannot_open_file">No s\'ha pogut obrir el fitxer</string>
-    <string name="filter">Filtre</string>
-    <string name="clear">Netejar</string>
 </resources>
