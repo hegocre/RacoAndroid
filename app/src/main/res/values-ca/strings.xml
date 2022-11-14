@@ -21,4 +21,7 @@
     <string name="filter">Filtrar</string>
     <string name="clear">Netejar</string>
     <string name="no_notices_yet">Encara no tens cap avís</string>
+    <string name="all">Tots</string>
+    <string name="tens_avisos_nous">Tens %d avisos nous</string>
+    <string name="avisos_nous">Avisos nous</string>
 </resources>

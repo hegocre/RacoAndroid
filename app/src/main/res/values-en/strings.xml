@@ -19,4 +19,9 @@
     <string name="download_started">Download started</string>
     <string name="cannot_open_file">Could not open file</string>
     <string name="no_notices_yet">You have no notices yet</string>
+    <string name="filter">Filter</string>
+    <string name="clear">Clean</string>
+    <string name="all">All</string>
+    <string name="tens_avisos_nous">You have %d new notices</string>
+    <string name="avisos_nous">New notices</string>
 </resources>
