@@ -3,28 +3,29 @@ package com.yara.raco.ui.components
 import android.text.format.DateUtils
 import android.text.format.Formatter.formatShortFileSize
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.core.text.HtmlCompat
-import androidx.core.text.HtmlCompat.FROM_HTML_OPTION_USE_CSS_COLORS
+import androidx.core.text.HtmlCompat.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.yara.raco.R
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
@@ -35,112 +36,135 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun RacoNoticeTabs(
+    subjects: List<Subject>,
+    pagerState: PagerState,
+    modifier: Modifier = Modifier
+) {
+    val indicator = @Composable { tabPositions: List<TabPosition> ->
+        Spacer(
+            Modifier
+                .pagerTabIndicatorOffset(pagerState, tabPositions)
+                .padding(horizontal = 12.dp)
+                .height(3.dp)
+                .background(
+                    LocalContentColor.current,
+                    RoundedCornerShape(topStartPercent = 100, topEndPercent = 100)
+                )
+        )
+    }
+
+    ScrollableTabRow(
+        selectedTabIndex = pagerState.currentPage,
+        modifier = modifier,
+        indicator = indicator,
+        edgePadding = 32.dp
+    ) {
+        val coroutineScope = rememberCoroutineScope()
+        Tab(
+            selected = pagerState.currentPage == 0,
+            onClick = {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(0)
+                }
+            },
+            unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+            text = { Text(text = stringResource(id = R.string.all)) }
+        )
+        subjects.forEachIndexed { index, subject ->
+            Tab(
+                selected = pagerState.currentPage == index + 1,
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(index + 1)
+                    }
+                },
+                unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                text = { Text(text = subject.sigles) }
+            )
+        }
+
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun RacoNoticePager(
+    pagerState: PagerState,
+    subjects: List<Subject>,
+    noticesWithFiles: List<NoticeWithFiles>,
+    onFileClick: (File) -> Unit
+) {
+    HorizontalPager(
+        count = subjects.size + 1,
+        state = pagerState,
+        userScrollEnabled = false
+    ) { page ->
+        if (page == 0) {
+            RacoNoticeList(
+                noticesWithFiles = noticesWithFiles,
+                selectedSubject = null,
+                onFileClick = onFileClick
+            )
+        } else {
+            RacoNoticeList(
+                noticesWithFiles = noticesWithFiles,
+                selectedSubject = subjects.getOrNull(page - 1),
+                onFileClick = onFileClick
+            )
+        }
+    }
+}
+
 @Composable
 fun RacoNoticeList(
     noticesWithFiles: List<NoticeWithFiles>,
-    subjects: List<Subject>,
+    selectedSubject: Subject?,
     onFileClick: (File) -> Unit
 ) {
-    val (filter, setFilter) = rememberSaveable { mutableStateOf<String?>(null) }
-    var showFilterDialog by rememberSaveable { mutableStateOf(false) }
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showFilterDialog = true }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.FilterList,
-                    contentDescription = stringResource(id = R.string.filter)
+    val coroutineScope = rememberCoroutineScope()
+    val noticeListState = rememberLazyListState()
+    LaunchedEffect(key1 = noticesWithFiles.firstOrNull()) {
+        noticeListState.animateScrollToItem(0)
+    }
+    val noticesWithFilesFiltered = remember(noticesWithFiles) {
+        noticesWithFiles.filter {
+            if (selectedSubject == null) true else it.notice.codiAssig == selectedSubject.id
+        }
+    }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize(),
+        state = noticeListState,
+    ) {
+        if (noticesWithFilesFiltered.isNotEmpty()) {
+            itemsIndexed(
+                items = noticesWithFilesFiltered,
+                key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
+            ) { index, noticeWithFiles ->
+                NoticeWithFiles(
+                    noticeWithFiles = noticeWithFiles,
+                    onNoticeClose = {
+                        if (noticeListState.firstVisibleItemIndex == index) {
+                            coroutineScope.launch {
+                                noticeListState.animateScrollToItem(index)
+                            }
+                        }
+                    },
+                    onFileClick = onFileClick,
                 )
             }
-        },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
-    ) { paddingValues ->
-        val coroutineScope = rememberCoroutineScope()
-        val noticeListState = rememberLazyListState()
-        LaunchedEffect(key1 = filter, key2 = noticesWithFiles.firstOrNull()) {
-            noticeListState.animateScrollToItem(0)
-        }
-        LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            state = noticeListState,
-        ) {
-            if (noticesWithFiles.isNotEmpty()) {
-                itemsIndexed(
-                    items = noticesWithFiles.filter {
-                        if (filter == null) true else it.notice.codiAssig == filter
-                    },
-                    key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
-                ) { index, noticeWithFiles ->
-                    NoticeWithFiles(
-                        noticeWithFiles = noticeWithFiles,
-                        onNoticeClose = {
-                            if (noticeListState.firstVisibleItemIndex == index) {
-                                coroutineScope.launch {
-                                    noticeListState.animateScrollToItem(index)
-                                }
-                            }
-                        },
-                        onFileClick = onFileClick,
-                    )
-                }
-            } else {
-                item(key = "no_items") {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Center) {
-                        Text(text = stringResource(id = R.string.no_notices_yet))
-                    }
-                }
-            }
-        }
-        if (showFilterDialog) {
-            Dialog(onDismissRequest = { showFilterDialog = false }) {
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column {
-                        subjects.sortedBy { it.nom }.forEach { subject ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        setFilter(subject.id)
-                                        showFilterDialog = false
-                                    }
-                                    .padding(all = 8.dp),
-                                verticalAlignment = CenterVertically
-                            ) {
-                                Text(
-                                    text = subject.nom,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 8.dp)
-                                )
-                                RadioButton(
-                                    selected = filter == subject.id,
-                                    onClick = {
-                                        setFilter(subject.id)
-                                        showFilterDialog = false
-                                    }
-                                )
-                            }
-                        }
-                        TextButton(
-                            onClick = {
-                                setFilter(null)
-                                showFilterDialog = false
-                            },
-                            modifier = Modifier
-                                .align(End)
-                                .padding(horizontal = 8.dp)
-                        ) {
-                            Text(text = stringResource(R.string.clear))
-                        }
-                    }
-                }
+        } else {
+            item(key = "no_items") {
+                Text(
+                    text = stringResource(id = R.string.no_notices_yet),
+                    modifier = Modifier
+                        .fillParentMaxSize()
+                        .wrapContentHeight(),
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -154,20 +178,23 @@ fun NoticeWithFiles(
     onFileClick: (File) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss", Locale.getDefault())
-    val date =
-        dateFormat.parse(noticeWithFiles.notice.dataModificacio) ?: Date(System.currentTimeMillis())
-    val dateString = DateUtils.getRelativeTimeSpanString(
-        date.time,
-        System.currentTimeMillis(),
-        DateUtils.MINUTE_IN_MILLIS
-    )
-    val parsedTitle = HtmlCompat.fromHtml(
-        noticeWithFiles.notice.titol,
-        FROM_HTML_OPTION_USE_CSS_COLORS
-    ).toString()
+    val dateString by produceState(initialValue = "") {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss", Locale.getDefault())
+        val date =
+            dateFormat.parse(noticeWithFiles.notice.dataModificacio)
+                ?: Date(System.currentTimeMillis())
+        value = DateUtils.getRelativeTimeSpanString(
+            date.time,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS
+        ).toString()
+    }
+    val parsedTitle =
+        remember { fromHtml(noticeWithFiles.notice.titol, FROM_HTML_MODE_COMPACT).toString() }
 
     var showDetails by rememberSaveable { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Card(
         modifier = modifier
@@ -196,7 +223,9 @@ fun NoticeWithFiles(
                                 .fillMaxWidth()
                                 .padding(vertical = 16.dp)
                         ) {
-                            noticeWithFiles.files.sortedBy { it.dataModificacio }.forEach { file ->
+                            val sortedFiles =
+                                remember { noticeWithFiles.files.sortedBy { it.dataModificacio } }
+                            sortedFiles.forEach { file ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -209,11 +238,11 @@ fun NoticeWithFiles(
                                         contentDescription = file.nom,
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
-                                    val fileSize = formatShortFileSize(
-                                        LocalContext.current, file.mida.toLong()
-                                    )
-                                        .replace("(", "")
-                                        .replace(")", "")
+                                    val fileSize = remember {
+                                        formatShortFileSize(context, file.mida.toLong())
+                                            .replace("(", "")
+                                            .replace(")", "")
+                                    }
                                     Text(text = "${file.nom} ($fileSize)")
                                 }
                             }
@@ -221,8 +250,10 @@ fun NoticeWithFiles(
                     }
                 }
             }
-            val codiSub = if (noticeWithFiles.notice.codiAssig.startsWith("#"))
-                "FIB" else noticeWithFiles.notice.codiAssig
+            val codiSub = remember(noticeWithFiles.notice) {
+                if (noticeWithFiles.notice.codiAssig.startsWith("#"))
+                    "FIB" else noticeWithFiles.notice.codiAssig
+            }
             Text(text = "$codiSub - $dateString")
 
         }
@@ -263,6 +294,18 @@ fun NoticeWithFilesPreview() {
             ),
             onFileClick = {},
             onNoticeClose = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun RacoNoticeListPreview() {
+    RacoTheme {
+        RacoNoticeList(
+            noticesWithFiles = emptyList(),
+            selectedSubject = null,
+            onFileClick = {}
         )
     }
 }

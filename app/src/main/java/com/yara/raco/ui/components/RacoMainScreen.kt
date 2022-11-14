@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -68,12 +69,18 @@ fun RacoMainScreen(
             contentWindowInsets = WindowInsets.systemBars,
         ) { paddingValues ->
             val noticesWithFiles by racoViewModel.notices.observeAsState(initial = emptyList())
+            val sortedNoticesWithFiles = remember(noticesWithFiles) {
+                noticesWithFiles.sortedByDescending { it.notice.dataModificacio }
+            }
             val subjects by racoViewModel.subjects.observeAsState(initial = emptyList())
+            val sortedSubjects = remember(subjects) {
+                subjects.sortedBy { it.nom }
+            }
             RacoMainNavHost(
                 navHostController = navController,
-                noticesWithFiles = noticesWithFiles.sortedByDescending { it.notice.dataModificacio },
+                noticesWithFiles = sortedNoticesWithFiles,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
-                subjects = subjects,
+                subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing

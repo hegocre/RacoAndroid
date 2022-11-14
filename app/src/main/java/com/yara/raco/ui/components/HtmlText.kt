@@ -83,10 +83,9 @@ fun HtmlText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
-    var annotatedString = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
-        .toAnnotatedString(urlSpanStyle, colorMapping)
-    while (annotatedString.endsWith("\n")) {
-        annotatedString = annotatedString.subSequence(0, annotatedString.length - 1)
+    val annotatedString = remember {
+        Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+            .toAnnotatedString(urlSpanStyle, colorMapping)
     }
 
     val clickableElements = annotatedString.getStringAnnotations(0, annotatedString.length - 1)
