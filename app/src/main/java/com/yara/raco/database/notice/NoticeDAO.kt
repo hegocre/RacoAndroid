@@ -12,7 +12,7 @@ interface NoticeDAO {
     fun fetchAllNotices(): LiveData<List<NoticeWithFiles>>
 
     @Query("SELECT * FROM notices WHERE id = :id")
-    suspend fun fetchNotice(id: String): Notice
+    suspend fun fetchNotice(id: Int): Notice
 
     @Query("SELECT id FROM notices")
     suspend fun fetchAllNoticeIds(): List<Int>
