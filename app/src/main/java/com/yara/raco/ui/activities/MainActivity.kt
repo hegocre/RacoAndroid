@@ -52,6 +52,12 @@ class MainActivity : ComponentActivity() {
 
         val racoViewModel by viewModels<RacoViewModel>()
 
+        racoViewModel.shouldLogOut.observe(this) { shouldLogOut ->
+            if (shouldLogOut) {
+                logout()
+            }
+        }
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             RacoMainScreen(racoViewModel = racoViewModel, onLogOut = this::logout)

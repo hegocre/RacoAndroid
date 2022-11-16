@@ -69,6 +69,8 @@ class TokenApi private constructor() {
 
         if (code == 200 && body != null) {
             Result.Success(Json.decodeFromString(body))
+        } else if (code == 400) {
+            Result.Error(400)
         } else {
             Result.Error(0)
         }

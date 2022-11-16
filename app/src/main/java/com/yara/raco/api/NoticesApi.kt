@@ -9,8 +9,8 @@ import androidx.core.content.FileProvider
 import com.yara.raco.R
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
-import com.yara.raco.utils.Error
 import com.yara.raco.utils.OkHttpRequest
+import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -40,12 +40,12 @@ class NoticesApi private constructor() {
             val aux = Json.decodeFromString<NoticeResponse>(body).results
             Result.Success(aux)
         } else {
-            Result.Error(Error.API_BAD_RESPONSE)
+            Result.Error(ResultCode.ERROR_API_BAD_RESPONSE)
         }
 
     } catch (e: Exception) {
         e.printStackTrace()
-        Result.Error(Error.API_BAD_REQUEST)
+        Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 
     fun getAttachment(context: Context, file: File, accessToken: String) {
