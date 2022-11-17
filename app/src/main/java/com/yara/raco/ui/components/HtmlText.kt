@@ -9,7 +9,7 @@ import android.graphics.Typeface
 import android.text.Html
 import android.text.Spanned
 import android.text.style.*
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,12 +24,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -120,7 +117,7 @@ fun HtmlText(
                     if (startLine < endLine) {
                         boxPosX.add(
                             Pair(
-                                it.getBoundingBox(url.start).left,
+                                it.getBoundingBox(it.getLineStart(startLine)).left,
                                 it.getBoundingBox(it.getLineEnd(startLine) - 1).right
                             )
                         )
@@ -157,10 +154,21 @@ fun HtmlText(
                     .padding(start = buttonPaddingX, top = buttonPaddingY)
                     .width(buttonWidth)
                     .height(buttonHeight)
-                    .clickable { uriHandler.openUri(clickableElements[i].item) }
-                    .semantics {
-                        role = Role.Button
-                        contentDescription = clickableElements[i].item
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+                            layoutResult.value?.let { layoutResult ->
+                                val position =
+                                    layoutResult.getOffsetForPosition(offset.copy(y = offset.y + boxPosY[i].first))
+                                annotatedString
+                                    .getStringAnnotations(position, position)
+                                    .firstOrNull()
+                                    ?.let { sa ->
+                                        if (sa.tag == "url") {
+                                            uriHandler.openUri(sa.item)
+                                        }
+                                    }
+                            }
+                        }
                     }
             )
         }
