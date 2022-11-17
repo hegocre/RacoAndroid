@@ -18,4 +18,10 @@
     <string name="download_failed">La descàrrega ha fallat</string>
     <string name="download_started">S\'ha iniciat la decàrrega</string>
     <string name="cannot_open_file">No s\'ha pogut obrir el fitxer</string>
+    <string name="filter">Filtrar</string>
+    <string name="clear">Netejar</string>
+    <string name="no_notices_yet">Encara no tens cap avís</string>
+    <string name="all">Tots</string>
+    <string name="tens_avisos_nous">Tens %d avisos nous</string>
+    <string name="avisos_nous">Avisos nous</string>
 </resources>
