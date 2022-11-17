@@ -1,4 +1,4 @@
-package com.yara.raco.model.grades
+package com.yara.raco.model.grade
 
 import androidx.room.Entity
 import kotlinx.serialization.SerialName
@@ -13,7 +13,7 @@ import kotlinx.serialization.SerialName
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "grade", primaryKeys = ["id"])
-data class Grade @JvmOverloads constructor(
+data class Grade(
     @SerialName("id")
     val id: String,
     @SerialName("Name")
@@ -23,5 +23,7 @@ data class Grade @JvmOverloads constructor(
     @SerialName("Mark")
     val mark: Double,
     @SerialName("Description")
-    val description: String? = null,
+    val description: String = "",
+    @Transient
+    val gradesId: Int = 0
 )

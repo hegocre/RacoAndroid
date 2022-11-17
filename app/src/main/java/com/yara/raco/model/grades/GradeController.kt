@@ -2,14 +2,11 @@ package com.yara.raco.model.grades
 
 import android.content.Context
 import com.yara.raco.database.RacoDatabase
+import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.subject.Subject
 
 class GradeController private constructor(context: Context) {
     private val racoDatabase = RacoDatabase.getInstance(context)
-
-    suspend fun addGrade(subject: Subject, grade: Grade) {
-
-    }
 
     companion object {
         private var INSTANCE: GradeController? = null
