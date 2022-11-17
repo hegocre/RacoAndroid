@@ -42,7 +42,7 @@ fun RacoMainTopAppBar(
                 }
                 DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                     DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.tancar_sessio)) },
+                        text = { Text(text = stringResource(id = R.string.logout)) },
                         onClick = {
                             onLogOut()
                             menuExpanded = false

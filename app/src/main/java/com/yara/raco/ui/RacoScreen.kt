@@ -17,17 +17,17 @@ enum class RacoScreen(
     val unselectedIcon: ImageVector
 ) {
     Avisos(
-        title = R.string.avisos,
+        title = R.string.notices,
         selectedIcon = Icons.Filled.Notifications,
         unselectedIcon = Icons.Outlined.Notifications
     ),
     Horari(
-        title = R.string.horari,
+        title = R.string.planning,
         selectedIcon = Icons.Filled.CalendarToday,
         unselectedIcon = Icons.Outlined.CalendarToday
     ),
     Notes(
-        title = R.string.notes,
+        title = R.string.grades,
         selectedIcon = Icons.Filled.School,
         unselectedIcon = Icons.Outlined.School
     );

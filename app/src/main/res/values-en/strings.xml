@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="avisos">Notes</string>
-    <string name="horari">Planning</string>
-    <string name="notes">Grades</string>
+    <string name="notices">Notes</string>
+    <string name="planning">Planning</string>
+    <string name="grades">Grades</string>
     <string name="menu">Menu</string>
-    <string name="tancar_sessio">Log out</string>
+    <string name="logout">Log out</string>
     <string name="login">Log in</string>
     <string name="login_failed">Could not log in</string>
     <string name="about">About</string>
@@ -19,9 +19,7 @@
     <string name="download_started">Download started</string>
     <string name="cannot_open_file">Could not open file</string>
     <string name="no_notices_yet">You have no notices yet</string>
-    <string name="filter">Filter</string>
-    <string name="clear">Clean</string>
     <string name="all">All</string>
-    <string name="tens_avisos_nous">You have %d new notices</string>
-    <string name="avisos_nous">New notices</string>
+    <string name="you_have_new_notices">You have new notices</string>
+    <string name="new_notices">New notices</string>
 </resources>

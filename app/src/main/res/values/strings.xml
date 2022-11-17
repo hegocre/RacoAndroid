@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">Racó</string>
-    <string name="avisos">Avisos</string>
-    <string name="horari">Horari</string>
-    <string name="notes">Notes</string>
+    <string name="notices">Avisos</string>
+    <string name="planning">Horari</string>
+    <string name="grades">Notes</string>
     <string name="menu">Menú</string>
-    <string name="tancar_sessio">Tancar sessió</string>
+    <string name="logout">Tancar sessió</string>
     <string name="login">Iniciar sessió</string>
     <string name="login_failed">No s\'ha pogut iniciar sessió</string>
     <string name="about">Informació</string>
@@ -18,10 +18,8 @@
     <string name="download_failed">La descàrrega ha fallat</string>
     <string name="download_started">S\'ha iniciat la decàrrega</string>
     <string name="cannot_open_file">No s\'ha pogut obrir el fitxer</string>
-    <string name="filter">Filtrar</string>
-    <string name="clear">Netejar</string>
     <string name="no_notices_yet">Encara no tens cap avís</string>
     <string name="all">Tots</string>
-    <string name="tens_avisos_nous">Tens %d avisos nous</string>
-    <string name="avisos_nous">Avisos nous</string>
+    <string name="you_have_new_notices">Tens avisos nous</string>
+    <string name="new_notices">Avisos nous</string>
 </resources>
