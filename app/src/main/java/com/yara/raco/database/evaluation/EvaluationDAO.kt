@@ -9,5 +9,5 @@ import com.yara.raco.model.evaluation.EvaluationWithGrade
 interface EvaluationDAO {
 
     @Query("SELECT * FROM evaluation")
-    fun getEvaluations(): LiveData<List<EvaluationWithGrade>>
+    fun getEvaluations(): List<EvaluationWithGrade>
 }

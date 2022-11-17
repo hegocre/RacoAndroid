@@ -82,6 +82,7 @@ fun RacoMainScreen(
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = sortedNoticesWithFiles,
+                evaluationWithGrade = racoViewModel.evaluation,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
                 subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),
