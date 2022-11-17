@@ -30,6 +30,7 @@ fun RacoMainTopAppBar(
         title = { Text(text = title) },
         scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets.statusBars,
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
         actions = {
             Box {
                 IconButton(onClick = { menuExpanded = true }) {

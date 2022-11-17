@@ -1,11 +1,11 @@
 package com.yara.raco.model.user
 
 import android.content.Context
-import android.util.Log
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.utils.PreferencesManager
+import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -20,7 +20,6 @@ class UserController private constructor(context: Context) {
         apiController.accessToken = preferencesManager.getAccessToken()
         val lastLanguage = preferencesManager.getUserLastLanguage()
         val deviceLanguage = Locale.getDefault().language
-        Log.d("Language", deviceLanguage)
         if (lastLanguage != deviceLanguage) {
             CoroutineScope(Dispatchers.IO).launch {
                 //Delete databases which can be translated
@@ -56,7 +55,7 @@ class UserController private constructor(context: Context) {
         return false
     }
 
-    suspend fun refreshToken(): Boolean {
+    suspend fun refreshToken(): Int {
         val refreshResult = apiController.refreshToken()
 
         if (refreshResult is Result.Success) {
@@ -69,17 +68,21 @@ class UserController private constructor(context: Context) {
                 refreshToken()
             }
 
-            return true
+            return ResultCode.SUCCESS
         }
         if (refreshResult is Result.Error) {
-            val refreshJob = SupervisorJob()
-            CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                delay(10 * 1000)
-                refreshToken()
+            return if (refreshResult.code == 400) {
+                ResultCode.INVALID_TOKEN
+            } else {
+                val refreshJob = SupervisorJob()
+                CoroutineScope(Dispatchers.IO + refreshJob).launch {
+                    delay(10 * 1000)
+                    refreshToken()
+                }
+                ResultCode.ERROR_API_BAD_RESPONSE
             }
         }
-
-        return false
+        return ResultCode.UNKNOWN
     }
 
     fun logOut() {

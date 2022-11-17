@@ -18,4 +18,10 @@
     <string name="download_failed">La descarga ha fallado</string>
     <string name="download_started">Se ha iniciado la descarga</string>
     <string name="cannot_open_file">No se ha podido abrir el fichero</string>
+    <string name="no_notices_yet">Aún no tienes ningún aviso</string>
+    <string name="filter">Filtrar</string>
+    <string name="clear">Limpiar</string>
+    <string name="all">Todos</string>
+    <string name="tens_avisos_nous">Tienes %d avisos nuevos</string>
+    <string name="avisos_nous">Avisos nuevos</string>
 </resources>
