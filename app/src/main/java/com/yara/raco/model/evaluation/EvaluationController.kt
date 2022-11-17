@@ -1,27 +1,28 @@
-package com.yara.raco.model.grades
+package com.yara.raco.model.evaluation
 
 import android.content.Context
 import com.yara.raco.database.RacoDatabase
-import com.yara.raco.model.grade.Grade
-import com.yara.raco.model.subject.Subject
 
-class GradeController private constructor(context: Context) {
+class EvaluationController private constructor(context: Context) {
+
     private val racoDatabase = RacoDatabase.getInstance(context)
 
+    fun getEvaluations() = racoDatabase.evaluationDAO.getEvaluations()
+
     companion object {
-        private var INSTANCE: GradeController? = null
+        private var INSTANCE: EvaluationController? = null
 
         /**
-         * Get the instance of [GradeController], and create it if null.
+         * Get the instance of [EvaluationController], and create it if null.
          *
          * @param context Context of the application.
          * @return The instance of the controller.
          */
-        fun getInstance(context: Context): GradeController {
+        fun getInstance(context: Context): EvaluationController {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
-                    instance = GradeController(context)
+                    instance = EvaluationController(context)
                     INSTANCE = instance
                 }
                 return instance

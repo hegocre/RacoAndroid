@@ -13,17 +13,16 @@ import kotlinx.serialization.SerialName
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "grade", primaryKeys = ["id"])
-data class Grade(
+data class Grade @JvmOverloads constructor(
     @SerialName("id")
     val id: String,
     @SerialName("Name")
     val name: String,
     @SerialName("weight")
-    val weight: Double,
+    var weight: Double,
     @SerialName("Mark")
-    val mark: Double,
+    var mark: Double,
     @SerialName("Description")
     val description: String = "",
-    @Transient
     val gradesId: Int = 0
 )

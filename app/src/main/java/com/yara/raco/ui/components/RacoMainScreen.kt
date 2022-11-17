@@ -71,10 +71,12 @@ fun RacoMainScreen(
             contentWindowInsets = WindowInsets.systemBars
         ) { paddingValues ->
             val noticesWithFiles by racoViewModel.notices.observeAsState(initial = emptyList())
+            val evaluationWithGrade by racoViewModel.evaluation.observeAsState(initial = emptyList())
             racoViewModel.subjects.observeAsState(initial = emptyList())
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = noticesWithFiles.sortedByDescending { it.notice.dataModificacio },
+                evaluationWithGrade = evaluationWithGrade,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },

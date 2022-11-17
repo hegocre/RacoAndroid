@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
@@ -21,6 +22,7 @@ import com.yara.raco.ui.RacoScreen
 fun RacoMainNavHost(
     navHostController: NavHostController,
     noticesWithFiles: List<NoticeWithFiles>,
+    evaluationWithGrade: List<EvaluationWithGrade>,
     onFileClick: (File) -> Unit,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -47,8 +49,8 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Notes.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-
+                if (evaluationWithGrade.isNotEmpty()) {
+                    RacoEvalutaionList(evaluationWithGrade = evaluationWithGrade)
                 }
             }
         }

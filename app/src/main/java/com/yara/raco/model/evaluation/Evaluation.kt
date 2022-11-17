@@ -1,8 +1,7 @@
-package com.yara.raco.model.grades
+package com.yara.raco.model.evaluation
 
 import androidx.room.Entity
 import androidx.room.Ignore
-import com.yara.raco.model.files.File
 import com.yara.raco.model.grade.Grade
 import kotlinx.serialization.SerialName
 
@@ -10,15 +9,16 @@ import kotlinx.serialization.SerialName
  * Class that represents a grade.
  *
  * @param subjectId Subject instance.
- * @param grades List of grades.
+ * @param evaluation List of evaluation.
  */
 @kotlinx.serialization.Serializable
-@Entity(tableName = "grades", primaryKeys = ["id"])
-data class Grades @JvmOverloads constructor(
+@Entity(tableName = "evaluation", primaryKeys = ["id"])
+data class Evaluation @JvmOverloads constructor(
     @SerialName("id")
     val id: Int,
     @SerialName("subjectId")
     val subjectId: String,
     @SerialName("listOfGrade")
+    @Ignore
     val listOfGrade: ArrayList<Grade> = arrayListOf()
 )
