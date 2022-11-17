@@ -50,6 +50,11 @@ class MainActivity : ComponentActivity() {
             setupNotification()
         }
 
+        //Dismiss existing notifications
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
+
         val racoViewModel by viewModels<RacoViewModel>()
 
         racoViewModel.shouldLogOut.observe(this) { shouldLogOut ->
@@ -73,6 +78,7 @@ class MainActivity : ComponentActivity() {
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
+            notificationManager.cancelAll()
         }
 
         //Create periodic task
