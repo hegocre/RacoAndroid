@@ -18,6 +18,8 @@ data class Evaluation @JvmOverloads constructor(
     val id: Int,
     @SerialName("subjectId")
     val subjectId: String,
+    @SerialName("name")
+    val name: String,
     @SerialName("listOfGrade")
     @Ignore
     val listOfGrade: ArrayList<Grade> = arrayListOf()

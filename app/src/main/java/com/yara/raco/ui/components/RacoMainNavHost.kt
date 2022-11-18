@@ -70,8 +70,21 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Notes.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                if (evaluationWithGrade.isNotEmpty()) {
-                    RacoEvalutaionList(evaluationWithGrade = evaluationWithGrade)
+                Column {
+                    val pagerState = rememberPagerState()
+
+                    RacoEvaluationTabs(
+                        subjects = subjects,
+                        pagerState = pagerState,
+                    )
+
+                    RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
+                        RacoGradesPager(
+                            pagerState = pagerState,
+                            subjects = subjects,
+                            evaluations = evaluationWithGrade,
+                        )
+                    }
                 }
             }
         }

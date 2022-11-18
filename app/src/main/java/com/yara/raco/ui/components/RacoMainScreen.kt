@@ -79,10 +79,11 @@ fun RacoMainScreen(
             val sortedSubjects = remember(subjects) {
                 subjects.sortedBy { it.nom }
             }
+            val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = sortedNoticesWithFiles,
-                evaluationWithGrade = racoViewModel.evaluation,
+                evaluationWithGrade = evaluations,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
                 subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),

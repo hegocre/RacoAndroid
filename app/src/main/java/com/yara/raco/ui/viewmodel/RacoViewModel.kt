@@ -40,7 +40,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         get() = subjectController.getSubjects()
     val notices: LiveData<List<NoticeWithFiles>>
         get() = noticeController.getNotices()
-    val evaluation: List<EvaluationWithGrade>
+    val evaluation: LiveData<List<EvaluationWithGrade>>
         get() = evaluationController.getEvaluations()
 
     init {
