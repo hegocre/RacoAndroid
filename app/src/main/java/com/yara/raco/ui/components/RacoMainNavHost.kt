@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -32,6 +32,7 @@ fun RacoMainNavHost(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var detailedNoticeWithFiles by remember { mutableStateOf<NoticeWithFiles?>(null) }
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Avisos.name,
@@ -51,6 +52,20 @@ fun RacoMainNavHost(
                         pagerState = pagerState,
                         subjects = subjects,
                         noticesWithFiles = noticesWithFiles,
+                        onNoticeClick = { noticeWithFiles ->
+                            detailedNoticeWithFiles = noticeWithFiles
+                            navHostController.navigate("${RacoScreen.Avisos.name}/details")
+                        }
+                    )
+                }
+            }
+        }
+
+        composable("${RacoScreen.Avisos.name}/details") {
+            Column {
+                detailedNoticeWithFiles?.let { noticeWithFiles ->
+                    DetailedNoticeWithFiles(
+                        noticeWithFiles = noticeWithFiles,
                         onFileClick = onFileClick
                     )
                 }
