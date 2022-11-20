@@ -17,6 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.yara.raco.model.evaluation.Evaluation
+import com.yara.raco.model.grade.Grade
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
@@ -85,6 +87,24 @@ fun RacoMainScreen(
                 noticesWithFiles = sortedNoticesWithFiles,
                 evaluationWithGrade = evaluations,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
+                onGradeAddOrUpdate = { grade: Grade, evaluation: Evaluation ->
+                    racoViewModel.addOrUpdateGradeToEvaluation(
+                        grade,
+                        evaluation
+                    )
+                },
+                onGradeDelete = { grade: Grade, evaluation: Evaluation ->
+                    racoViewModel.removeGradeFromEvaluation(
+                        grade,
+                        evaluation
+                    )
+                },
+                onEvaluationAdd = { subjectId: String -> racoViewModel.addEvaluation(subjectId) },
+                onEvaluationDelete = { evaluation: Evaluation ->
+                    racoViewModel.deleteEvaluation(
+                        evaluation
+                    )
+                },
                 subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },

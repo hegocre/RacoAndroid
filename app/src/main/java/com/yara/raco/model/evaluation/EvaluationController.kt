@@ -1,9 +1,9 @@
 package com.yara.raco.model.evaluation
 
 import android.content.Context
-import androidx.compose.ui.text.font.FontWeight
 import com.yara.raco.database.RacoDatabase
 import com.yara.raco.model.grade.Grade
+import kotlinx.coroutines.launch
 
 class EvaluationController private constructor(context: Context) {
 
@@ -11,46 +11,36 @@ class EvaluationController private constructor(context: Context) {
 
     fun getEvaluations() = racoDatabase.evaluationDAO.getEvaluations()
 
-    suspend fun getEvaluation(id: Int) = racoDatabase.evaluationDAO.getEvaluation(id)
+    fun getEvaluation(id: Int) = racoDatabase.evaluationDAO.getEvaluation(id)
 
-    suspend fun getEvaluationIds() = racoDatabase.evaluationDAO.getEvaluationIds()
+    fun getEvaluationIds() = racoDatabase.evaluationDAO.getEvaluationIds()
 
-    suspend fun insertEvaluation(evaluation: Evaluation) =
+    fun addEvaluation(subjectId: String) {
+        var ids = getEvaluationIds()
+        var evaluation = Evaluation(
+            id = (ids.last() + 1),
+            subjectId = subjectId,
+            name = "",
+            listOfGrade = ArrayList()
+        )
         racoDatabase.evaluationDAO.insertEvaluation(evaluation)
+    }
 
-    suspend fun deleteEvaluation(evaluation: Evaluation) =
+    fun deleteEvaluation(evaluation: Evaluation) =
         racoDatabase.evaluationDAO.deleteEvaluation(evaluation)
 
-    suspend fun deleteEvaluation(id: Int) = racoDatabase.evaluationDAO.deleteEvaluation(id)
+    fun deleteEvaluation(id: Int) = racoDatabase.evaluationDAO.deleteEvaluation(id)
 
-    suspend fun deleteAllEvaluations() = racoDatabase.evaluationDAO.deleteAllEvaluations()
+    fun deleteAllEvaluations() = racoDatabase.evaluationDAO.deleteAllEvaluations()
 
-    suspend fun addGradeToEvaluation(grade: Grade, evaluation: Evaluation) {
+    fun addOrUpdateGradeToEvaluation(grade: Grade, evaluation: Evaluation) {
         evaluation.listOfGrade.add(grade)
-        insertEvaluation(evaluation)
+        //insertEvaluation(evaluation)
     }
 
-    suspend fun removeGradeFromEvaluation(grade: Grade, evaluation: Evaluation) {
+    fun removeGradeFromEvaluation(grade: Grade, evaluation: Evaluation) {
         evaluation.listOfGrade.remove(grade)
-        insertEvaluation(evaluation)
-    }
-
-    suspend fun updateMarkFromGradeInEvaluation(
-        gradeId: String,
-        evaluation: Evaluation,
-        mark: Double
-    ) {
-        evaluation.listOfGrade.find { it.id == gradeId }?.mark = mark
-        insertEvaluation(evaluation)
-    }
-
-    suspend fun updateWeightFromGradeInEvaluation(
-        gradeId: String,
-        evaluation: Evaluation,
-        weight: Double
-    ) {
-        evaluation.listOfGrade.find { it.id == gradeId }?.weight = weight
-        insertEvaluation(evaluation)
+        //insertEvaluation(evaluation)
     }
 
     companion object {

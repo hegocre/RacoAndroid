@@ -90,6 +90,10 @@ fun RacoGradesPager(
     pagerState: PagerState,
     subjects: List<Subject>,
     evaluations: List<EvaluationWithGrade>,
+    onGradeAddOrUpdate: (grade: Grade, evaluation: Evaluation) -> Unit,
+    onGradeDelete: (grade: Grade, evaluation: Evaluation) -> Unit,
+    onEvaluationAdd: (subjectId: String) -> Unit,
+    onEvaluationDelete: (evaluation: Evaluation) -> Unit,
     modifier: Modifier = Modifier
 ) {
     HorizontalPager(
@@ -101,38 +105,42 @@ fun RacoGradesPager(
             when (page) {
                 0 -> {
                     items(evaluations) { evaluation -> RacoGradesCollapsed(evaluation = evaluation) }
-                }
-                else -> {
-                    items(evaluations.filter { it.evaluation.subjectId == subjects[page - 1].id }) { evaluationSubject ->
-                        RacoGradesExpanded(evaluation = evaluationSubject)
-                    }
-                }
-            }
-            item {
-                OutlinedCard(
-                    border = CardDefaults.outlinedCardBorder(enabled = false),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    )
-                    {
-                        Text(
-                            text = "Add new evaluation",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(Icons.Outlined.Add, contentDescription = "Add Evaluation")
+                    item {
+                        OutlinedCard(
+                            border = CardDefaults.outlinedCardBorder(enabled = false),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                verticalAlignment = CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            )
+                            {
+                                Text(
+                                    text = "Add new evaluation",
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                                IconButton(onClick = { onEvaluationAdd("-1") }) {
+                                    Icon(Icons.Outlined.Add, contentDescription = "Add Evaluation")
+                                }
+                            }
                         }
                     }
                 }
+                else -> {
+                    items(evaluations.filter { it.evaluation.subjectId == subjects[page - 1].id }) { evaluationSubject ->
+                        RacoGradesExpanded(
+                            evaluation = evaluationSubject,
+                            onEvaluationAdd = onEvaluationAdd
+                        )
+                    }
+                }
             }
+
         }
     }
 }
@@ -179,10 +187,13 @@ fun RacoGradesCollapsed(
 
 @Composable
 fun RacoGradesExpanded(
-    evaluation: EvaluationWithGrade
+    evaluation: EvaluationWithGrade,
+    onEvaluationAdd: (subjectId: String) -> Unit
+
 ) {
     var editWeight by rememberSaveable { mutableStateOf(false) }
     var neededMark by rememberSaveable { mutableStateOf(computeAverageMarkForPassing(evaluation.listOfGrade)) }
+    var subjectId = evaluation.evaluation.subjectId
     OutlinedCard(
         border = CardDefaults.outlinedCardBorder(enabled = false),
         modifier = Modifier
@@ -257,6 +268,29 @@ fun RacoGradesExpanded(
                 IconButton(onClick = { editWeight = !editWeight }) {
                     Icon(Icons.Outlined.Add, contentDescription = "Add Weight")
                 }
+            }
+        }
+    }
+    OutlinedCard(
+        border = CardDefaults.outlinedCardBorder(enabled = false),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        )
+        {
+            Text(
+                text = "Add new evaluation",
+                style = MaterialTheme.typography.titleMedium,
+            )
+            IconButton(onClick = { onEvaluationAdd(subjectId) }) {
+                Icon(Icons.Outlined.Add, contentDescription = "Add Evaluation")
             }
         }
     }

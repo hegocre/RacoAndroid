@@ -17,8 +17,10 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
+import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.RacoScreen
@@ -30,6 +32,10 @@ fun RacoMainNavHost(
     noticesWithFiles: List<NoticeWithFiles>,
     evaluationWithGrade: List<EvaluationWithGrade>,
     onFileClick: (File) -> Unit,
+    onGradeAddOrUpdate: (grade: Grade, evaluation: Evaluation) -> Unit,
+    onGradeDelete: (grade: Grade, evaluation: Evaluation) -> Unit,
+    onEvaluationAdd: (subjectId: String) -> Unit,
+    onEvaluationDelete: (evaluation: Evaluation) -> Unit,
     subjects: List<Subject>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -83,6 +89,10 @@ fun RacoMainNavHost(
                             pagerState = pagerState,
                             subjects = subjects,
                             evaluations = evaluationWithGrade,
+                            onGradeAddOrUpdate = onGradeAddOrUpdate,
+                            onGradeDelete = onGradeDelete,
+                            onEvaluationAdd = onEvaluationAdd,
+                            onEvaluationDelete = onEvaluationDelete,
                         )
                     }
                 }

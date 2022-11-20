@@ -9,6 +9,7 @@ import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
+import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
@@ -77,5 +78,29 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
 
     fun downloadFile(file: File) {
         noticeController.downloadAttachment(getApplication(), file)
+    }
+
+    fun addEvaluation(subjectId: String) {
+        viewModelScope.launch {
+            evaluationController.addEvaluation(subjectId)
+        }
+    }
+
+    fun deleteEvaluation(evaluation: Evaluation) {
+        viewModelScope.launch {
+            evaluationController.deleteEvaluation(evaluation)
+        }
+    }
+
+    fun addOrUpdateGradeToEvaluation(grade: Grade, evaluation: Evaluation) {
+        viewModelScope.launch {
+            evaluationController.addOrUpdateGradeToEvaluation(grade, evaluation)
+        }
+    }
+
+    fun removeGradeFromEvaluation(grade: Grade, evaluation: Evaluation) {
+        viewModelScope.launch {
+            evaluationController.removeGradeFromEvaluation(grade, evaluation)
+        }
     }
 }
