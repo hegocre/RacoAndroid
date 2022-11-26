@@ -75,7 +75,7 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
                     val groupSummary = generateGroupSummary(
                         applicationContext,
                         applicationContext.getString(R.string.app_name),
-                        applicationContext.getString(R.string.tens_avisos_nous),
+                        applicationContext.getString(R.string.you_have_new_notices),
                         lines
                     )
                     notify(0, groupSummary)
@@ -107,7 +107,7 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
             inboxStyle.addLine(line)
         }
 
-        return NotificationCompat.Builder(context, context.getString(R.string.avisos))
+        return NotificationCompat.Builder(context, context.getString(R.string.notices))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(text)
@@ -136,7 +136,7 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
             context, 0, notificationIntent, intentFlags
         )
 
-        return NotificationCompat.Builder(context, context.getString(R.string.avisos))
+        return NotificationCompat.Builder(context, context.getString(R.string.notices))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setSubText(subText)
