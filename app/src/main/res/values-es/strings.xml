@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="avisos">Avisos</string>
-    <string name="horari">Horario</string>
-    <string name="notes">Notas</string>
+    <string name="notices">Avisos</string>
+    <string name="planning">Horario</string>
+    <string name="grades">Notas</string>
     <string name="menu">Menú</string>
-    <string name="tancar_sessio">Cerrar sesión</string>
+    <string name="logout">Cerrar sesión</string>
     <string name="login">Iniciar sesión</string>
     <string name="login_failed">No se ha podido iniciar sesión</string>
     <string name="about">Información</string>
@@ -19,9 +19,7 @@
     <string name="download_started">Se ha iniciado la descarga</string>
     <string name="cannot_open_file">No se ha podido abrir el fichero</string>
     <string name="no_notices_yet">Aún no tienes ningún aviso</string>
-    <string name="filter">Filtrar</string>
-    <string name="clear">Limpiar</string>
     <string name="all">Todos</string>
-    <string name="tens_avisos_nous">Tienes %d avisos nuevos</string>
-    <string name="avisos_nous">Avisos nuevos</string>
+    <string name="you_have_new_notices">Tienes avisos nuevos</string>
+    <string name="new_notices">Avisos nuevos</string>
 </resources>

@@ -43,6 +43,18 @@ fun RacoMainScreen(
 
     val context = LocalContext.current
 
+
+    val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+        //Declare back action for button to appear
+        "${RacoScreen.Avisos.name}/details" -> {
+            {
+                navController.popBackStack()
+            }
+        }
+        //Default to not visible
+        else -> null
+    }
+
     RacoTheme {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -51,6 +63,7 @@ fun RacoMainScreen(
                     title = stringResource(id = currentScreen.title),
                     scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
+                    onBackPress = onBackPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))
                     }
