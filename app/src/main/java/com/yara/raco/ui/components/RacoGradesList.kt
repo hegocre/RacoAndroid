@@ -1,12 +1,10 @@
 package com.yara.raco.ui.components
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -15,6 +13,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -25,87 +24,42 @@ import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.subject.Subject
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun RacoEvaluationTabs(
-    subjects: List<Subject>,
-    pagerState: PagerState,
-    modifier: Modifier = Modifier
-) {
-    val indicator = @Composable { tabPositions: List<TabPosition> ->
-        Spacer(
-            Modifier
-                .pagerTabIndicatorOffset(pagerState, tabPositions)
-                .padding(horizontal = 12.dp)
-                .height(3.dp)
-                .background(
-                    LocalContentColor.current,
-                    RoundedCornerShape(topStartPercent = 100, topEndPercent = 100)
-                )
-        )
-    }
-    ScrollableTabRow(
-        selectedTabIndex = pagerState.currentPage,
-        modifier = modifier,
-        indicator = indicator,
-        edgePadding = 32.dp
-    ) {
-        val coroutineScope = rememberCoroutineScope()
-        Tab(
-            selected = pagerState.currentPage == 0,
-            onClick = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(0)
-                }
-            },
-            text = { Text(text = stringResource(id = R.string.all)) }
-        )
-        subjects.forEachIndexed() { index, subject ->
-            Tab(
-                selected = pagerState.currentPage == index + 1,
-                onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(index + 1)
-                    }
-                },
-                text = { Text(text = subject.sigles) }
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun RacoGradesPager(
-    pagerState: PagerState,
     subjects: List<Subject>,
     evaluations: List<EvaluationWithGrade>,
     onGradeClick: (EvaluationWithGrade) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    HorizontalPager(
-        count = subjects.size + 1,
-        state = pagerState,
-        userScrollEnabled = false
-    ) { page ->
-        LazyColumn() {
-            when (page) {
-                0 -> {
-                    items(evaluations) { evaluation ->
-                        RacoGradesCollapsed(
-                            evaluation = evaluation,
-                            onGradeClick = onGradeClick
-                        )
-                    }
+    val subjectsIds = (evaluations.map { it.evaluation.subjectId }).distinct()
+    LazyColumn() {
+        for (subject in subjectsIds) {
+            val subjectName = subjects.find { it.sigles == subject }?.nom
+            stickyHeader {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = if (subject != "") subjectName.toString() else "Unlabeled",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
-                else -> {
-                    items(evaluations.filter { it.evaluation.subjectId == subjects[page - 1].id }) { evaluationSubject ->
-                        RacoGradesCollapsed(
-                            evaluation = evaluationSubject,
-                            onGradeClick = onGradeClick
+            }
+            items(evaluations.filter { it.evaluation.subjectId == subject }) { evaluation ->
+                RacoGradesCollapsed(
+                    evaluation = evaluation,
+                    onGradeClick = onGradeClick
+                )
+                Spacer(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillParentMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                         )
-                    }
-                }
+                )
             }
         }
     }
@@ -345,35 +299,26 @@ fun RacoGradesCollapsed(
     evaluation: EvaluationWithGrade,
     onGradeClick: (EvaluationWithGrade) -> Unit,
 ) {
-    OutlinedCard(
-        border = CardDefaults.outlinedCardBorder(enabled = false),
-        onClick = { onGradeClick(evaluation) },
+    ListItem(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        )
-        {
-            Text(
-                text = evaluation.evaluation.subjectId,
-                style = MaterialTheme.typography.titleLarge,
-            )
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable {
+                onGradeClick(evaluation)
+            },
+        headlineText = {
             Text(
                 text = evaluation.evaluation.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.labelMedium,
             )
+        },
+        supportingText = {
             gradeMarkWithColor(
                 computeFinalMarkFromEvaluation(evaluation.listOfGrade),
                 MaterialTheme.typography.titleLarge
             )
         }
-    }
+    )
 }
 
 @Composable

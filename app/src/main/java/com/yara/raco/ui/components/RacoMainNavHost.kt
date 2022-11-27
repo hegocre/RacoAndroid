@@ -92,14 +92,8 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Notes.name) {
             Column {
-                val pagerState = rememberPagerState()
-                RacoEvaluationTabs(
-                    subjects = subjects,
-                    pagerState = pagerState,
-                )
                 RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
                     RacoGradesPager(
-                        pagerState = pagerState,
                         subjects = subjects,
                         evaluations = evaluationWithGrade,
                         onGradeClick = { evaluationWithGrade ->
@@ -107,7 +101,6 @@ fun RacoMainNavHost(
                             navHostController.navigate("${RacoScreen.Notes.name}/details")
                         }
                     )
-
                 }
             }
         }
