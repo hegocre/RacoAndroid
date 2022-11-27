@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.yara.raco.database.file.FileDAO
 import com.yara.raco.database.evaluation.EvaluationDAO
+import com.yara.raco.database.grade.GradeDAO
 import com.yara.raco.database.notice.NoticeDAO
 import com.yara.raco.database.subject.SubjectDAO
 import com.yara.raco.model.files.File
@@ -24,6 +25,7 @@ abstract class RacoDatabase : RoomDatabase() {
     abstract val noticeDAO: NoticeDAO
     abstract val fileDAO: FileDAO
     abstract val evaluationDAO: EvaluationDAO
+    abstract val gradeDAO: GradeDAO
 
     companion object {
         @Volatile

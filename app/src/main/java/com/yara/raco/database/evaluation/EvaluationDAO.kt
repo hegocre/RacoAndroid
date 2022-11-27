@@ -13,7 +13,7 @@ interface EvaluationDAO {
     fun getEvaluations(): LiveData<List<EvaluationWithGrade>>
 
     @Query("SELECT * FROM evaluation WHERE id = :id")
-    fun getEvaluation(id: Int): Evaluation
+    fun getEvaluation(id: Int): LiveData<Evaluation>
 
     @Query("SELECT id FROM evaluation")
     fun getEvaluationIds(): List<Int>

@@ -1,6 +1,7 @@
 package com.yara.raco.model.grade
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 
 /**
@@ -12,10 +13,11 @@ import kotlinx.serialization.SerialName
  * @param description Description of the grade.
  */
 @kotlinx.serialization.Serializable
-@Entity(tableName = "grade", primaryKeys = ["id"])
+@Entity(tableName = "grade")
 data class Grade @JvmOverloads constructor(
     @SerialName("id")
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     @SerialName("Name")
     val name: String,
     @SerialName("weight")

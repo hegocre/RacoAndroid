@@ -5,11 +5,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -19,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.grade.Grade
+import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
@@ -31,6 +29,9 @@ fun RacoMainScreen(
     racoViewModel: RacoViewModel,
     onLogOut: () -> Unit
 ) {
+    var editDetailedEvaluation by remember { mutableStateOf<Boolean>(false) }
+    val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
+
     val navController = rememberNavController()
     val backStackEntry = navController.currentBackStackEntryAsState()
     val currentScreen = RacoScreen.fromRoute(
@@ -43,7 +44,6 @@ fun RacoMainScreen(
 
     val context = LocalContext.current
 
-
     val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
         //Declare back action for button to appear
         "${RacoScreen.Avisos.name}/details" -> {
@@ -51,8 +51,39 @@ fun RacoMainScreen(
                 navController.popBackStack()
             }
         }
+        "${RacoScreen.Notes.name}/details" -> {
+            {
+                editDetailedEvaluation = false
+                navController.popBackStack()
+            }
+        }
         //Default to not visible
         else -> null
+    }
+
+    val onEditPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+        "${RacoScreen.Notes.name}/details" -> {
+            {
+                editDetailedEvaluation = !editDetailedEvaluation
+            }
+        }
+        //Default to not visible
+        else -> null
+    }
+
+    val onAddPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+        "${RacoScreen.Notes.name}" -> {
+            {
+                racoViewModel.addEvaluation("")
+            }
+        }
+        //Default to not visible
+        else -> null
+    }
+
+    val onDeleteEvaluation: ((Int) -> Unit) = {
+        navController.popBackStack()
+        racoViewModel.deleteEvaluation(it)
     }
 
     RacoTheme {
@@ -64,6 +95,8 @@ fun RacoMainScreen(
                     scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
+                    onEditPress = onEditPress,
+                    onAddPress = onAddPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))
                     }
@@ -94,30 +127,15 @@ fun RacoMainScreen(
             val sortedSubjects = remember(subjects) {
                 subjects.sortedBy { it.nom }
             }
-            val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = sortedNoticesWithFiles,
                 evaluationWithGrade = evaluations,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
-                onGradeAddOrUpdate = { grade: Grade, evaluation: Evaluation ->
-                    racoViewModel.addOrUpdateGradeToEvaluation(
-                        grade,
-                        evaluation
-                    )
-                },
-                onGradeDelete = { grade: Grade, evaluation: Evaluation ->
-                    racoViewModel.removeGradeFromEvaluation(
-                        grade,
-                        evaluation
-                    )
-                },
-                onEvaluationAdd = { subjectId: String -> racoViewModel.addEvaluation(subjectId) },
-                onEvaluationDelete = { evaluation: Evaluation ->
-                    racoViewModel.deleteEvaluation(
-                        evaluation
-                    )
-                },
+                onGradeAdd = { grade -> racoViewModel.addGradeToEvaluation(grade) },
+                onGradeDelete = { grade -> racoViewModel.deleteGrade(grade) },
+                onEvaluationDelete = onDeleteEvaluation,
+                onGradeDetailedEdit = editDetailedEvaluation,
                 subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },

@@ -1,9 +1,12 @@
 package com.yara.raco.model.evaluation
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import com.yara.raco.database.RacoDatabase
 import com.yara.raco.model.grade.Grade
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EvaluationController private constructor(context: Context) {
 
@@ -11,36 +14,41 @@ class EvaluationController private constructor(context: Context) {
 
     fun getEvaluations() = racoDatabase.evaluationDAO.getEvaluations()
 
-    fun getEvaluation(id: Int) = racoDatabase.evaluationDAO.getEvaluation(id)
-
-    fun getEvaluationIds() = racoDatabase.evaluationDAO.getEvaluationIds()
-
-    fun addEvaluation(subjectId: String) {
-        var ids = getEvaluationIds()
+    suspend fun addEvaluation(subjectId: String) {
         var evaluation = Evaluation(
-            id = (ids.last() + 1),
+            id = 0,
             subjectId = subjectId,
             name = "",
-            listOfGrade = ArrayList()
+            listOfGrade = arrayListOf()
         )
-        racoDatabase.evaluationDAO.insertEvaluation(evaluation)
+        withContext(Dispatchers.IO) {
+            racoDatabase.evaluationDAO.insertEvaluation(evaluation)
+        }
     }
 
-    fun deleteEvaluation(evaluation: Evaluation) =
-        racoDatabase.evaluationDAO.deleteEvaluation(evaluation)
-
-    fun deleteEvaluation(id: Int) = racoDatabase.evaluationDAO.deleteEvaluation(id)
-
-    fun deleteAllEvaluations() = racoDatabase.evaluationDAO.deleteAllEvaluations()
-
-    fun addOrUpdateGradeToEvaluation(grade: Grade, evaluation: Evaluation) {
-        evaluation.listOfGrade.add(grade)
-        //insertEvaluation(evaluation)
+    suspend fun addGradeToEvaluation(evaluationId: Int) {
+        var grade = Grade(
+            id = 0,
+            gradesId = evaluationId,
+            name = "",
+            mark = -1.0,
+            weight = -1.0
+        )
+        withContext(Dispatchers.IO) {
+            racoDatabase.gradeDAO.insertGrade(grade)
+        }
     }
 
-    fun removeGradeFromEvaluation(grade: Grade, evaluation: Evaluation) {
-        evaluation.listOfGrade.remove(grade)
-        //insertEvaluation(evaluation)
+    suspend fun deleteGrade(gradeId: Int) {
+        withContext(Dispatchers.IO) {
+            racoDatabase.gradeDAO.deleteGrade(gradeId)
+        }
+    }
+
+    suspend fun deleteEvaluation(evaluationId: Int) {
+        withContext(Dispatchers.IO) {
+            racoDatabase.evaluationDAO.deleteEvaluation(evaluationId)
+        }
     }
 
     companion object {

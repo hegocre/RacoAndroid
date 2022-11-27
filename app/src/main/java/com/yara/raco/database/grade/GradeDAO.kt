@@ -1,6 +1,7 @@
 package com.yara.raco.database.grade
 
 import androidx.lifecycle.LiveData
+import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -8,8 +9,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.yara.raco.model.grade.Grade
 
+@Dao
 interface GradeDAO {
-
     @Transaction
     @Query("SELECT * FROM grade")
     fun getGrades(): LiveData<List<Grade>>

@@ -2,6 +2,7 @@ package com.yara.raco.model.evaluation
 
 import androidx.room.Entity
 import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.yara.raco.model.grade.Grade
 import kotlinx.serialization.SerialName
 
@@ -12,9 +13,10 @@ import kotlinx.serialization.SerialName
  * @param evaluation List of evaluation.
  */
 @kotlinx.serialization.Serializable
-@Entity(tableName = "evaluation", primaryKeys = ["id"])
+@Entity(tableName = "evaluation")
 data class Evaluation @JvmOverloads constructor(
     @SerialName("id")
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
     @SerialName("subjectId")
     val subjectId: String,

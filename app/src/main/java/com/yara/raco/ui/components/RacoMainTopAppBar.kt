@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +24,8 @@ fun RacoMainTopAppBar(
     onLogOut: () -> Unit,
     onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
+    onEditPress: (() -> Unit)? = null,
+    onAddPress: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     var menuExpanded by rememberSaveable {
@@ -52,6 +53,28 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
+            AnimatedVisibility(
+                visible = onEditPress != null,
+                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
+                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
+            ) {
+                IconButton(onClick = { onEditPress?.invoke() }) {
+                    Icon(
+                        imageVector = Icons.Default.Edit, contentDescription = "Edit"
+                    )
+                }
+            }
+            AnimatedVisibility(
+                visible = onAddPress != null,
+                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
+                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
+            ) {
+                IconButton(onClick = { onAddPress?.invoke() }) {
+                    Icon(
+                        imageVector = Icons.Default.Add, contentDescription = "Edit"
+                    )
+                }
+            }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(

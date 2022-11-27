@@ -86,21 +86,22 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteEvaluation(evaluation: Evaluation) {
+    fun addGradeToEvaluation(evaluationId: Int) {
         viewModelScope.launch {
-            evaluationController.deleteEvaluation(evaluation)
+            evaluationController.addGradeToEvaluation(evaluationId)
         }
     }
 
-    fun addOrUpdateGradeToEvaluation(grade: Grade, evaluation: Evaluation) {
+    fun deleteEvaluation(evaluationId: Int) {
         viewModelScope.launch {
-            evaluationController.addOrUpdateGradeToEvaluation(grade, evaluation)
+            evaluationController.deleteEvaluation(evaluationId)
+
         }
     }
 
-    fun removeGradeFromEvaluation(grade: Grade, evaluation: Evaluation) {
+    fun deleteGrade(gradeId: Int) {
         viewModelScope.launch {
-            evaluationController.removeGradeFromEvaluation(grade, evaluation)
+            evaluationController.deleteGrade(gradeId)
         }
     }
 }

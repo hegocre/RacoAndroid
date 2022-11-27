@@ -32,16 +32,17 @@ fun RacoMainNavHost(
     noticesWithFiles: List<NoticeWithFiles>,
     evaluationWithGrade: List<EvaluationWithGrade>,
     onFileClick: (File) -> Unit,
-    onGradeAddOrUpdate: (grade: Grade, evaluation: Evaluation) -> Unit,
-    onGradeDelete: (grade: Grade, evaluation: Evaluation) -> Unit,
-    onEvaluationAdd: (subjectId: String) -> Unit,
-    onEvaluationDelete: (evaluation: Evaluation) -> Unit,
+    onGradeAdd: (Int) -> Unit,
+    onGradeDelete: (Int) -> Unit,
+    onEvaluationDelete: (Int) -> Unit,
+    onGradeDetailedEdit: Boolean,
     subjects: List<Subject>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var detailedNoticeWithFiles by remember { mutableStateOf<NoticeWithFiles?>(null) }
+    var detailedGrade by remember { mutableStateOf<Int?>(null) }
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Avisos.name,
@@ -90,26 +91,37 @@ fun RacoMainNavHost(
         }
 
         composable(RacoScreen.Notes.name) {
-            RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                Column {
-                    val pagerState = rememberPagerState()
-
-                    RacoEvaluationTabs(
-                        subjects = subjects,
+            Column {
+                val pagerState = rememberPagerState()
+                RacoEvaluationTabs(
+                    subjects = subjects,
+                    pagerState = pagerState,
+                )
+                RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
+                    RacoGradesPager(
                         pagerState = pagerState,
+                        subjects = subjects,
+                        evaluations = evaluationWithGrade,
+                        onGradeClick = { evaluationWithGrade ->
+                            detailedGrade = evaluationWithGrade.evaluation.id
+                            navHostController.navigate("${RacoScreen.Notes.name}/details")
+                        }
                     )
 
-                    RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                        RacoGradesPager(
-                            pagerState = pagerState,
-                            subjects = subjects,
-                            evaluations = evaluationWithGrade,
-                            onGradeAddOrUpdate = onGradeAddOrUpdate,
-                            onGradeDelete = onGradeDelete,
-                            onEvaluationAdd = onEvaluationAdd,
-                            onEvaluationDelete = onEvaluationDelete,
-                        )
-                    }
+                }
+            }
+        }
+
+        composable("${RacoScreen.Notes.name}/details") {
+            Column {
+                detailedGrade?.let { evaluationId ->
+                    DetailedEvaluationWithGradeCall(
+                        evaluation = evaluationWithGrade.first { it.evaluation.id == evaluationId },
+                        onGradeDetailedEdit = onGradeDetailedEdit,
+                        onGradeAdd = onGradeAdd,
+                        onGradeDelete = onGradeDelete,
+                        onEvaluationDelete = onEvaluationDelete
+                    )
                 }
             }
         }
