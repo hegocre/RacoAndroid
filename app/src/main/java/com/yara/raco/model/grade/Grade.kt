@@ -17,14 +17,14 @@ import kotlinx.serialization.SerialName
 data class Grade @JvmOverloads constructor(
     @SerialName("id")
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
     @SerialName("Name")
-    val name: String,
+    var name: String,
     @SerialName("weight")
     var weight: Double,
     @SerialName("Mark")
     var mark: Double,
     @SerialName("Description")
-    val description: String = "",
-    val gradesId: Int = 0
+    var description: String = "",
+    var gradesId: Int = 0
 )

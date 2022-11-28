@@ -51,6 +51,12 @@ class EvaluationController private constructor(context: Context) {
         }
     }
 
+    suspend fun evaluationSave(evaluation: Evaluation) {
+        withContext(Dispatchers.IO) {
+            racoDatabase.evaluationDAO.insertEvaluation(evaluation)
+        }
+    }
+
     companion object {
         private var INSTANCE: EvaluationController? = null
 

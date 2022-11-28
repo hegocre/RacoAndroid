@@ -4,27 +4,25 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.yara.raco.R
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.subject.Subject
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
+/*TODO: Eliminar Boto + de Dalt*/
+
+@OptIn(
+    ExperimentalPagerApi::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun RacoGradesPager(
     subjects: List<Subject>,
@@ -33,38 +31,50 @@ fun RacoGradesPager(
     modifier: Modifier = Modifier
 ) {
     val subjectsIds = (evaluations.map { it.evaluation.subjectId }).distinct()
-    LazyColumn() {
-        for (subject in subjectsIds) {
-            val subjectName = subjects.find { it.sigles == subject }?.nom
-            stickyHeader {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = if (subject != "") subjectName.toString() else "Unlabeled",
-                        style = MaterialTheme.typography.titleMedium
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Outlined.Add, contentDescription = "Add grade")
+            }
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = modifier.padding(paddingValues)
+        ) {
+            for (subject in subjectsIds) {
+                val subjectName = subjects.find { it.sigles == subject }?.nom
+                stickyHeader {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = if (subject != "") subjectName.toString() else "Unlabeled",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+                items(evaluations.filter { it.evaluation.subjectId == subject }) { evaluation ->
+                    RacoGradesCollapsed(
+                        evaluation = evaluation,
+                        onGradeClick = onGradeClick
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillParentMaxWidth()
+                            .background(
+                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                            )
                     )
                 }
-            }
-            items(evaluations.filter { it.evaluation.subjectId == subject }) { evaluation ->
-                RacoGradesCollapsed(
-                    evaluation = evaluation,
-                    onGradeClick = onGradeClick
-                )
-                Spacer(
-                    modifier = Modifier
-                        .height(1.dp)
-                        .fillParentMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                        )
-                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedEvaluationWithGradeCall(
     evaluation: EvaluationWithGrade,
@@ -73,21 +83,39 @@ fun DetailedEvaluationWithGradeCall(
     onGradeDelete: (Int) -> Unit,
     onEvaluationDelete: (Int) -> Unit,
 ) {
-    if (!onGradeDetailedEdit) {
-        DetailedEvaluationWithGrade(evaluation = evaluation)
-    } else {
-        EditEvaluationWithGrade(
-            evaluation = evaluation,
-            onGradeAdd = onGradeAdd,
-            onGradeDelete = onGradeDelete,
-            onEvaluationDelete = onEvaluationDelete
-        )
+    val editableEvaluation = remember { evaluation.copy() }
+    Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    if (!onGradeDetailedEdit) Icons.Outlined.Edit else Icons.Outlined.Save,
+                    contentDescription = "Add grade"
+                )
+            }
+        }
+    ) { paddingValues ->
+        if (!onGradeDetailedEdit) {
+            DetailedEvaluationWithGrade(
+                evaluation = editableEvaluation,
+                modifier = Modifier.padding(paddingValues)
+            )
+        } else {
+            EditEvaluationWithGrade(
+                evaluation = editableEvaluation,
+                onGradeAdd = onGradeAdd,
+                onGradeDelete = onGradeDelete,
+                onEvaluationDelete = onEvaluationDelete,
+                modifier = Modifier.padding(paddingValues)
+            )
+        }
     }
 }
 
 @Composable
 fun DetailedEvaluationWithGrade(
     evaluation: EvaluationWithGrade,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = Modifier
@@ -102,7 +130,7 @@ fun DetailedEvaluationWithGrade(
             text = evaluation.evaluation.subjectId,
             style = MaterialTheme.typography.headlineLarge
         )
-        gradeMarkWithColor(
+        GradeMarkWithColor(
             computeFinalMarkFromEvaluation(evaluation.listOfGrade),
             MaterialTheme.typography.headlineMedium
         )
@@ -129,9 +157,8 @@ fun EditEvaluationWithGrade(
     onGradeAdd: (Int) -> Unit,
     onGradeDelete: (Int) -> Unit,
     onEvaluationDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var evaluationName by remember { mutableStateOf<String>(evaluation.evaluation.name) }
-    var evaluationSubjectId by remember { mutableStateOf<String>(evaluation.evaluation.subjectId) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -144,14 +171,14 @@ fun EditEvaluationWithGrade(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OutlinedTextField(
-                value = evaluationName,
+                value = evaluation.evaluation.name,
                 placeholder = {
                     Text(
                         text = "Evaluation Name", /* TODO: Make it multi language */
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
                     )
                 },
-                onValueChange = { evaluationName = it },
+                onValueChange = { evaluation.evaluation.name = it },
                 maxLines = 1,
             )
             IconButton(onClick = { onEvaluationDelete(evaluation.evaluation.id) }) {
@@ -159,18 +186,18 @@ fun EditEvaluationWithGrade(
             }
         }
         OutlinedTextField(
-            value = evaluationSubjectId,
+            value = evaluation.evaluation.subjectId,
             placeholder = {
                 Text(
                     text = "Subject Id", /* TODO: Make it multi language */
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
                 )
             },
-            onValueChange = { evaluationSubjectId = it },
+            onValueChange = { evaluation.evaluation.subjectId = it },
             modifier = Modifier.fillMaxSize(),
             maxLines = 1,
         )
-        gradeMarkWithColor(
+        GradeMarkWithColor(
             computeFinalMarkFromEvaluation(evaluation.listOfGrade),
             MaterialTheme.typography.headlineMedium
         )
@@ -201,8 +228,6 @@ fun RacoGradeView(
     grade: Grade,
     neededMark: Double
 ) {
-    var gradeMark by remember { mutableStateOf(grade.mark) }
-    var gradeWeight by remember { mutableStateOf(grade.weight) }
     Row(
         modifier = Modifier
             .fillMaxSize(),
@@ -216,12 +241,12 @@ fun RacoGradeView(
                 .width(150.dp)
         )
         Text(
-            text = if (gradeWeight >= 0) "%.${2}f %".format(gradeWeight) else "NaN",
+            text = if (grade.weight >= 0) "%.${2}f %".format(grade.weight) else "NaN",
             style = MaterialTheme.typography.labelMedium
         )
         OutlinedTextField(
-            value = if (gradeMark >= 0) "%.${2}f".format(gradeMark) else "",
-            onValueChange = { gradeMark = it.toDouble() },
+            value = if (grade.mark >= 0) "%.${2}f".format(grade.mark) else "",
+            onValueChange = { grade.mark = it.toDouble() },
             placeholder = {
                 Text(
                     text = neededMark.toString(),
@@ -241,9 +266,6 @@ fun RacoGradeEditView(
     neededMark: Double,
     onGradeDelete: (Int) -> Unit,
 ) {
-    var gradeName by remember { mutableStateOf(grade.name) }
-    var gradeMark by remember { mutableStateOf(grade.mark) }
-    var gradeWeight by remember { mutableStateOf(grade.weight) }
     Row(
         modifier = Modifier
             .fillMaxSize(),
@@ -251,8 +273,8 @@ fun RacoGradeEditView(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         OutlinedTextField(
-            value = gradeName,
-            onValueChange = { gradeName = it },
+            value = grade.name,
+            onValueChange = { grade.name = it },
             placeholder = {
                 Text(
                     text = "Grade Name",
@@ -264,8 +286,8 @@ fun RacoGradeEditView(
             maxLines = 1,
         )
         OutlinedTextField(
-            value = if (gradeWeight >= 0) "%.${2}f".format(gradeWeight) else "",
-            onValueChange = { gradeWeight = it.toDouble() },
+            value = if (grade.weight >= 0) "%.${2}f".format(grade.weight) else "",
+            onValueChange = { grade.weight = it.toDouble() },
             placeholder = {
                 Text(
                     text = "0.0 %",
@@ -276,8 +298,8 @@ fun RacoGradeEditView(
                 .width(80.dp)
         )
         OutlinedTextField(
-            value = if (gradeMark >= 0) "%.${2}f".format(gradeMark) else "",
-            onValueChange = { gradeMark = it.toDouble() },
+            value = if (grade.mark >= 0) "%.${2}f".format(grade.mark) else "",
+            onValueChange = { grade.mark = it.toDouble() },
             placeholder = {
                 Text(
                     text = neededMark.toString(),
@@ -313,7 +335,7 @@ fun RacoGradesCollapsed(
             )
         },
         supportingText = {
-            gradeMarkWithColor(
+            GradeMarkWithColor(
                 computeFinalMarkFromEvaluation(evaluation.listOfGrade),
                 MaterialTheme.typography.titleLarge
             )
@@ -322,7 +344,7 @@ fun RacoGradesCollapsed(
 }
 
 @Composable
-fun gradeMarkWithColor(
+fun GradeMarkWithColor(
     mark: Double,
     style: TextStyle
 ) {

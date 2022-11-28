@@ -17,11 +17,11 @@ import kotlinx.serialization.SerialName
 data class Evaluation @JvmOverloads constructor(
     @SerialName("id")
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    var id: Int,
     @SerialName("subjectId")
-    val subjectId: String,
+    var subjectId: String,
     @SerialName("name")
-    val name: String,
+    var name: String,
     @SerialName("listOfGrade")
     @Ignore
     val listOfGrade: ArrayList<Grade> = arrayListOf()

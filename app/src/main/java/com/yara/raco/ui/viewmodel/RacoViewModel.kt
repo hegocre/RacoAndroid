@@ -104,4 +104,10 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
             evaluationController.deleteGrade(gradeId)
         }
     }
+
+    fun evaluationSave(evaluation: Evaluation) {
+        viewModelScope.launch {
+            evaluationController.evaluationSave(evaluation)
+        }
+    }
 }
