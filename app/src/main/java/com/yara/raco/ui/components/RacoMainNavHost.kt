@@ -1,39 +1,74 @@
 package com.yara.raco.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeWithFiles
+import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.RacoScreen
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RacoMainNavHost(
     navHostController: NavHostController,
     noticesWithFiles: List<NoticeWithFiles>,
     onFileClick: (File) -> Unit,
+    subjects: List<Subject>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var detailedNoticeWithFiles by remember { mutableStateOf<NoticeWithFiles?>(null) }
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Avisos.name,
         modifier = modifier
     ) {
         composable(RacoScreen.Avisos.name) {
-            RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                RacoNoticeList(noticesWithFiles = noticesWithFiles, onFileClick = onFileClick)
+            Column {
+                val pagerState = rememberPagerState()
+
+                RacoNoticeTabs(
+                    subjects = subjects,
+                    pagerState = pagerState,
+                )
+
+                RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
+                    RacoNoticePager(
+                        pagerState = pagerState,
+                        subjects = subjects,
+                        noticesWithFiles = noticesWithFiles,
+                        onNoticeClick = { noticeWithFiles ->
+                            detailedNoticeWithFiles = noticeWithFiles
+                            navHostController.navigate("${RacoScreen.Avisos.name}/details")
+                        }
+                    )
+                }
+            }
+        }
+
+        composable("${RacoScreen.Avisos.name}/details") {
+            Column {
+                detailedNoticeWithFiles?.let { noticeWithFiles ->
+                    DetailedNoticeWithFiles(
+                        noticeWithFiles = noticeWithFiles,
+                        onFileClick = onFileClick
+                    )
+                }
             }
         }
 

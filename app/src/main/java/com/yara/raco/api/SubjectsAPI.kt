@@ -1,9 +1,8 @@
 package com.yara.raco.api
 
-import android.util.Log
 import com.yara.raco.model.subject.Subject
-import com.yara.raco.utils.Error
 import com.yara.raco.utils.OkHttpRequest
+import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -12,16 +11,18 @@ import kotlinx.serialization.json.Json
 
 class SubjectsAPI private constructor() {
 
-    suspend fun getSubjects(accessToken: String): Result<List<Subject>> = try {
-        val response = withContext(Dispatchers.IO) {
-            OkHttpRequest.getInstance().get(
-                sUrl = SUBJECT_URL,
-                accessToken = accessToken,
-            )
-        }
+    suspend fun getSubjects(accessToken: String, language: String = "ca"): Result<List<Subject>> =
+        try {
+            val response = withContext(Dispatchers.IO) {
+                OkHttpRequest.getInstance().get(
+                    sUrl = SUBJECT_URL,
+                    accessToken = accessToken,
+                    language = language
+                )
+            }
 
-        val statusCode = response.code
-        val body = withContext(Dispatchers.IO) {
+            val statusCode = response.code
+            val body = withContext(Dispatchers.IO) {
             response.body?.string()
         }
 
@@ -34,13 +35,13 @@ class SubjectsAPI private constructor() {
             Result.Success(aux)
         }
         else {
-            Result.Error(Error.API_BAD_RESPONSE)
+            Result.Error(ResultCode.ERROR_API_BAD_RESPONSE)
         }
 
     }
     catch (e: Exception) {
-        Log.d("ERROR", e.toString())
-        Result.Error(Error.API_BAD_REQUEST)
+        e.printStackTrace()
+        Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 
     @Serializable

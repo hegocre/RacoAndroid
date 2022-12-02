@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notices">Avisos</string>
+    <string name="planning">Horario</string>
+    <string name="grades">Notas</string>
+    <string name="menu">Menú</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="login_failed">No se ha podido iniciar sesión</string>
+    <string name="about">Información</string>
+    <string name="back">Atrás</string>
+    <string name="version">Versión</string>
+    <string name="source_code">Código fuente</string>
+    <string name="api_raco_disclaimer">Aplicación desarollada usando la API v2 del Raco de la FIB.</string>
+    <string name="authors">Autores</string>
+    <string name="licenses">Licencias</string>
+    <string name="help_suggestions">Ayuda y sugerencias</string>
+    <string name="download_failed">La descarga ha fallado</string>
+    <string name="download_started">Se ha iniciado la descarga</string>
+    <string name="cannot_open_file">No se ha podido abrir el fichero</string>
+    <string name="no_notices_yet">Aún no tienes ningún aviso</string>
+    <string name="all">Todos</string>
+    <string name="you_have_new_notices">Tienes avisos nuevos</string>
+    <string name="new_notices">Avisos nuevos</string>
+</resources>

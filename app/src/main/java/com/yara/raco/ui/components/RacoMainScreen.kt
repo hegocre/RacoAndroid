@@ -1,14 +1,13 @@
 package com.yara.raco.ui.components
 
 import android.content.Intent
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +19,6 @@ import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +38,18 @@ fun RacoMainScreen(
 
     val context = LocalContext.current
 
+
+    val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+        //Declare back action for button to appear
+        "${RacoScreen.Avisos.name}/details" -> {
+            {
+                navController.popBackStack()
+            }
+        }
+        //Default to not visible
+        else -> null
+    }
+
     RacoTheme {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -48,6 +58,7 @@ fun RacoMainScreen(
                     title = stringResource(id = currentScreen.title),
                     scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
+                    onBackPress = onBackPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))
                     }
@@ -68,14 +79,21 @@ fun RacoMainScreen(
                     }
                 )
             },
-            contentWindowInsets = WindowInsets.systemBars
+            contentWindowInsets = WindowInsets.systemBars,
         ) { paddingValues ->
             val noticesWithFiles by racoViewModel.notices.observeAsState(initial = emptyList())
-            racoViewModel.subjects.observeAsState(initial = emptyList())
+            val sortedNoticesWithFiles = remember(noticesWithFiles) {
+                noticesWithFiles.sortedByDescending { it.notice.dataModificacio }
+            }
+            val subjects by racoViewModel.subjects.observeAsState(initial = emptyList())
+            val sortedSubjects = remember(subjects) {
+                subjects.sortedBy { it.nom }
+            }
             RacoMainNavHost(
                 navHostController = navController,
-                noticesWithFiles = noticesWithFiles.sortedByDescending { it.notice.dataModificacio },
+                noticesWithFiles = sortedNoticesWithFiles,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
+                subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing

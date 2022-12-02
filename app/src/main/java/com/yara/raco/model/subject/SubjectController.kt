@@ -29,6 +29,12 @@ class SubjectController private constructor(context: Context)  {
         }
     }
 
+    suspend fun deleteAllSubjects() {
+        withContext(Dispatchers.IO) {
+            racoDatabase.subjectDAO.deleteAllSubjects()
+        }
+    }
+
     fun getSubjects() = racoDatabase.subjectDAO.fetchAllSubjects()
 
     companion object {

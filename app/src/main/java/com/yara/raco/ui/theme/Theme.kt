@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat.getInsetsController
 
-private val LightColorScheme = lightColorScheme(
+private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
     primaryContainer = md_theme_light_primaryContainer,
@@ -40,10 +40,13 @@ private val LightColorScheme = lightColorScheme(
     inverseOnSurface = md_theme_light_inverseOnSurface,
     inverseSurface = md_theme_light_inverseSurface,
     inversePrimary = md_theme_light_inversePrimary,
+    surfaceTint = md_theme_light_surfaceTint,
+    outlineVariant = md_theme_light_outlineVariant,
+    scrim = md_theme_light_scrim,
 )
 
 
-private val DarkColorScheme = darkColorScheme(
+private val DarkColors = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
     primaryContainer = md_theme_dark_primaryContainer,
@@ -70,6 +73,9 @@ private val DarkColorScheme = darkColorScheme(
     inverseOnSurface = md_theme_dark_inverseOnSurface,
     inverseSurface = md_theme_dark_inverseSurface,
     inversePrimary = md_theme_dark_inversePrimary,
+    surfaceTint = md_theme_dark_surfaceTint,
+    outlineVariant = md_theme_dark_outlineVariant,
+    scrim = md_theme_dark_scrim,
 )
 
 @Composable
@@ -84,8 +90,8 @@ fun RacoTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> DarkColors
+        else -> LightColors
     }
     val view = LocalView.current
 

@@ -9,27 +9,19 @@ import android.graphics.Typeface
 import android.text.Html
 import android.text.Spanned
 import android.text.style.*
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -39,7 +31,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.core.text.getSpans
-import java.lang.Integer.min
 
 /**
  * Simple Text composable to show the text with html styling from a String.
@@ -83,23 +74,32 @@ fun HtmlText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
-    var annotatedString = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
-        .toAnnotatedString(urlSpanStyle, colorMapping)
-    while (annotatedString.endsWith("\n")) {
-        annotatedString = annotatedString.subSequence(0, annotatedString.length - 1)
+    val annotatedString = remember {
+        Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+            .toAnnotatedString(urlSpanStyle, colorMapping)
     }
-
-    val clickableElements = annotatedString.getStringAnnotations(0, annotatedString.length - 1)
 
     val uriHandler = LocalUriHandler.current
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
 
-    val boxPosX = remember { mutableStateListOf<Pair<Float, Float>>() }
-    val boxPosY = remember { mutableStateListOf<Pair<Float, Float>>() }
-
     Box {
         Text(
-            modifier = modifier,
+            modifier = modifier.pointerInput(Unit) {
+                detectTapGestures { pos ->
+                    layoutResult.value?.let { layoutResult ->
+                        val position =
+                            layoutResult.getOffsetForPosition(pos)
+                        annotatedString
+                            .getStringAnnotations(position, position)
+                            .firstOrNull()
+                            ?.let { sa ->
+                                if (sa.tag == "url") {
+                                    uriHandler.openUri(sa.item)
+                                }
+                            }
+                    }
+                }
+            },
             text = annotatedString,
             color = color,
             fontSize = fontSize,
@@ -115,45 +115,11 @@ fun HtmlText(
             maxLines = maxLines,
             inlineContent = inlineContent,
             onTextLayout = {
-                clickableElements.forEach { url ->
-                    boxPosX.add(
-                        Pair(
-                            it.getBoundingBox(url.start).left,
-                            it.getBoundingBox(url.end - 1).right
-                        )
-                    )
-                    boxPosY.add(
-                        Pair(
-                            it.getBoundingBox(url.start).top,
-                            it.getBoundingBox(url.end - 1).top
-                        )
-                    )
-                }
                 layoutResult.value = it
                 onTextLayout(it)
             },
             style = style
         )
-
-        for (i in 0 until min(boxPosX.size, boxPosY.size)) {
-            val buttonPaddingX = with(LocalDensity.current) { boxPosX[i].first.toDp() }
-            val buttonPaddingY = with(LocalDensity.current) { boxPosY[i].first.toDp() }
-            val buttonWidth =
-                with(LocalDensity.current) { (boxPosX[i].second - boxPosX[i].first).toDp() }
-            val buttonHeight =
-                with(LocalDensity.current) { (boxPosY[i].second - boxPosY[i].first).toDp() }
-            Box(
-                modifier = Modifier
-                    .padding(start = buttonPaddingX, top = buttonPaddingY)
-                    .width(buttonWidth)
-                    .height(buttonHeight)
-                    .clickable { uriHandler.openUri(clickableElements[i].item) }
-                    .semantics {
-                        role = Role.Button
-                        contentDescription = clickableElements[i].item
-                    }
-            )
-        }
     }
 
 
