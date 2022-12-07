@@ -15,7 +15,7 @@ interface ScheduleDAO {
     data class SchedulePrimaryKey(
         @ColumnInfo(name = "codiAssig") val codiAssig: String,
         @ColumnInfo(name = "diaSetmana") val diaSetmana: Int,
-        @ColumnInfo(name = "inici") val inici: Int
+        @ColumnInfo(name = "inici") val inici: String
     )
 
     @Query("SELECT codiAssig, diaSetmana, inici FROM schedule")
@@ -28,7 +28,7 @@ interface ScheduleDAO {
     suspend fun deleteSchedule(subject: Schedule)
 
     @Query("DELETE FROM schedule WHERE codiAssig = :codiAssig and diaSetmana = :diaSetmana and inici = :inici")
-    suspend fun deleteSchedule(codiAssig: String, diaSetmana: Int, inici: Int)
+    suspend fun deleteSchedule(codiAssig: String, diaSetmana: Int, inici: String)
 
     @Query("DELETE FROM schedule")
     suspend fun deleteAllSchedules()

@@ -1,7 +1,7 @@
 package com.yara.raco.api
 
 import com.yara.raco.model.schedule.Schedule
-import com.yara.raco.utils.Error
+import com.yara.raco.utils.ResultCode
 import com.yara.raco.utils.OkHttpRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,12 +32,12 @@ class ScheduleApi private constructor() {
             val aux = Json.decodeFromString<ScheduleResponse>(body).results
             Result.Success(aux)
         } else {
-            Result.Error(Error.API_BAD_RESPONSE)
+            Result.Error(ResultCode.ERROR_API_BAD_RESPONSE)
         }
 
     } catch (e: Exception) {
         e.printStackTrace()
-        Result.Error(Error.API_BAD_REQUEST)
+        Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 
     @Serializable

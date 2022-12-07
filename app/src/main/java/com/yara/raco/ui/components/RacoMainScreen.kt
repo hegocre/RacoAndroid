@@ -89,11 +89,13 @@ fun RacoMainScreen(
             val sortedSubjects = remember(subjects) {
                 subjects.sortedBy { it.nom }
             }
+            val schedules by racoViewModel.schedules.observeAsState(initial = emptyList())
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = sortedNoticesWithFiles,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
                 subjects = sortedSubjects,
+                schedules = schedules,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing

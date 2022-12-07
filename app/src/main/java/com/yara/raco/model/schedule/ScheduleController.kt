@@ -4,6 +4,7 @@ import android.content.Context
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
 import com.yara.raco.database.RacoDatabase
+import com.yara.raco.database.schedule.ScheduleDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -17,14 +18,18 @@ class ScheduleController private constructor(context: Context)  {
             if (result is Result.Success) {
                 val savedScheduleSet = racoDatabase.scheduleDAO.fetchAllSchedulePrimaryKeys().toHashSet()
                 for (schedule in result.data) {
-                    //CAL ARREGLAR-HO
-                    if (!savedScheduleSet.contains(schedule.codiAssig+schedule.diaSetmana+schedule.inici)) {
+                    var primarykey = ScheduleDAO.SchedulePrimaryKey(
+                        schedule.codiAssig,
+                        schedule.diaSetmana,
+                        schedule.inici
+                    )
+                    if (!savedScheduleSet.contains(primarykey)) {
                         racoDatabase.scheduleDAO.insertSchedule(schedule)
                     }
-                    savedScheduleSet.remove(schedule.codiAssig+schedule.diaSetmana+schedule.inici)
+                    savedScheduleSet.remove(primarykey)
                 }
-                for (primarykey in savedScheduleSet) {
-                    racoDatabase.scheduleDAO.deleteSchedule(primarykey.codiAssig, primarykey.diaSetmana, primarykey.inici)
+                for (pk in savedScheduleSet) {
+                    racoDatabase.scheduleDAO.deleteSchedule(pk.codiAssig, pk.diaSetmana, pk.inici)
                 }
             }
         }

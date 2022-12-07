@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId "com.yara.raco"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -96,6 +96,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+
+    implementation("com.himanshoe:kalendar:1.2.0")
 
     //Debug and test implementations
     testImplementation 'junit:junit:4.13.2'

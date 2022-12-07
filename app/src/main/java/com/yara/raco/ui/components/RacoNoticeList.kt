@@ -118,7 +118,6 @@ fun RacoNoticePager(
         }
     }
 }
-
 @Composable
 fun RacoNoticeList(
     noticesWithFiles: List<NoticeWithFiles>,

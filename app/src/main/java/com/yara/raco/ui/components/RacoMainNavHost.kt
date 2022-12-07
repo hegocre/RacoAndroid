@@ -18,6 +18,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeWithFiles
+import com.yara.raco.model.schedule.Schedule
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.RacoScreen
 
@@ -28,6 +29,7 @@ fun RacoMainNavHost(
     noticesWithFiles: List<NoticeWithFiles>,
     onFileClick: (File) -> Unit,
     subjects: List<Subject>,
+    schedules: List<Schedule>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -74,9 +76,7 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Horari.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-
-                }
+                RacoScheduleMonth(schedules = schedules, selectedDay = 1)
             }
         }
 
