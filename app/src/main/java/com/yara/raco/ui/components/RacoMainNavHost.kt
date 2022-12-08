@@ -84,7 +84,7 @@ fun RacoMainNavHost(
                     if(isDayCalendarViewSelected){
                         RacoScheduleDay(schedules = schedules)
                     }else{
-                        RacoScheduleMonth(schedules = schedules)
+                        RacoScheduleWeek(schedules = schedules)
                     }
                 }
             }
