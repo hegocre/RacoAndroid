@@ -18,6 +18,7 @@ import com.yara.raco.R
 import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.components.RacoMainScreen
 import com.yara.raco.ui.viewmodel.RacoViewModel
+import com.yara.raco.workers.LogOutWorker
 import com.yara.raco.workers.NoticeNotificationWorker
 
 class MainActivity : ComponentActivity() {
@@ -86,7 +87,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun logout() {
-        UserController.getInstance(this).logOut()
+        LogOutWorker.executeSelf(this)
         launchLogin()
         finish()
     }

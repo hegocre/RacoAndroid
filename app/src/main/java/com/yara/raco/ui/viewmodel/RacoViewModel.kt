@@ -9,13 +9,13 @@ import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
-import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
 import com.yara.raco.utils.ResultCode
+import com.yara.raco.workers.LogOutWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,12 +47,13 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     init {
         viewModelScope.launch {
             _isRefreshing.emit(true)
-            when (userController.refreshToken()) {
+            when (LogOutWorker.getLastExecutionResult(application)) {
                 ResultCode.INVALID_TOKEN -> _shouldLogOut.value = true
                 ResultCode.SUCCESS -> {
                     shouldRefreshToken = false
                     refresh()
                 }
+                ResultCode.UNKNOWN, ResultCode.ERROR_API_BAD_RESPONSE -> _isRefreshing.emit(false)
             }
         }
     }
@@ -67,8 +68,9 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
                         _isRefreshing.emit(false)
                         return@launch
                     }
+                    ResultCode.UNKNOWN, ResultCode.ERROR_API_BAD_RESPONSE -> return@launch
+                    ResultCode.SUCCESS -> shouldRefreshToken = false
                 }
-
             }
             subjectController.syncSubjects()
             noticeController.syncNotices()

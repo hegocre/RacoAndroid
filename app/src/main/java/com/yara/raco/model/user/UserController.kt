@@ -3,16 +3,22 @@ package com.yara.raco.model.user
 import android.content.Context
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
+import com.yara.raco.model.evaluation.EvaluationController
+import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.utils.PreferencesManager
 import com.yara.raco.utils.ResultCode
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class UserController private constructor(context: Context) {
     private val preferencesManager = PreferencesManager.getInstance(context)
     private val apiController = ApiController.getInstance()
     private val subjectController = SubjectController.getInstance(context)
+    private val noticeController = NoticeController.getInstance(context)
+    private val evaluationController = EvaluationController.getInstance(context)
     val isLoggedIn: Boolean
         get() = apiController.accessToken != null
 
@@ -85,9 +91,12 @@ class UserController private constructor(context: Context) {
         return ResultCode.UNKNOWN
     }
 
-    fun logOut() {
+    suspend fun logOut() {
         preferencesManager.setAccessToken(null)
         apiController.accessToken = null
+        subjectController.deleteAllSubjects()
+        noticeController.deleteAllNotices()
+        evaluationController.deleteAllEvaluations()
     }
 
     companion object {
