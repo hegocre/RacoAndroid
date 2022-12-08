@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,13 +25,10 @@ fun RacoMainTopAppBar(
     onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
     onEventSettingsPress: (() -> Unit)? = null,
+    isDayViewSelected: Boolean,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     var menuExpanded by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    var calendarMenuExpanded by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -59,31 +54,28 @@ fun RacoMainTopAppBar(
         },
         actions = {
             AnimatedVisibility(
-                visible = onEventSettingsPress != null,
+                visible = onEventSettingsPress != null && isDayViewSelected,
                 enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
                 exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
             ) {
-                IconButton(onClick = { calendarMenuExpanded = true }) {
+                IconButton(onClick = { onEventSettingsPress?.invoke() }) {
                     Icon(
-                        imageVector = Icons.Default.Event, contentDescription = stringResource(
+                        imageVector = Icons.Default.ViewDay, contentDescription = stringResource(
                             id = R.string.calendar_menu
                         )
                     )
                 }
-                DropdownMenu(expanded = calendarMenuExpanded, onDismissRequest = { calendarMenuExpanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text(text= stringResource(id = R.string.calendar_day)) },
-                        onClick = {
-                            onEventSettingsPress?.invoke()
-                            calendarMenuExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text= stringResource(id = R.string.calendar_week)) },
-                        onClick = {
-                            onEventSettingsPress?.invoke()
-                            calendarMenuExpanded = false
-                        }
+            }
+            AnimatedVisibility(
+                visible = onEventSettingsPress != null && !isDayViewSelected,
+                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
+                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
+            ) {
+                IconButton(onClick = { onEventSettingsPress?.invoke() }) {
+                    Icon(
+                        imageVector = Icons.Default.ViewWeek, contentDescription = stringResource(
+                            id = R.string.calendar_menu
+                        )
                     )
                 }
             }

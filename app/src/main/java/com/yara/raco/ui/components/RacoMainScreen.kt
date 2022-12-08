@@ -68,6 +68,7 @@ fun RacoMainScreen(
                     scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
+                    isDayViewSelected = dayCalendarViewSelected,
                     onEventSettingsPress = onEventSettingsPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))

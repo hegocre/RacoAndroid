@@ -5,8 +5,6 @@
     <string name="grades">Grades</string>
     <string name="menu">Menu</string>
     <string name="calendar_menu">Calendar Menu</string>
-    <string name="calendar_day">Day</string>
-    <string name="calendar_week">Week</string>
     <string name="logout">Log out</string>
     <string name="login">Log in</string>
     <string name="login_failed">Could not log in</string>

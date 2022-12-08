@@ -5,8 +5,6 @@
     <string name="grades">Notas</string>
     <string name="menu">Menú</string>
     <string name="calendar_menu">Menú del calendario</string>
-    <string name="calendar_day">Día</string>
-    <string name="calendar_week">Semana</string>
     <string name="logout">Cerrar sesión</string>
     <string name="login">Iniciar sesión</string>
     <string name="login_failed">No se ha podido iniciar sesión</string>
