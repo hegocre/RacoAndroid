@@ -76,7 +76,7 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Horari.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                RacoScheduleMonth(schedules = schedules, selectedDay = 1)
+                RacoScheduleDay(schedules = schedules)
             }
         }
 

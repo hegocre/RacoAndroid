@@ -15,7 +15,7 @@ import com.yara.raco.model.subject.Subject
 
 @Database(
     entities = [Subject::class, Notice::class, File::class, Schedule::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class RacoDatabase : RoomDatabase() {
