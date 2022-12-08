@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -25,9 +26,14 @@ fun RacoMainTopAppBar(
     onLogOut: () -> Unit,
     onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
+    onEventSettingsPress: (() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     var menuExpanded by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    var calendarMenuExpanded by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -52,6 +58,35 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
+            AnimatedVisibility(
+                visible = onEventSettingsPress != null,
+                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
+                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
+            ) {
+                IconButton(onClick = { calendarMenuExpanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Event, contentDescription = stringResource(
+                            id = R.string.calendar_menu
+                        )
+                    )
+                }
+                DropdownMenu(expanded = calendarMenuExpanded, onDismissRequest = { calendarMenuExpanded = false }) {
+                    DropdownMenuItem(
+                        text = { Text(text= stringResource(id = R.string.calendar_day)) },
+                        onClick = {
+                            onEventSettingsPress?.invoke()
+                            calendarMenuExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text= stringResource(id = R.string.calendar_week)) },
+                        onClick = {
+                            onEventSettingsPress?.invoke()
+                            calendarMenuExpanded = false
+                        }
+                    )
+                }
+            }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(

@@ -1,5 +1,7 @@
 package com.yara.raco.ui.components
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +32,7 @@ fun RacoMainNavHost(
     onFileClick: (File) -> Unit,
     subjects: List<Subject>,
     schedules: List<Schedule>,
+    dayCalendarViewSelected: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -76,7 +79,14 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Horari.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                RacoScheduleDay(schedules = schedules)
+                Crossfade(targetState = dayCalendarViewSelected, animationSpec = tween(durationMillis = 1000)) {
+                    isDayCalendarViewSelected ->
+                    if(isDayCalendarViewSelected){
+                        RacoScheduleDay(schedules = schedules)
+                    }else{
+                        RacoScheduleMonth(schedules = schedules)
+                    }
+                }
             }
         }
 

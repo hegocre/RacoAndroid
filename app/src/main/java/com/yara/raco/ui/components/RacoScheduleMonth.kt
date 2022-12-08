@@ -13,8 +13,7 @@ import com.himanshoe.kalendar.model.KalendarType
 
 @Composable
 fun RacoScheduleMonth(
-    schedules: List<Schedule>,
-    selectedDay: Int
+    schedules: List<Schedule>
 ) {
     val colorSubject = HashMap<String, Color>()
     for (subject in schedules.distinctBy{ it.codiAssig }.withIndex()){

@@ -3,11 +3,9 @@ package com.yara.raco.ui.components
 import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -38,12 +36,23 @@ fun RacoMainScreen(
 
     val context = LocalContext.current
 
+    var dayCalendarViewSelected by rememberSaveable{ mutableStateOf(true)}
 
     val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
         //Declare back action for button to appear
         "${RacoScreen.Avisos.name}/details" -> {
             {
                 navController.popBackStack()
+            }
+        }
+        //Default to not visible
+        else -> null
+    }
+
+    val onEventSettingsPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+        "${RacoScreen.Horari.name}" -> {
+            {
+                dayCalendarViewSelected = !dayCalendarViewSelected
             }
         }
         //Default to not visible
@@ -59,6 +68,7 @@ fun RacoMainScreen(
                     scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
+                    onEventSettingsPress = onEventSettingsPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))
                     }
@@ -96,6 +106,7 @@ fun RacoMainScreen(
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
                 subjects = sortedSubjects,
                 schedules = schedules,
+                dayCalendarViewSelected = dayCalendarViewSelected,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing
