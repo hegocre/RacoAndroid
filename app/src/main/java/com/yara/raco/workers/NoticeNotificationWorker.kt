@@ -14,7 +14,6 @@ import com.yara.raco.database.RacoDatabase
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.activities.MainActivity
-import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -28,11 +27,6 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
             val userController = UserController.getInstance(applicationContext)
             if (!userController.isLoggedIn) {
                 return@withContext Result.failure()
-            }
-            when (userController.refreshToken()) {
-                ResultCode.INVALID_TOKEN -> return@withContext Result.failure()
-                ResultCode.SUCCESS -> {}
-                else -> return@withContext Result.retry()
             }
 
             val racoDatabase = RacoDatabase.getInstance(applicationContext)

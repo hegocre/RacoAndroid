@@ -48,13 +48,6 @@ class UserController private constructor(context: Context) {
         if (loginResult is Result.Success) {
             val accessToken = loginResult.data
             preferencesManager.setAccessToken(accessToken)
-
-            val refreshJob = SupervisorJob()
-            CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                delay((accessToken.expiresIn - 100) * 1000)
-                refreshToken()
-            }
-
             return true
         }
 
@@ -67,24 +60,12 @@ class UserController private constructor(context: Context) {
         if (refreshResult is Result.Success) {
             val accessToken = refreshResult.data
             preferencesManager.setAccessToken(accessToken)
-
-            val refreshJob = SupervisorJob()
-            CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                delay((accessToken.expiresIn - 100) * 1000)
-                refreshToken()
-            }
-
             return ResultCode.SUCCESS
         }
         if (refreshResult is Result.Error) {
             return if (refreshResult.code == 400) {
                 ResultCode.INVALID_TOKEN
             } else {
-                val refreshJob = SupervisorJob()
-                CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                    delay(10 * 1000)
-                    refreshToken()
-                }
                 ResultCode.ERROR_API_BAD_RESPONSE
             }
         }
