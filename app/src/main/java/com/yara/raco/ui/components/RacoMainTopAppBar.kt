@@ -24,9 +24,6 @@ fun RacoMainTopAppBar(
     onLogOut: () -> Unit,
     onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
-    onEditPress: (() -> Unit)? = null,
-    onAddPress: (() -> Unit)? = null,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     var menuExpanded by rememberSaveable {
         mutableStateOf(false)
@@ -34,7 +31,6 @@ fun RacoMainTopAppBar(
 
     CenterAlignedTopAppBar(
         title = { Text(text = title) },
-        scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets.statusBars,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
         navigationIcon = {
@@ -53,28 +49,6 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
-            AnimatedVisibility(
-                visible = onEditPress != null,
-                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
-                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
-            ) {
-                IconButton(onClick = { onEditPress?.invoke() }) {
-                    Icon(
-                        imageVector = Icons.Default.Edit, contentDescription = "Edit"
-                    )
-                }
-            }
-            AnimatedVisibility(
-                visible = onAddPress != null,
-                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
-                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
-            ) {
-                IconButton(onClick = { onAddPress?.invoke() }) {
-                    Icon(
-                        imageVector = Icons.Default.Add, contentDescription = "Edit"
-                    )
-                }
-            }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(

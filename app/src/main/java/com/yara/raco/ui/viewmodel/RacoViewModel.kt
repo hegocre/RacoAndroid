@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
@@ -82,15 +81,9 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         noticeController.downloadAttachment(getApplication(), file)
     }
 
-    fun addEvaluation(subjectId: String) {
+    fun addEvaluation(subjectId: String, evaluationName: String) {
         viewModelScope.launch {
-            evaluationController.addEvaluation(subjectId)
-        }
-    }
-
-    fun addGradeToEvaluation(evaluationId: Int) {
-        viewModelScope.launch {
-            evaluationController.addGradeToEvaluation(evaluationId)
+            evaluationController.addEvaluation(subjectId, evaluationName)
         }
     }
 
@@ -101,15 +94,9 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteGrade(gradeId: Int) {
+    fun evaluationSave(evaluationWithGrade: EvaluationWithGrade) {
         viewModelScope.launch {
-            evaluationController.deleteGrade(gradeId)
-        }
-    }
-
-    fun evaluationSave(evaluation: Evaluation) {
-        viewModelScope.launch {
-            evaluationController.evaluationSave(evaluation)
+            evaluationController.evaluationSave(evaluationWithGrade)
         }
     }
 }

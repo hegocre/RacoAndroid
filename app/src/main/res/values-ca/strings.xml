@@ -22,4 +22,7 @@
     <string name="all">Tots</string>
     <string name="you_have_new_notices">Tens avisos nous</string>
     <string name="new_notices">Avisos nous</string>
+    <string name="add_evaluation">Afegir avaluació</string>
+    <string name="delete_evaluation">Esborrar avaluació</string>
+    <string name="evaluation_name">Nom de l\'avaluació</string>
 </resources>

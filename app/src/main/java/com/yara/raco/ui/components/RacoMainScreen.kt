@@ -8,15 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.yara.raco.model.evaluation.Evaluation
-import com.yara.raco.model.grade.Grade
-import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
@@ -29,16 +25,11 @@ fun RacoMainScreen(
     racoViewModel: RacoViewModel,
     onLogOut: () -> Unit
 ) {
-    var editDetailedEvaluation by remember { mutableStateOf<Boolean>(false) }
-    val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
-
     val navController = rememberNavController()
     val backStackEntry = navController.currentBackStackEntryAsState()
     val currentScreen = RacoScreen.fromRoute(
         backStackEntry.value?.destination?.route
     )
-
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     val isRefreshing by racoViewModel.isRefreshing.collectAsState()
 
@@ -46,35 +37,9 @@ fun RacoMainScreen(
 
     val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
         //Declare back action for button to appear
-        "${RacoScreen.Avisos.name}/details" -> {
+        "${RacoScreen.Avisos.name}/details", "${RacoScreen.Notes.name}/details" -> {
             {
                 navController.popBackStack()
-            }
-        }
-        "${RacoScreen.Notes.name}/details" -> {
-            {
-                editDetailedEvaluation = false
-                navController.popBackStack()
-            }
-        }
-        //Default to not visible
-        else -> null
-    }
-
-    val onEditPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
-        "${RacoScreen.Notes.name}/details" -> {
-            {
-                editDetailedEvaluation = !editDetailedEvaluation
-            }
-        }
-        //Default to not visible
-        else -> null
-    }
-
-    val onAddPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
-        "${RacoScreen.Notes.name}" -> {
-            {
-                racoViewModel.addEvaluation("")
             }
         }
         //Default to not visible
@@ -86,17 +51,15 @@ fun RacoMainScreen(
         racoViewModel.deleteEvaluation(it)
     }
 
+    var showAddEvaluationDialog by remember { mutableStateOf(false) }
+
     RacoTheme {
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 RacoMainTopAppBar(
                     title = stringResource(id = currentScreen.title),
-                    scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
-                    onEditPress = onEditPress,
-                    onAddPress = onAddPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))
                     }
@@ -127,20 +90,39 @@ fun RacoMainScreen(
             val sortedSubjects = remember(subjects) {
                 subjects.sortedBy { it.nom }
             }
+            val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
+            val sortedEvaluations = remember(evaluations) {
+                evaluations.sortedBy { it.evaluation.name }
+            }
+
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = sortedNoticesWithFiles,
-                evaluationWithGrade = evaluations,
+                evaluationWithGrade = sortedEvaluations,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
-                onGradeAdd = { grade -> racoViewModel.addGradeToEvaluation(grade) },
-                onGradeDelete = { grade -> racoViewModel.deleteGrade(grade) },
+                onEvaluationUpdate = { evaluationWithGrade ->
+                    racoViewModel.evaluationSave(
+                        evaluationWithGrade
+                    )
+                },
                 onEvaluationDelete = onDeleteEvaluation,
-                onGradeDetailedEdit = editDetailedEvaluation,
+                onAddEvaluationClick = { showAddEvaluationDialog = true },
                 subjects = sortedSubjects,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing
             )
+
+            if (showAddEvaluationDialog) {
+                AddEvaluationDialog(
+                    subjects = sortedSubjects,
+                    onAddClick = { subjectId, evaluationName ->
+                        racoViewModel.addEvaluation(subjectId, evaluationName)
+                        showAddEvaluationDialog = false
+                    },
+                    onDismissRequest = { showAddEvaluationDialog = false }
+                )
+            }
         }
     }
 }

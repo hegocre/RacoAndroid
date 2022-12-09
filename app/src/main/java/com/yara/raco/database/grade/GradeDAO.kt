@@ -1,12 +1,7 @@
 package com.yara.raco.database.grade
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
+import androidx.room.*
 import com.yara.raco.model.grade.Grade
 
 @Dao
@@ -29,6 +24,9 @@ interface GradeDAO {
 
     @Query("DELETE FROM grade WHERE id = :id")
     suspend fun deleteGrade(id: Int)
+
+    @Query("DELETE FROM grade WHERE evaluationId = :evaluationId")
+    suspend fun deleteEvaluationGrades(evaluationId: Int)
 
     @Query("DELETE FROM grade")
     suspend fun deleteAllGrades()
