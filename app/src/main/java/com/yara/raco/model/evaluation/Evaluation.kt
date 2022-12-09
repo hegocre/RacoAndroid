@@ -8,8 +8,10 @@ import com.yara.raco.model.grade.Grade
 /**
  * Class that represents a grade.
  *
+ * @param id Id of the evaluation
  * @param subjectId Subject instance.
- * @param evaluation List of evaluation.
+ * @param name Name of the evaluation
+ * @param listOfGrade List of evaluation.
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "evaluation")
