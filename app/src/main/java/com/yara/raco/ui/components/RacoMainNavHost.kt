@@ -6,9 +6,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,10 +17,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
-import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.RacoScreen
@@ -32,17 +30,24 @@ fun RacoMainNavHost(
     noticesWithFiles: List<NoticeWithFiles>,
     evaluationWithGrade: List<EvaluationWithGrade>,
     onFileClick: (File) -> Unit,
-    onGradeAdd: (Int) -> Unit,
-    onGradeDelete: (Int) -> Unit,
+    onEvaluationUpdate: (EvaluationWithGrade) -> Unit,
     onEvaluationDelete: (Int) -> Unit,
-    onGradeDetailedEdit: Boolean,
+    onAddEvaluationClick: () -> Unit,
     subjects: List<Subject>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var detailedNoticeWithFiles by remember { mutableStateOf<NoticeWithFiles?>(null) }
-    var detailedGrade by remember { mutableStateOf<Int?>(null) }
+    var detailedNoticeWithFiles by rememberSaveable(saver = NoticeWithFiles.Saver) {
+        mutableStateOf(
+            null
+        )
+    }
+    var detailedEvaluationWithGrades by rememberSaveable(saver = EvaluationWithGrade.Saver) {
+        mutableStateOf(
+            null
+        )
+    }
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Avisos.name,
@@ -93,13 +98,14 @@ fun RacoMainNavHost(
         composable(RacoScreen.Notes.name) {
             Column {
                 RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                    RacoGradesPager(
+                    RacoGradesList(
                         subjects = subjects,
                         evaluations = evaluationWithGrade,
                         onGradeClick = { evaluationWithGrade ->
-                            detailedGrade = evaluationWithGrade.evaluation.id
+                            detailedEvaluationWithGrades = evaluationWithGrade
                             navHostController.navigate("${RacoScreen.Notes.name}/details")
-                        }
+                        },
+                        onAddEvaluationClick = onAddEvaluationClick
                     )
                 }
             }
@@ -107,12 +113,11 @@ fun RacoMainNavHost(
 
         composable("${RacoScreen.Notes.name}/details") {
             Column {
-                detailedGrade?.let { evaluationId ->
+                detailedEvaluationWithGrades?.let { evaluationWithGrades ->
                     DetailedEvaluationWithGradeCall(
-                        evaluation = evaluationWithGrade.first { it.evaluation.id == evaluationId },
-                        onGradeDetailedEdit = onGradeDetailedEdit,
-                        onGradeAdd = onGradeAdd,
-                        onGradeDelete = onGradeDelete,
+                        subjects = subjects,
+                        evaluation = evaluationWithGrades,
+                        onEvaluationUpdate = onEvaluationUpdate,
                         onEvaluationDelete = onEvaluationDelete
                     )
                 }

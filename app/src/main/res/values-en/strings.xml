@@ -22,4 +22,7 @@
     <string name="all">All</string>
     <string name="you_have_new_notices">You have new notices</string>
     <string name="new_notices">New notices</string>
+    <string name="add_evaluation">Add evaluation</string>
+    <string name="delete_evaluation">Delete evaluation</string>
+    <string name="evaluation_name">Evaluation name</string>
 </resources>
