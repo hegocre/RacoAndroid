@@ -22,4 +22,7 @@
     <string name="all">Todos</string>
     <string name="you_have_new_notices">Tienes avisos nuevos</string>
     <string name="new_notices">Avisos nuevos</string>
+    <string name="add_evaluation">Añadir evaluación</string>
+    <string name="delete_evaluation">Borrar evaluación</string>
+    <string name="evaluation_name">Nombre de la evaluación</string>
 </resources>
