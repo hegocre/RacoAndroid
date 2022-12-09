@@ -34,7 +34,6 @@ fun RacoMainTopAppBar(
 
     CenterAlignedTopAppBar(
         title = { Text(text = title) },
-        scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets.statusBars,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
         navigationIcon = {

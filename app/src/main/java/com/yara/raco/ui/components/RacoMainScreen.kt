@@ -1,13 +1,14 @@
 package com.yara.raco.ui.components
 
 import android.content.Intent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -17,6 +18,7 @@ import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,8 +32,6 @@ fun RacoMainScreen(
         backStackEntry.value?.destination?.route
     )
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-
     val isRefreshing by racoViewModel.isRefreshing.collectAsState()
 
     val context = LocalContext.current
@@ -40,7 +40,7 @@ fun RacoMainScreen(
 
     val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
         //Declare back action for button to appear
-        "${RacoScreen.Avisos.name}/details" -> {
+        "${RacoScreen.Avisos.name}/details", "${RacoScreen.Notes.name}/details" -> {
             {
                 navController.popBackStack()
             }
@@ -59,13 +59,18 @@ fun RacoMainScreen(
         else -> null
     }
 
+    val onDeleteEvaluation: ((Int) -> Unit) = {
+        navController.popBackStack()
+        racoViewModel.deleteEvaluation(it)
+    }
+
+    var showAddEvaluationDialog by remember { mutableStateOf(false) }
+
     RacoTheme {
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 RacoMainTopAppBar(
                     title = stringResource(id = currentScreen.title),
-                    scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
                     isDayViewSelected = dayCalendarViewSelected,
@@ -101,10 +106,23 @@ fun RacoMainScreen(
                 subjects.sortedBy { it.nom }
             }
             val schedules by racoViewModel.schedules.observeAsState(initial = emptyList())
+            val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
+            val sortedEvaluations = remember(evaluations) {
+                evaluations.sortedBy { it.evaluation.name }
+            }
+
             RacoMainNavHost(
                 navHostController = navController,
                 noticesWithFiles = sortedNoticesWithFiles,
+                evaluationWithGrade = sortedEvaluations,
                 onFileClick = { file -> racoViewModel.downloadFile(file) },
+                onEvaluationUpdate = { evaluationWithGrade ->
+                    racoViewModel.evaluationSave(
+                        evaluationWithGrade
+                    )
+                },
+                onEvaluationDelete = onDeleteEvaluation,
+                onAddEvaluationClick = { showAddEvaluationDialog = true },
                 subjects = sortedSubjects,
                 schedules = schedules,
                 dayCalendarViewSelected = dayCalendarViewSelected,
@@ -112,6 +130,17 @@ fun RacoMainScreen(
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing
             )
+
+            if (showAddEvaluationDialog) {
+                AddEvaluationDialog(
+                    subjects = sortedSubjects,
+                    onAddClick = { subjectId, evaluationName ->
+                        racoViewModel.addEvaluation(subjectId, evaluationName)
+                        showAddEvaluationDialog = false
+                    },
+                    onDismissRequest = { showAddEvaluationDialog = false }
+                )
+            }
         }
     }
 }

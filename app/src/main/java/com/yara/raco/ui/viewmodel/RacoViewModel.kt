@@ -5,6 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.yara.raco.model.evaluation.EvaluationController
+import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.notices.NoticeWithFiles
@@ -24,6 +26,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     private val subjectController = SubjectController.getInstance(application)
     private val noticeController = NoticeController.getInstance(application)
     private val scheduleController = ScheduleController.getInstance(application)
+    private val evaluationController = EvaluationController.getInstance(application)
 
     private var shouldRefreshToken = false
 
@@ -41,6 +44,8 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         get() = noticeController.getNotices()
     val schedules: LiveData<List<Schedule>>
         get() = scheduleController.getSchedule()
+    val evaluation: LiveData<List<EvaluationWithGrade>>
+        get() = evaluationController.getEvaluations()
 
     init {
         viewModelScope.launch {
@@ -77,5 +82,24 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
 
     fun downloadFile(file: File) {
         noticeController.downloadAttachment(getApplication(), file)
+    }
+
+    fun addEvaluation(subjectId: String, evaluationName: String) {
+        viewModelScope.launch {
+            evaluationController.addEvaluation(subjectId, evaluationName)
+        }
+    }
+
+    fun deleteEvaluation(evaluationId: Int) {
+        viewModelScope.launch {
+            evaluationController.deleteEvaluation(evaluationId)
+
+        }
+    }
+
+    fun evaluationSave(evaluationWithGrade: EvaluationWithGrade) {
+        viewModelScope.launch {
+            evaluationController.evaluationSave(evaluationWithGrade)
+        }
     }
 }
