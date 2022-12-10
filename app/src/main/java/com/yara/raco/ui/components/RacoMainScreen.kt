@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -35,11 +36,23 @@ fun RacoMainScreen(
 
     val context = LocalContext.current
 
+    var dayCalendarViewSelected by rememberSaveable{ mutableStateOf(true)}
+
     val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
         //Declare back action for button to appear
         "${RacoScreen.Avisos.name}/details", "${RacoScreen.Notes.name}/details" -> {
             {
                 navController.popBackStack()
+            }
+        }
+        //Default to not visible
+        else -> null
+    }
+
+    val onEventSettingsPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+        "${RacoScreen.Horari.name}" -> {
+            {
+                dayCalendarViewSelected = !dayCalendarViewSelected
             }
         }
         //Default to not visible
@@ -60,6 +73,8 @@ fun RacoMainScreen(
                     title = stringResource(id = currentScreen.title),
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
+                    isDayViewSelected = dayCalendarViewSelected,
+                    onEventSettingsPress = onEventSettingsPress,
                     onAbout = {
                         context.startActivity(Intent(context, AboutActivity::class.java))
                     }
@@ -90,6 +105,7 @@ fun RacoMainScreen(
             val sortedSubjects = remember(subjects) {
                 subjects.sortedBy { it.nom }
             }
+            val schedules by racoViewModel.schedules.observeAsState(initial = emptyList())
             val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
             val sortedEvaluations = remember(evaluations) {
                 evaluations.sortedBy { it.evaluation.name }
@@ -108,6 +124,8 @@ fun RacoMainScreen(
                 onEvaluationDelete = onDeleteEvaluation,
                 onAddEvaluationClick = { showAddEvaluationDialog = true },
                 subjects = sortedSubjects,
+                schedules = schedules,
+                dayCalendarViewSelected = dayCalendarViewSelected,
                 modifier = Modifier.padding(paddingValues),
                 onRefresh = { racoViewModel.refresh() },
                 isRefreshing = isRefreshing

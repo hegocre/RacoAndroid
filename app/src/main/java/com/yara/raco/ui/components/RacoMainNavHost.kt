@@ -1,8 +1,8 @@
 package com.yara.raco.ui.components
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
@@ -20,6 +20,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeWithFiles
+import com.yara.raco.model.schedule.Schedule
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.RacoScreen
 
@@ -34,6 +35,8 @@ fun RacoMainNavHost(
     onEvaluationDelete: (Int) -> Unit,
     onAddEvaluationClick: () -> Unit,
     subjects: List<Subject>,
+    schedules: List<Schedule>,
+    dayCalendarViewSelected: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -89,8 +92,12 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Horari.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-
+                Crossfade(targetState = dayCalendarViewSelected) { isDayCalendarViewSelected ->
+                    if (isDayCalendarViewSelected) {
+                        RacoScheduleDay(schedules = schedules)
+                    } else {
+                        RacoScheduleWeek(schedules = schedules)
+                    }
                 }
             }
         }

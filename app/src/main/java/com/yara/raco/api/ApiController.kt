@@ -3,6 +3,7 @@ package com.yara.raco.api
 import android.content.Context
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
+import com.yara.raco.model.schedule.Schedule
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.user.AccessToken
 
@@ -12,6 +13,7 @@ class ApiController private constructor() {
     private val tokenApi = TokenApi.getInstance()
     private val subjectApi = SubjectsAPI.getInstance()
     private val noticeApi = NoticesApi.getInstance()
+    private val scheduleApi = ScheduleApi.getInstance()
 
     suspend fun login(authorizationCode: String): Result<AccessToken> {
         val loginResult = tokenApi.getToken(authorizationCode)
@@ -45,6 +47,12 @@ class ApiController private constructor() {
     suspend fun listNotices(): Result<List<Notice>> {
         accessToken?.let {
             return noticeApi.getNotices(it.accessToken)
+        } ?: return Result.Error(2)
+    }
+
+    suspend fun listSchedule(): Result<List<Schedule>> {
+        accessToken?.let {
+            return scheduleApi.getSchedule(it.accessToken)
         } ?: return Result.Error(2)
     }
 

@@ -10,6 +10,8 @@ import com.yara.raco.model.evaluation.EvaluationWithGrade
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.notices.NoticeWithFiles
+import com.yara.raco.model.schedule.Schedule
+import com.yara.raco.model.schedule.ScheduleController
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
@@ -23,6 +25,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     private val userController = UserController.getInstance(application)
     private val subjectController = SubjectController.getInstance(application)
     private val noticeController = NoticeController.getInstance(application)
+    private val scheduleController = ScheduleController.getInstance(application)
     private val evaluationController = EvaluationController.getInstance(application)
 
     private var shouldRefreshToken = false
@@ -39,6 +42,8 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         get() = subjectController.getSubjects()
     val notices: LiveData<List<NoticeWithFiles>>
         get() = noticeController.getNotices()
+    val schedules: LiveData<List<Schedule>>
+        get() = scheduleController.getSchedule()
     val evaluation: LiveData<List<EvaluationWithGrade>>
         get() = evaluationController.getEvaluations()
 
@@ -70,6 +75,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
             }
             subjectController.syncSubjects()
             noticeController.syncNotices()
+            scheduleController.syncSchedule()
             _isRefreshing.emit(false)
         }
     }

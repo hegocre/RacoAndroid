@@ -24,6 +24,8 @@ fun RacoMainTopAppBar(
     onLogOut: () -> Unit,
     onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
+    onEventSettingsPress: (() -> Unit)? = null,
+    isDayViewSelected: Boolean,
 ) {
     var menuExpanded by rememberSaveable {
         mutableStateOf(false)
@@ -49,6 +51,24 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
+            if (onEventSettingsPress != null && !isDayViewSelected) {
+                IconButton(onClick = onEventSettingsPress) {
+                    Icon(
+                        imageVector = Icons.Default.ViewDay, contentDescription = stringResource(
+                            id = R.string.calendar_menu
+                        )
+                    )
+                }
+            }
+            if (onEventSettingsPress != null && isDayViewSelected) {
+                IconButton(onClick = onEventSettingsPress) {
+                    Icon(
+                        imageVector = Icons.Default.ViewWeek, contentDescription = stringResource(
+                            id = R.string.calendar_menu
+                        )
+                    )
+                }
+            }
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(
