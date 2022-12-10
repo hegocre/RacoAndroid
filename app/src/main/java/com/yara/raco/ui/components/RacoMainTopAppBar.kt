@@ -51,8 +51,8 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
-            if(onEventSettingsPress != null && isDayViewSelected){
-                IconButton(onClick = { onEventSettingsPress?.invoke() }) {
+            if (onEventSettingsPress != null && !isDayViewSelected) {
+                IconButton(onClick = onEventSettingsPress) {
                     Icon(
                         imageVector = Icons.Default.ViewDay, contentDescription = stringResource(
                             id = R.string.calendar_menu
@@ -60,8 +60,8 @@ fun RacoMainTopAppBar(
                     )
                 }
             }
-            if(onEventSettingsPress != null && !isDayViewSelected){
-                IconButton(onClick = { onEventSettingsPress?.invoke() }) {
+            if (onEventSettingsPress != null && isDayViewSelected) {
+                IconButton(onClick = onEventSettingsPress) {
                     Icon(
                         imageVector = Icons.Default.ViewWeek, contentDescription = stringResource(
                             id = R.string.calendar_menu

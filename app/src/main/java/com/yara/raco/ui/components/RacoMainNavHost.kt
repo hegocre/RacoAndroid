@@ -92,11 +92,10 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Horari.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = onRefresh) {
-                Crossfade(targetState = dayCalendarViewSelected) {
-                    isDayCalendarViewSelected ->
-                    if(isDayCalendarViewSelected){
+                Crossfade(targetState = dayCalendarViewSelected) { isDayCalendarViewSelected ->
+                    if (isDayCalendarViewSelected) {
                         RacoScheduleDay(schedules = schedules)
-                    }else{
+                    } else {
                         RacoScheduleWeek(schedules = schedules)
                     }
                 }

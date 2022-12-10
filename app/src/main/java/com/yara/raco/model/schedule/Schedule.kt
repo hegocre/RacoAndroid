@@ -1,7 +1,13 @@
 package com.yara.raco.model.schedule
 
+import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
+import com.yara.raco.ui.components.Event
 import kotlinx.serialization.SerialName
+import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.temporal.TemporalAdjusters
 
 /**
  * Class that represents a class in the schedule.
@@ -34,4 +40,23 @@ data class Schedule (
     val aules: String,
     @SerialName("idioma")
     val idioma: String
-)
+) {
+    fun toEvent(colorSubject: HashMap<String, Color>): Event {
+        val dateWithoutTime =
+            LocalDateTime.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.of(diaSetmana)))
+        val dateStart = dateWithoutTime.with(
+            LocalTime.of(
+                inici.split(":")[0].toInt(),
+                inici.split(":")[1].toInt()
+            )
+        )
+
+        return Event(
+            name = codiAssig.plus(" ").plus(grup).plus("-").plus(tipus),
+            color = colorSubject.getValue(codiAssig),
+            start = dateStart,
+            end = dateStart.plusHours(durada.toLong()),
+            description = aules
+        )
+    }
+}
