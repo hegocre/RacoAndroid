@@ -520,7 +520,10 @@ fun RacoScheduleDay(
                 val selected = pagerState.currentPage == i
                 val isToday = day == LocalDate.now()
 
-                Column(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         text = day.format(DayFormatter),
