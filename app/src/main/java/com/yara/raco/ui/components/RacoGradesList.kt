@@ -604,5 +604,5 @@ fun computeAverageMarkForPassing(
     }
     val currentMark = computeFinalMarkFromEvaluation(evaluation)
 
-    return (5.0 - currentMark) / (remainingWeight / 100).coerceIn(0.0, 10.0)
+    return ((5.0 - currentMark) / (remainingWeight / 100)).coerceIn(0.0, 10.0)
 }
