@@ -340,6 +340,12 @@ val licenses = listOf(
         copyright = "Copyright 2019 Square, Inc.",
         licenseName = "Apache License 2.0",
         licenseUrl = "https://github.com/square/okhttp/blob/master/LICENSE.txt"
+    ),
+    LicenseNotice(
+        name = "WeekSchedule",
+        copyright = "Copyright (c) 2021 Daniel Rampelt",
+        licenseName = "MIT License",
+        licenseUrl = "https://github.com/drampelt/WeekSchedule/blob/main/LICENSE"
     )
 )
 
