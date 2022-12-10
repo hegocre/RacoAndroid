@@ -9,7 +9,6 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -109,7 +108,7 @@ fun BasicEvent(
                 )
             }",
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.contentColorFor(event.color),
+            color = Color.DarkGray,
             maxLines = 1,
             overflow = TextOverflow.Clip,
         )
@@ -117,7 +116,7 @@ fun BasicEvent(
         Text(
             text = event.name,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.contentColorFor(event.color),
+            color = Color.DarkGray,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -127,7 +126,7 @@ fun BasicEvent(
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.contentColorFor(event.color),
+                color = Color.DarkGray,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
