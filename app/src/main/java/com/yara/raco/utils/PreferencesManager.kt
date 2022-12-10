@@ -21,9 +21,14 @@ class PreferencesManager private constructor(context: Context) {
             .putString("accessToken", accessToken?.let { Json.encodeToString(it) }).apply()
 
     fun getUserLastLanguage(): String = _sharedPreferences.getString("last_language", "_") ?: "_"
-
     fun setUserLastLanguage(language: String) = _sharedPreferences.edit()
         .putString("last_language", language).apply()
+
+    fun getFirstTimeNotification(): Boolean =
+        _sharedPreferences.getBoolean("first_time_notification", true)
+
+    fun setFirstTimeNotification(isFirstTime: Boolean) = _sharedPreferences.edit()
+        .putBoolean("first_time_notification", isFirstTime).apply()
 
     companion object {
         private var instance: PreferencesManager? = null

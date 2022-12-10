@@ -14,6 +14,7 @@ import com.yara.raco.database.RacoDatabase
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.activities.MainActivity
+import com.yara.raco.utils.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -27,6 +28,11 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
             val userController = UserController.getInstance(applicationContext)
             if (!userController.isLoggedIn) {
                 return@withContext Result.failure()
+            }
+            val preferencesManager = PreferencesManager.getInstance(applicationContext)
+            if (preferencesManager.getFirstTimeNotification()) {
+                preferencesManager.setFirstTimeNotification(false)
+                return@withContext Result.success()
             }
 
             val racoDatabase = RacoDatabase.getInstance(applicationContext)
