@@ -26,7 +26,6 @@ fun RacoMainTopAppBar(
     onBackPress: (() -> Unit)? = null,
     onEventSettingsPress: (() -> Unit)? = null,
     isDayViewSelected: Boolean,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     var menuExpanded by rememberSaveable {
         mutableStateOf(false)
@@ -52,11 +51,7 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
-            AnimatedVisibility(
-                visible = onEventSettingsPress != null && isDayViewSelected,
-                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
-                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
-            ) {
+            if(onEventSettingsPress != null && isDayViewSelected){
                 IconButton(onClick = { onEventSettingsPress?.invoke() }) {
                     Icon(
                         imageVector = Icons.Default.ViewDay, contentDescription = stringResource(
@@ -65,11 +60,7 @@ fun RacoMainTopAppBar(
                     )
                 }
             }
-            AnimatedVisibility(
-                visible = onEventSettingsPress != null && !isDayViewSelected,
-                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
-                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
-            ) {
+            if(onEventSettingsPress != null && !isDayViewSelected){
                 IconButton(onClick = { onEventSettingsPress?.invoke() }) {
                     Icon(
                         imageVector = Icons.Default.ViewWeek, contentDescription = stringResource(

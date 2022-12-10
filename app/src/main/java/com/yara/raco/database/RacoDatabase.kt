@@ -8,6 +8,7 @@ import com.yara.raco.database.evaluation.EvaluationDAO
 import com.yara.raco.database.file.FileDAO
 import com.yara.raco.database.grade.GradeDAO
 import com.yara.raco.database.notice.NoticeDAO
+import com.yara.raco.database.schedule.ScheduleDAO
 import com.yara.raco.database.subject.SubjectDAO
 import com.yara.raco.model.evaluation.Evaluation
 import com.yara.raco.model.grade.Grade
@@ -17,7 +18,7 @@ import com.yara.raco.model.schedule.Schedule
 import com.yara.raco.model.subject.Subject
 
 @Database(
-    entities = [Subject::class, Notice::class, File::class, Schedule::class, Evaluation::class],
+    entities = [Subject::class, Notice::class, File::class, Schedule::class, Grade::class, Evaluation::class],
     version = 4,
     exportSchema = false
 )

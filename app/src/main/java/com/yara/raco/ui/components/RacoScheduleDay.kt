@@ -41,9 +41,11 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.himanshoe.kalendar.Kalendar
 import com.himanshoe.kalendar.color.KalendarThemeColor
+import com.himanshoe.kalendar.component.day.config.KalendarDayColors
 import com.himanshoe.kalendar.model.KalendarType
 import com.yara.raco.ui.theme.isLight
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toKotlinLocalDate
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -81,7 +83,7 @@ data class PositionedEvent(
     val colTotal: Int = 1,
 )
 
-val EventTimeFormatter = DateTimeFormatter.ofPattern("h:mm a")
+val EventTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @Composable
 fun BasicEvent(
@@ -113,6 +115,7 @@ fun BasicEvent(
         Text(
             text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
             style = MaterialTheme.typography.labelMedium,
+            color = Color.DarkGray,
             maxLines = 1,
             overflow = TextOverflow.Clip,
         )
@@ -120,6 +123,7 @@ fun BasicEvent(
         Text(
             text = event.name,
             style = MaterialTheme.typography.bodyMedium,
+            color = Color.DarkGray,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -129,6 +133,7 @@ fun BasicEvent(
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodySmall,
+                color = Color.DarkGray,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -180,7 +185,7 @@ fun ScheduleHeader(
     }
 }
 
-private val HourFormatter = DateTimeFormatter.ofPattern("h a")
+private val HourFormatter = DateTimeFormatter.ofPattern("HH:00")
 
 @Composable
 fun BasicSidebarLabel(
@@ -524,14 +529,11 @@ fun RacoScheduleDay(
 
     val events = Array(7) { ArrayList<Event>() }
 
-    //val events = ArrayList<ArrayList<Event>>(7)
-
     for (schedule in schedules){
         events[schedule.diaSetmana-1].add(convertScheduleToEvent(schedule, colorSubject))
     }
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
-    //var selectedDay = LocalDate.now().dayOfWeek.value
 
     Column {
         Kalendar(
@@ -541,11 +543,16 @@ fun RacoScheduleDay(
                 dayBackgroundColor = MaterialTheme.colorScheme.primary,
                 headerTextColor = MaterialTheme.colorScheme.primary,
             ),
+            takeMeToDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toKotlinLocalDate(),
             onCurrentDayClick = { kalendarDay, kalendarEvents ->
                 coroutineScope.launch {
                     pagerState.animateScrollToPage(kalendarDay.localDate.dayOfWeek.value-1)
                 }
-            }
+            },
+            kalendarDayColors = KalendarDayColors(
+                textColor = Color.LightGray,
+                selectedTextColor = Color.LightGray
+            )
         )
 
 
@@ -556,47 +563,4 @@ fun RacoScheduleDay(
             Schedule(events[page], daySize = ScheduleSize.Adaptive(0.dp))
         }
     }
-
-
-
-
-/*val currentDate = remember { mutableStateOf(LocalDate.now()) }
-    com.mabn.calendarlibrary.ExpandableCalendar(onDayClick = {
-        currentDate.value = it
-    })*/
-    /*val currentDate = remember { mutableStateOf(LocalDate.now()) }
-    ExpandableCalendar(
-         onDayClick = {
-            currentDate.value = it
-        })
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        Text("Selected date: ${currentDate.value}")
-    }*/
-    //Schedule(events = sampleEvents)
-
-
-
-    /*val kalendarEvent = KalendarEvent(LocalDate(2022,12,5), "TEST EVENT")
-    val eventList = ArrayList<KalendarEvent>()
-    eventList.add(kalendarEvent)
-
-    Kalendar(kalendarType = KalendarType.Firey, kalendarEvents = eventList)
-
-
-
-    val scheduleState = rememberLazyListState()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        state = scheduleState,
-    ) {
-
-        /*Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-
-            //AndroidView(factory = { CalendarView(it) }, update = { it.setOnDateChangeListener{ calendarView, year, month, day }})
-        }*/
-    }*/
 }
