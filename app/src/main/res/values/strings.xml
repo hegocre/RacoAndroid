@@ -25,4 +25,6 @@
     <string name="evaluation_name">Nom de l\'avaluació</string>
     <string name="add_evaluation">Afegir avaluació</string>
     <string name="delete_evaluation">Esborrar avaluació</string>
+    <string name="privacy_policy_url">https://hegocre.com/raco/privacy_ca.html</string>
+    <string name="privacy_policy">Política de Privadesa</string>
 </resources>
