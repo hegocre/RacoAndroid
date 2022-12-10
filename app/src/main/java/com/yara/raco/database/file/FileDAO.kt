@@ -13,4 +13,7 @@ interface FileDAO {
 
     @Query("DELETE from files WHERE noticeId = :id")
     fun deleteNoticeFiles(id: Int)
+
+    @Query("DELETE from files")
+    fun deleteAllFiles()
 }

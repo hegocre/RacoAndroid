@@ -3,16 +3,22 @@ package com.yara.raco.model.user
 import android.content.Context
 import com.yara.raco.api.ApiController
 import com.yara.raco.api.Result
+import com.yara.raco.model.evaluation.EvaluationController
+import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.utils.PreferencesManager
 import com.yara.raco.utils.ResultCode
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class UserController private constructor(context: Context) {
     private val preferencesManager = PreferencesManager.getInstance(context)
     private val apiController = ApiController.getInstance()
     private val subjectController = SubjectController.getInstance(context)
+    private val noticeController = NoticeController.getInstance(context)
+    private val evaluationController = EvaluationController.getInstance(context)
     val isLoggedIn: Boolean
         get() = apiController.accessToken != null
 
@@ -42,13 +48,6 @@ class UserController private constructor(context: Context) {
         if (loginResult is Result.Success) {
             val accessToken = loginResult.data
             preferencesManager.setAccessToken(accessToken)
-
-            val refreshJob = SupervisorJob()
-            CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                delay((accessToken.expiresIn - 100) * 1000)
-                refreshToken()
-            }
-
             return true
         }
 
@@ -61,33 +60,24 @@ class UserController private constructor(context: Context) {
         if (refreshResult is Result.Success) {
             val accessToken = refreshResult.data
             preferencesManager.setAccessToken(accessToken)
-
-            val refreshJob = SupervisorJob()
-            CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                delay((accessToken.expiresIn - 100) * 1000)
-                refreshToken()
-            }
-
             return ResultCode.SUCCESS
         }
         if (refreshResult is Result.Error) {
             return if (refreshResult.code == 400) {
                 ResultCode.INVALID_TOKEN
             } else {
-                val refreshJob = SupervisorJob()
-                CoroutineScope(Dispatchers.IO + refreshJob).launch {
-                    delay(10 * 1000)
-                    refreshToken()
-                }
                 ResultCode.ERROR_API_BAD_RESPONSE
             }
         }
         return ResultCode.UNKNOWN
     }
 
-    fun logOut() {
+    suspend fun logOut() {
         preferencesManager.setAccessToken(null)
         apiController.accessToken = null
+        subjectController.deleteAllSubjects()
+        noticeController.deleteAllNotices()
+        evaluationController.deleteAllEvaluations()
     }
 
     companion object {

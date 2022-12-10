@@ -15,8 +15,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -57,36 +59,41 @@ fun RacoNoticeTabs(
         )
     }
 
-    ScrollableTabRow(
-        selectedTabIndex = pagerState.currentPage,
-        modifier = modifier,
-        indicator = indicator,
-        edgePadding = 32.dp
-    ) {
-        val coroutineScope = rememberCoroutineScope()
-        Tab(
-            selected = pagerState.currentPage == 0,
-            onClick = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(0)
-                }
-            },
-            unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-            text = { Text(text = stringResource(id = R.string.all)) }
-        )
-        subjects.forEachIndexed { index, subject ->
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = BottomCenter) {
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        ScrollableTabRow(
+            selectedTabIndex = pagerState.currentPage,
+            indicator = indicator,
+            divider = {},
+            containerColor = Color.Transparent,
+            edgePadding = 32.dp
+        ) {
+            val coroutineScope = rememberCoroutineScope()
             Tab(
-                selected = pagerState.currentPage == index + 1,
+                selected = pagerState.currentPage == 0,
                 onClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(index + 1)
+                        pagerState.animateScrollToPage(0)
                     }
                 },
                 unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                text = { Text(text = subject.sigles) }
+                text = { Text(text = stringResource(id = R.string.all)) }
             )
-        }
+            subjects.forEachIndexed { index, subject ->
+                Tab(
+                    selected = pagerState.currentPage == index + 1,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index + 1)
+                        }
+                    },
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    text = { Text(text = subject.sigles) }
+                )
+            }
 
+        }
     }
 }
 
@@ -101,7 +108,6 @@ fun RacoNoticePager(
     HorizontalPager(
         count = subjects.size + 1,
         state = pagerState,
-        userScrollEnabled = false
     ) { page ->
         if (page == 0) {
             RacoNoticeList(
@@ -141,14 +147,7 @@ fun RacoNoticeList(
                 key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
             ) { index, noticeWithFiles ->
                 if (index != 0) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .fillParentMaxWidth()
-                            .background(
-                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                            )
-                    )
+                    Divider()
                 }
                 NoticeListEntry(
                     noticeWithFiles = noticeWithFiles,

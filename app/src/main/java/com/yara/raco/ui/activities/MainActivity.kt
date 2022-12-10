@@ -18,7 +18,9 @@ import com.yara.raco.R
 import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.components.RacoMainScreen
 import com.yara.raco.ui.viewmodel.RacoViewModel
+import com.yara.raco.workers.LogOutWorker
 import com.yara.raco.workers.NoticeNotificationWorker
+import com.yara.raco.workers.RefreshTokenWorker
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,8 @@ class MainActivity : ComponentActivity() {
             finish()
             return
         }
+
+        RefreshTokenWorker.enqueueSelf(this)
 
         //Request notification permission on Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -86,7 +90,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun logout() {
-        UserController.getInstance(this).logOut()
+        LogOutWorker.executeSelf(this)
         launchLogin()
         finish()
     }

@@ -42,6 +42,13 @@ class NoticeController private constructor(context: Context)  {
         apiController.downloadAttachment(context, file)
     }
 
+    suspend fun deleteAllNotices() {
+        withContext(Dispatchers.IO) {
+            racoDatabase.noticeDAO.deleteAllNotices()
+            racoDatabase.fileDAO.deleteAllFiles()
+        }
+    }
+
     companion object {
         private var INSTANCE: NoticeController? = null
 
