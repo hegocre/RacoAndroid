@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -437,17 +438,14 @@ fun RacoGradeEditView(
                     )
                 )
             },
-            placeholder = {
-                Text(
-                    text = "0.0 %",
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
-                )
-            },
             modifier = Modifier
-                .width(80.dp),
+                .width(120.dp),
             maxLines = 1,
             singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            trailingIcon = {
+                Icon(imageVector = Icons.Default.Percent, contentDescription = "")
+            }
         )
         IconButton(onClick = { onGradeDelete(grade) }) {
             Icon(Icons.Outlined.Delete, contentDescription = "Delete Weight")

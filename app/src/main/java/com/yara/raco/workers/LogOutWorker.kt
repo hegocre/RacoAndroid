@@ -23,7 +23,9 @@ class LogOutWorker(context: Context, workerParams: WorkerParameters) :
             val workInfos =
                 WorkManager.getInstance(context).getWorkInfosByTag("com.yara.raco.LOG_OUT_WORK")
                     .get()
-            val lastWork = workInfos.lastOrNull() ?: return ResultCode.SUCCESS
+            val lastWork = workInfos.lastOrNull {
+                it.state != WorkInfo.State.RUNNING && it.state != WorkInfo.State.ENQUEUED
+            } ?: return ResultCode.SUCCESS
             return if (lastWork.state == WorkInfo.State.SUCCEEDED) {
                 ResultCode.SUCCESS
             } else {
