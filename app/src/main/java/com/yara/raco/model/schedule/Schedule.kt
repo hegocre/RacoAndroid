@@ -4,10 +4,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import com.yara.raco.ui.components.Event
 import kotlinx.serialization.SerialName
-import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.*
 
 /**
  * Class that represents a class in the schedule.
@@ -42,8 +43,11 @@ data class Schedule (
     val idioma: String
 ) {
     fun toEvent(colorSubject: HashMap<String, Color>): Event {
+        val firstDay = LocalDateTime.now().with(
+            TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+        )
         val dateWithoutTime =
-            LocalDateTime.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.of(diaSetmana)))
+            firstDay.plusDays((8L - firstDay.dayOfWeek.value) % 7 + diaSetmana - 1L)
         val dateStart = dateWithoutTime.with(
             LocalTime.of(
                 inici.split(":")[0].toInt(),
