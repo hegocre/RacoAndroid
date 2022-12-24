@@ -6,6 +6,7 @@ import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.schedule.Schedule
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.user.AccessToken
+import com.yara.raco.utils.Result
 
 class ApiController private constructor() {
     var accessToken: AccessToken? = null

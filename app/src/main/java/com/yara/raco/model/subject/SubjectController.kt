@@ -2,8 +2,8 @@ package com.yara.raco.model.subject
 
 import android.content.Context
 import com.yara.raco.api.ApiController
-import com.yara.raco.api.Result
 import com.yara.raco.database.RacoDatabase
+import com.yara.raco.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

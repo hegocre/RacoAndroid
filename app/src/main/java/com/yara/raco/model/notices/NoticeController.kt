@@ -2,9 +2,9 @@ package com.yara.raco.model.notices
 
 import android.content.Context
 import com.yara.raco.api.ApiController
-import com.yara.raco.api.Result
 import com.yara.raco.database.RacoDatabase
 import com.yara.raco.model.files.File
+import com.yara.raco.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -37,6 +37,8 @@ class NoticeController private constructor(context: Context)  {
     }
 
     fun getNotices() = racoDatabase.noticeDAO.fetchAllNotices()
+
+    suspend fun getNoticeWithFiles(id: Int) = racoDatabase.noticeDAO.fetchNoticeWithFiles(id)
 
     fun downloadAttachment(context: Context, file: File) {
         apiController.downloadAttachment(context, file)

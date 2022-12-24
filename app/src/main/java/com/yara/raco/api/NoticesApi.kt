@@ -10,6 +10,7 @@ import com.yara.raco.R
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.utils.OkHttpRequest
+import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

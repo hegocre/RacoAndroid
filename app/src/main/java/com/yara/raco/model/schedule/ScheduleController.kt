@@ -2,9 +2,9 @@ package com.yara.raco.model.schedule
 
 import android.content.Context
 import com.yara.raco.api.ApiController
-import com.yara.raco.api.Result
 import com.yara.raco.database.RacoDatabase
 import com.yara.raco.database.schedule.ScheduleDAO
+import com.yara.raco.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

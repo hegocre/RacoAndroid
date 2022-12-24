@@ -15,6 +15,7 @@ import com.yara.raco.model.schedule.ScheduleController
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
+import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
 import com.yara.raco.workers.LogOutWorker
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,6 +82,11 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
             scheduleController.syncSchedule()
             _isRefreshing.emit(false)
         }
+    }
+
+    suspend fun getNoticeDetails(noticeId: Int): Result<NoticeWithFiles> {
+        val noticeWithFiles = noticeController.getNoticeWithFiles(noticeId)
+        return if (noticeWithFiles != null) Result.Success(noticeWithFiles) else Result.Error(0)
     }
 
     fun downloadFile(file: File) {
