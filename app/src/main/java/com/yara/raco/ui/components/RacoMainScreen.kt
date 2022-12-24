@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.yara.raco.R
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
@@ -62,13 +63,15 @@ fun RacoMainScreen(
         rememberTopAppBarState()
     )
 
+    var showLogOutDialog by rememberSaveable { mutableStateOf(false) }
+
     RacoTheme {
         Scaffold(
             topBar = {
                 RacoMainTopAppBar(
                     title = stringResource(id = currentScreen.title),
                     scrollBehavior = scrollBehavior,
-                    onLogOut = onLogOut,
+                    onLogOut = { showLogOutDialog = true },
                     onBackPress = onBackPress,
                     isDayViewSelected = dayCalendarViewSelected,
                     onEventSettingsPress = onEventSettingsPress,
@@ -102,6 +105,27 @@ fun RacoMainScreen(
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                     .padding(paddingValues),
             )
+
+            if (showLogOutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLogOutDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showLogOutDialog = false
+                            onLogOut()
+                        }) {
+                            Text(text = stringResource(id = R.string.logout))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showLogOutDialog = false }) {
+                            Text(text = stringResource(id = android.R.string.cancel))
+                        }
+                    },
+                    title = { Text(text = stringResource(id = R.string.logout)) },
+                    text = { Text(text = stringResource(id = R.string.logout_confirmation)) }
+                )
+            }
         }
     }
 }

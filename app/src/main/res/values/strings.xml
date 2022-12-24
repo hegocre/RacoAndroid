@@ -28,4 +28,5 @@
     <string name="delete_evaluation">Esborrar avaluació</string>
     <string name="privacy_policy_url">https://hegocre.com/raco/privacy_ca.html</string>
     <string name="privacy_policy">Política de Privadesa</string>
+    <string name="logout_confirmation">Segur que vols tancar la sessió?</string>
 </resources>

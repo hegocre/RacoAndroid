@@ -28,4 +28,5 @@
     <string name="evaluation_name">Nombre de la evaluación</string>
     <string name="privacy_policy_url">https://hegocre.com/raco/privacy_es.html</string>
     <string name="privacy_policy">Política de Privacidad</string>
+    <string name="logout_confirmation">¿Seguro que quieres cerrar la sesión?</string>
 </resources>
