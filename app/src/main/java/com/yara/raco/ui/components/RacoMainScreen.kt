@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -57,11 +58,16 @@ fun RacoMainScreen(
         else -> null
     }
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        rememberTopAppBarState()
+    )
+
     RacoTheme {
         Scaffold(
             topBar = {
                 RacoMainTopAppBar(
                     title = stringResource(id = currentScreen.title),
+                    scrollBehavior = scrollBehavior,
                     onLogOut = onLogOut,
                     onBackPress = onBackPress,
                     isDayViewSelected = dayCalendarViewSelected,
@@ -92,7 +98,9 @@ fun RacoMainScreen(
                 navHostController = navController,
                 racoViewModel = racoViewModel,
                 dayCalendarViewSelected = dayCalendarViewSelected,
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(paddingValues),
             )
         }
     }
