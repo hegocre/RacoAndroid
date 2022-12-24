@@ -489,8 +489,6 @@ fun GradeMarkWithColor(
         text = "%.${2}f".format(mark),
         style = style,
         color = when (mark) {
-            in 0.0..4.9 -> MaterialTheme.colorScheme.error
-            in 5.0..6.9 -> MaterialTheme.colorScheme.secondary
             in 7.0..10.0 -> MaterialTheme.colorScheme.primary
             else -> MaterialTheme.colorScheme.onSurface
         }
