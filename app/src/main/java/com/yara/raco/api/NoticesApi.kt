@@ -4,6 +4,7 @@ import android.app.DownloadManager
 import android.content.*
 import android.net.Uri
 import android.os.Environment
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.yara.raco.R
@@ -52,7 +53,7 @@ class NoticesApi private constructor() {
     fun getAttachment(context: Context, file: File, accessToken: String) {
         val request = DownloadManager.Request(Uri.parse(file.url))
             .setTitle(file.nom)
-            .setMimeType(file.tipusMime)
+            .setMimeType(file.nom.getMime() ?: file.tipusMime)
             .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, file.nom)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED or DownloadManager.Request.VISIBILITY_VISIBLE)
             .addRequestHeader("Authorization", "Bearer $accessToken")
@@ -124,6 +125,11 @@ class NoticesApi private constructor() {
             context.getString(R.string.download_started),
             Toast.LENGTH_LONG,
         ).show()
+    }
+
+    private fun String.getMime(): String? {
+        val extension = java.io.File(this).extension
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     }
 
     @Serializable
