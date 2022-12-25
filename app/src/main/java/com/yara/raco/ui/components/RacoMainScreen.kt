@@ -1,9 +1,7 @@
 package com.yara.raco.ui.components
 
 import android.content.Intent
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,7 +17,6 @@ import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +37,8 @@ fun RacoMainScreen(
     val currentRoute = backStackEntry.value?.destination?.route
     val onBackPress: (() -> Unit)? = when {
         //Declare back action for button to appear
-        currentRoute == "${RacoScreen.Notes.name}/details" || currentRoute?.startsWith("${RacoScreen.Avisos.name}/details") == true -> {
+        currentRoute?.startsWith("${RacoScreen.Notes.name}/details") == true ||
+                currentRoute?.startsWith("${RacoScreen.Avisos.name}/details") == true -> {
             {
                 navController.popBackStack()
             }

@@ -29,4 +29,7 @@
     <string name="privacy_policy_url">https://hegocre.com/raco/privacy_ca.html</string>
     <string name="privacy_policy">Política de Privadesa</string>
     <string name="logout_confirmation">Segur que vols tancar la sessió?</string>
+    <string name="grade_name">Nom de la nota</string>
+    <string name="edit">Editar</string>
+    <string name="save">Desar</string>
 </resources>

@@ -29,4 +29,7 @@
     <string name="privacy_policy_url">https://hegocre.com/raco/privacy.html</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="logout_confirmation">Are you sure you want to log out?</string>
+    <string name="edit">Edit</string>
+    <string name="grade_name">Grade name</string>
+    <string name="save">Save</string>
 </resources>

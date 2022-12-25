@@ -6,8 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.yara.raco.model.evaluation.EvaluationController
-import com.yara.raco.model.evaluation.EvaluationWithGrade
+import com.yara.raco.model.evaluation.EvaluationWithGrades
 import com.yara.raco.model.files.File
+import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.schedule.Schedule
@@ -46,7 +47,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         get() = noticeController.getNotices()
     val schedules: LiveData<List<Schedule>>
         get() = scheduleController.getSchedule()
-    val evaluation: LiveData<List<EvaluationWithGrade>>
+    val evaluation: LiveData<List<EvaluationWithGrades>>
         get() = evaluationController.getEvaluations()
 
     init {
@@ -89,6 +90,17 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         return if (noticeWithFiles != null) Result.Success(noticeWithFiles) else Result.Error(0)
     }
 
+    suspend fun getEvaluationDetails(evaluationId: Int): Result<EvaluationWithGrades> {
+        val evaluationWithGrades = evaluationController.getEvaluationWithGrades(evaluationId)
+        return if (evaluationWithGrades != null) Result.Success(evaluationWithGrades) else Result.Error(
+            0
+        )
+    }
+
+    fun getLiveEvaluationDetails(evaluationId: Int): LiveData<EvaluationWithGrades?> {
+        return evaluationController.getLiveEvaluationWithGrades(evaluationId)
+    }
+
     fun downloadFile(file: File) {
         noticeController.downloadAttachment(getApplication(), file)
     }
@@ -106,9 +118,15 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun evaluationSave(evaluationWithGrade: EvaluationWithGrade) {
+    fun saveEvaluation(evaluationWithGrades: EvaluationWithGrades) {
         viewModelScope.launch {
-            evaluationController.evaluationSave(evaluationWithGrade)
+            evaluationController.saveEvaluation(evaluationWithGrades)
+        }
+    }
+
+    fun updateGrade(grade: Grade) {
+        viewModelScope.launch {
+            evaluationController.updateGrade(grade)
         }
     }
 }

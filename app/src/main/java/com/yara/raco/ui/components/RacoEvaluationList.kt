@@ -1,7 +1,5 @@
 package com.yara.raco.ui.components
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -21,45 +19,74 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.yara.raco.R
-import com.yara.raco.model.evaluation.EvaluationWithGrade
+import com.yara.raco.model.evaluation.EvaluationWithGrades
 import com.yara.raco.model.grade.Grade
+import com.yara.raco.model.grade.MutableGrade
 import com.yara.raco.model.subject.Subject
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class EditableEvaluationState(private val evaluationWithGrade: EvaluationWithGrade) {
-    var subjectId by mutableStateOf(evaluationWithGrade.evaluation.subjectId)
-    var evaluationName by mutableStateOf(evaluationWithGrade.evaluation.name)
-    val gradesList = evaluationWithGrade.listOfGrade.sortedBy { it.name }.toMutableStateList()
+class EditableEvaluationState(private val evaluationWithGrades: EvaluationWithGrades) {
+    private constructor(
+        evaluationWithGrades: EvaluationWithGrades,
+        evaluationName: String,
+        gradesList: List<MutableGrade>
+    ) : this(evaluationWithGrades) {
+        this.evaluationName = evaluationName
+        this.gradesList.clear()
+        this.gradesList.addAll(gradesList)
+    }
 
-    fun getEvaluationWithGrades(): EvaluationWithGrade = EvaluationWithGrade(
-        evaluation = evaluationWithGrade.evaluation.copy(
-            subjectId = subjectId,
+    val evaluationId = evaluationWithGrades.evaluation.id
+    var evaluationName by mutableStateOf(evaluationWithGrades.evaluation.name)
+    val gradesList = evaluationWithGrades.listOfGrade.sortedBy { it.name }.map {
+        MutableGrade(
+            id = it.id,
+            name = it.name,
+            weight = it.weight.toString(),
+            mark = (it.mark ?: "").toString(),
+            evaluationId = it.evaluationId
+        )
+    }.toMutableStateList()
+
+    fun getEvaluationWithGrades(): EvaluationWithGrades = EvaluationWithGrades(
+        evaluation = evaluationWithGrades.evaluation.copy(
             name = evaluationName
         ),
-        listOfGrade = gradesList
+        listOfGrade = gradesList.map {
+            it.toGrade()
+        }
     )
 
     companion object {
         val Saver: Saver<EditableEvaluationState, *> = listSaver(
-            save = { listOf(Json.encodeToString(it.getEvaluationWithGrades())) },
-            restore = { EditableEvaluationState(Json.decodeFromString(it[0])) }
+            save = {
+                listOf(Json.encodeToString(it.evaluationWithGrades))
+                    .plus(it.evaluationName)
+                    .plus(Json.encodeToString(it.gradesList.toList()))
+            },
+            restore = {
+                EditableEvaluationState(
+                    evaluationWithGrades = Json.decodeFromString(it[0]),
+                    evaluationName = it[1],
+                    gradesList = Json.decodeFromString(it[2])
+                )
+            }
         )
     }
 }
 
 @Composable
-fun rememberEditableEvaluationState(evaluationWithGrade: EvaluationWithGrade): EditableEvaluationState =
-    rememberSaveable(evaluationWithGrade, saver = EditableEvaluationState.Saver) {
-        EditableEvaluationState(evaluationWithGrade)
+fun rememberEditableEvaluationState(evaluationWithGrades: EvaluationWithGrades): EditableEvaluationState =
+    rememberSaveable(evaluationWithGrades, saver = EditableEvaluationState.Saver) {
+        EditableEvaluationState(evaluationWithGrades)
     }
 
 @OptIn(
@@ -67,14 +94,13 @@ fun rememberEditableEvaluationState(evaluationWithGrade: EvaluationWithGrade): E
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun RacoGradesList(
+fun RacoEvaluationList(
     subjects: List<Subject>,
-    evaluations: List<EvaluationWithGrade>,
-    onGradeClick: (EvaluationWithGrade) -> Unit,
+    evaluations: List<EvaluationWithGrades>,
+    onGradeClick: (EvaluationWithGrades) -> Unit,
     onAddEvaluationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val subjectsIds = (evaluations.map { it.evaluation.subjectId }).distinct()
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
@@ -83,35 +109,49 @@ fun RacoGradesList(
             }
         }
     ) { paddingValues ->
+        val filteredEvaluations = remember(evaluations, subjects) {
+            subjects.associate { subject ->
+                Pair(
+                    subject.id,
+                    evaluations.filter { it.evaluation.subjectId == subject.id })
+            }
+        }
+
         LazyColumn(
-            modifier = modifier.padding(paddingValues)
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            for (subject in subjectsIds) {
-                val subjectName = subjects.find { it.sigles == subject }?.nom
-                stickyHeader {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = if (subject != "") subjectName.toString() else "Unlabeled",
-                            style = MaterialTheme.typography.titleMedium
+            for (subject in subjects) {
+                val evaluationsList = filteredEvaluations.getOrDefault(subject.id, emptyList())
+
+                if (evaluationsList.isNotEmpty()) {
+                    stickyHeader {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = subject.nom,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+
+                    itemsIndexed(
+                        items = evaluationsList,
+                        key = { _, evaluation -> evaluation.evaluation.id }
+                    ) { index, evaluation ->
+                        if (index != 0) {
+                            Divider()
+                        }
+                        EvaluationListEntry(
+                            evaluation = evaluation,
+                            onGradeClick = onGradeClick
                         )
                     }
-                }
-                itemsIndexed(
-                    items = evaluations.filter { it.evaluation.subjectId == subject },
-                    key = { _, evaluation -> evaluation.evaluation.id }
-                ) { index, evaluation ->
-                    if (index != 0) {
-                        Divider()
-                    }
-                    RacoGradesCollapsed(
-                        evaluation = evaluation,
-                        onGradeClick = onGradeClick
-                    )
                 }
             }
         }
@@ -120,97 +160,35 @@ fun RacoGradesList(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailedEvaluationWithGradeCall(
-    subjects: List<Subject>,
-    evaluation: EvaluationWithGrade,
-    onEvaluationUpdate: (EvaluationWithGrade) -> Unit,
-    onEvaluationDelete: (Int) -> Unit,
+fun DetailedEvaluation(
+    evaluation: EvaluationWithGrades,
+    onEditClick: () -> Unit,
+    onGradeUpdate: (Grade) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var isEditingEvaluation by remember { mutableStateOf(false) }
-
-    val editableEvaluationState = rememberEditableEvaluationState(evaluationWithGrade = evaluation)
-
-    val neededMark by remember {
-        derivedStateOf {
-            computeAverageMarkForPassing(editableEvaluationState.gradesList)
-        }
-    }
-
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    if (isEditingEvaluation) {
-                        editableEvaluationState.gradesList.filter { it.id < 0 }
-                            .forEach { it.id = 0 }
-                        onEvaluationUpdate(editableEvaluationState.getEvaluationWithGrades())
-                    }
-                    isEditingEvaluation = !isEditingEvaluation
-                }
+                onClick = onEditClick
             ) {
                 Icon(
-                    if (!isEditingEvaluation) Icons.Outlined.Edit else Icons.Outlined.Save,
-                    contentDescription = "Add grade"
+                    Icons.Outlined.Edit,
+                    contentDescription = stringResource(id = R.string.edit)
                 )
             }
         }
     ) { paddingValues ->
-        BackHandler(onBack = { isEditingEvaluation = false }, enabled = isEditingEvaluation)
-
-        Crossfade(targetState = isEditingEvaluation) { editing ->
-            if (!editing) {
-                DetailedEvaluationWithGrade(
-                    evaluation = editableEvaluationState.getEvaluationWithGrades(),
-                    neededMark = neededMark,
-                    modifier = Modifier.padding(paddingValues),
-                    onGradeUpdate = { newGrade ->
-                        editableEvaluationState.gradesList[editableEvaluationState.gradesList.indexOfFirst { it.id == newGrade.id }] =
-                            newGrade
-                    }
-                )
-                DisposableEffect(LocalLifecycleOwner.current) {
-                    onDispose {
-                        onEvaluationUpdate(editableEvaluationState.getEvaluationWithGrades())
-                    }
-                }
-            } else {
-                EditEvaluationWithGrade(
-                    subjects = subjects,
-                    editableEvaluationState = editableEvaluationState,
-                    onGradeAdd = { grade ->
-                        editableEvaluationState.gradesList.add(
-                            grade.copy(
-                                evaluationId = editableEvaluationState.getEvaluationWithGrades().evaluation.id
-                            )
-                        )
-                    },
-                    onGradeDelete = { grade -> editableEvaluationState.gradesList.remove(grade) },
-                    onGradeUpdate = { grade ->
-                        editableEvaluationState.gradesList[editableEvaluationState.gradesList.indexOfFirst { it.id == grade.id }] =
-                            grade
-                    },
-                    onEvaluationDelete = { onEvaluationDelete(editableEvaluationState.getEvaluationWithGrades().evaluation.id) },
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
+        val sortedGrades by remember {
+            derivedStateOf { evaluation.listOfGrade.sortedBy { it.name } }
         }
-    }
-}
 
-@Composable
-fun DetailedEvaluationWithGrade(
-    evaluation: EvaluationWithGrade,
-    onGradeUpdate: (Grade) -> Unit,
-    neededMark: Double,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-    ) {
-        LazyColumn {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+        ) {
             item {
                 ElevatedCard(modifier = Modifier) {
                     Row(
@@ -230,8 +208,8 @@ fun DetailedEvaluationWithGrade(
                         }
 
                         GradeMarkWithColor(
-                            computeFinalMarkFromEvaluation(evaluation.listOfGrade),
-                            MaterialTheme.typography.headlineMedium
+                            mark = evaluation.getFinalMark(),
+                            style = MaterialTheme.typography.headlineMedium
                         )
                     }
                 }
@@ -243,11 +221,14 @@ fun DetailedEvaluationWithGrade(
                 )
             }
 
-            items(items = evaluation.listOfGrade) { grade ->
+            items(
+                items = sortedGrades,
+                key = { grade -> grade.id }
+            ) { grade ->
                 Spacer(modifier = Modifier.height(8.dp))
-                RacoGradeView(
+                EditableGradeMark(
                     grade = grade,
-                    neededMark = neededMark,
+                    neededMark = evaluation.getPassMark(),
                     onMarkUpdate = { newMark ->
                         onGradeUpdate(grade.copy(mark = newMark))
                     }
@@ -263,121 +244,115 @@ fun DetailedEvaluationWithGrade(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditEvaluationWithGrade(
-    subjects: List<Subject>,
+fun EditableEvaluation(
     editableEvaluationState: EditableEvaluationState,
-    onGradeAdd: (Grade) -> Unit,
-    onGradeDelete: (Grade) -> Unit,
-    onGradeUpdate: (Grade) -> Unit,
+    onEvaluationSave: () -> Unit,
     onEvaluationDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var subjectsMenuExpanded by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .clickable { subjectsMenuExpanded = true },
-        ) {
-            Row(verticalAlignment = CenterVertically) {
-                Text(
-                    text = subjects.find { it.id == editableEvaluationState.subjectId }?.nom ?: "",
-                    modifier = Modifier.weight(1f)
+    Scaffold(
+        contentWindowInsets = WindowInsets.ime,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onEvaluationSave,
+            ) {
+                Icon(
+                    Icons.Outlined.Save,
+                    contentDescription = stringResource(id = R.string.save)
                 )
-                IconButton(onClick = { subjectsMenuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = ""
-                    )
-                }
             }
-            DropdownMenu(
-                expanded = subjectsMenuExpanded,
-                onDismissRequest = { subjectsMenuExpanded = false },
-            ) {
-                subjects.forEach { subject ->
-                    DropdownMenuItem(text = { Text(text = subject.nom) }, onClick = {
-                        editableEvaluationState.subjectId = subject.id
-                        subjectsMenuExpanded = false
-                    })
-                }
-            }
-        }
-
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 24.dp),
-            value = editableEvaluationState.evaluationName,
-            onValueChange = { newValue -> editableEvaluationState.evaluationName = newValue },
-            singleLine = true,
-            maxLines = 1,
-            placeholder = {
-                Text(text = stringResource(id = R.string.evaluation_name))
-            }
-        )
-
-        Text(
-            text = stringResource(id = R.string.grades),
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        for (grade in editableEvaluationState.gradesList) {
-            RacoGradeEditView(
-                grade = grade,
-                onGradeUpdate = onGradeUpdate,
-                onGradeDelete = onGradeDelete,
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        )
-        {
-            IconButton(
-                onClick = {
-                    val newGrade = Grade(
-                        id = -(System.currentTimeMillis().toInt() % 100),
-                        name = "",
-                        mark = null,
-                        weight = 0.0,
-                        evaluationId = 0
-                    )
-                    onGradeAdd(newGrade)
-                }
-            ) {
-                Icon(Icons.Outlined.AddCircleOutline, contentDescription = "Add Weight")
-            }
-        }
-
-        Button(
-            onClick = { onEvaluationDelete() },
-            colors = ButtonDefaults.filledTonalButtonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer
-            ),
-            modifier = Modifier.fillMaxWidth()
+        },
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = stringResource(id = R.string.delete_evaluation))
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 24.dp),
+                value = editableEvaluationState.evaluationName,
+                onValueChange = { newValue -> editableEvaluationState.evaluationName = newValue },
+                singleLine = true,
+                maxLines = 1,
+                placeholder = {
+                    Text(text = stringResource(id = R.string.evaluation_name))
+                }
+            )
+
+            Text(
+                text = stringResource(id = R.string.grades),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            editableEvaluationState.gradesList.forEachIndexed { index, grade ->
+                EditableGradeWeight(
+                    grade = grade,
+                    onNameChange = { newName ->
+                        editableEvaluationState.gradesList[index] =
+                            editableEvaluationState.gradesList[index].copy(name = newName)
+                    },
+                    onWeightChange = { newWeight ->
+                        editableEvaluationState.gradesList[index] =
+                            editableEvaluationState.gradesList[index].copy(weight = newWeight)
+                    },
+                    onGradeDelete = { editableEvaluationState.gradesList.removeAt(index) },
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                IconButton(
+                    onClick = {
+                        val newGrade = MutableGrade(
+                            id = null,
+                            name = "",
+                            mark = "",
+                            weight = "0.0",
+                            evaluationId = editableEvaluationState.evaluationId
+                        )
+                        editableEvaluationState.gradesList.add(newGrade)
+                    }
+                ) {
+                    Icon(Icons.Outlined.AddCircleOutline, contentDescription = "Add Weight")
+                }
+            }
+
+            Button(
+                onClick = { onEvaluationDelete() },
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(id = R.string.delete_evaluation))
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RacoGradeView(
+fun EditableGradeMark(
     grade: Grade,
     onMarkUpdate: (Double?) -> Unit,
     neededMark: Double
 ) {
+    val (editableMark, setEditableMark) = rememberSaveable {
+        mutableStateOf(
+            (grade.mark ?: "").toString()
+        )
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = CenterVertically,
@@ -387,8 +362,15 @@ fun RacoGradeView(
             modifier = Modifier.weight(1f)
         )
         OutlinedTextField(
-            value = grade.mark?.toString() ?: "",
-            onValueChange = { newMark -> onMarkUpdate(newMark.toDoubleOrNull() ?: grade.mark) },
+            value = editableMark,
+            onValueChange = { newMark ->
+                setEditableMark(newMark)
+                if (newMark == "") {
+                    onMarkUpdate(null)
+                } else if (newMark.toDoubleOrNull() != null) {
+                    onMarkUpdate(newMark.toDoubleOrNull())
+                }
+            },
             placeholder = {
                 Text(
                     text = String.format("%.2f", neededMark)
@@ -397,17 +379,19 @@ fun RacoGradeView(
             modifier = Modifier.width(80.dp),
             maxLines = 1,
             singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            isError = editableMark != "" && editableMark.toDoubleOrNull() == null
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RacoGradeEditView(
-    grade: Grade,
-    onGradeUpdate: (Grade) -> Unit,
-    onGradeDelete: (Grade) -> Unit,
+fun EditableGradeWeight(
+    grade: MutableGrade,
+    onNameChange: (String) -> Unit,
+    onWeightChange: (String) -> Unit,
+    onGradeDelete: (MutableGrade) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -417,10 +401,10 @@ fun RacoGradeEditView(
     ) {
         OutlinedTextField(
             value = grade.name,
-            onValueChange = { onGradeUpdate(grade.copy(name = it)) },
+            onValueChange = onNameChange,
             placeholder = {
                 Text(
-                    text = "Grade Name",
+                    text = stringResource(id = R.string.grade_name),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
                 )
             },
@@ -428,16 +412,11 @@ fun RacoGradeEditView(
                 .weight(1f)
                 .padding(end = 16.dp),
             maxLines = 1,
+            singleLine = true
         )
         OutlinedTextField(
-            value = grade.weight.toString(),
-            onValueChange = {
-                onGradeUpdate(
-                    grade.copy(
-                        weight = it.toDoubleOrNull() ?: grade.weight
-                    )
-                )
-            },
+            value = grade.weight,
+            onValueChange = onWeightChange,
             modifier = Modifier
                 .width(120.dp),
             maxLines = 1,
@@ -445,7 +424,8 @@ fun RacoGradeEditView(
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             trailingIcon = {
                 Icon(imageVector = Icons.Default.Percent, contentDescription = "")
-            }
+            },
+            isError = grade.weight != "" && grade.weight.toDoubleOrNull() == null
         )
         IconButton(onClick = { onGradeDelete(grade) }) {
             Icon(Icons.Outlined.Delete, contentDescription = "Delete Weight")
@@ -455,9 +435,9 @@ fun RacoGradeEditView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RacoGradesCollapsed(
-    evaluation: EvaluationWithGrade,
-    onGradeClick: (EvaluationWithGrade) -> Unit,
+fun EvaluationListEntry(
+    evaluation: EvaluationWithGrades,
+    onGradeClick: (EvaluationWithGrades) -> Unit,
 ) {
     ListItem(
         modifier = Modifier
@@ -473,7 +453,7 @@ fun RacoGradesCollapsed(
         },
         supportingText = {
             GradeMarkWithColor(
-                computeFinalMarkFromEvaluation(evaluation.listOfGrade),
+                evaluation.getFinalMark(),
                 MaterialTheme.typography.titleLarge
             )
         }
@@ -490,6 +470,8 @@ fun GradeMarkWithColor(
         style = style,
         color = when (mark) {
             in 7.0..10.0 -> MaterialTheme.colorScheme.primary
+            in 5.0..7.0 -> MaterialTheme.colorScheme.secondary
+            in 0.0..5.0 -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
         }
     )
@@ -575,30 +557,4 @@ fun AddEvaluationDialog(
             }
         }
     }
-}
-
-fun computeFinalMarkFromEvaluation(
-    evaluation: List<Grade>
-): Double {
-    var mark = 0.0
-    for (grade in evaluation) {
-        grade.mark?.let {
-            mark += it * (grade.weight / 100)
-        }
-    }
-    return mark
-}
-
-fun computeAverageMarkForPassing(
-    evaluation: List<Grade>
-): Double {
-    var remainingWeight = 0.0
-    for (grade in evaluation) {
-        if (grade.mark == null) {
-            remainingWeight += grade.weight
-        }
-    }
-    val currentMark = computeFinalMarkFromEvaluation(evaluation)
-
-    return ((5.0 - currentMark) / (remainingWeight / 100)).coerceIn(0.0, 10.0)
 }

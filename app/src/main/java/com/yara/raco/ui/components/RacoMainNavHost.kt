@@ -1,5 +1,6 @@
 package com.yara.raco.ui.components
 
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -23,7 +24,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.yara.raco.model.evaluation.EvaluationWithGrade
+import com.yara.raco.model.evaluation.EvaluationWithGrades
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.viewmodel.RacoViewModel
@@ -44,12 +45,6 @@ fun RacoMainNavHost(
     modifier: Modifier = Modifier
 ) {
     val isRefreshing by racoViewModel.isRefreshing.collectAsState()
-
-    var detailedEvaluationWithGrades by rememberSaveable(saver = EvaluationWithGrade.Saver) {
-        mutableStateOf(
-            null
-        )
-    }
 
     val noticesWithFiles by racoViewModel.notices.observeAsState(initial = emptyList())
     val sortedNoticesWithFiles = remember(noticesWithFiles) {
@@ -160,19 +155,14 @@ fun RacoMainNavHost(
             var showAddEvaluationDialog by remember { mutableStateOf(false) }
 
             Column {
-                RacoSwipeRefresh(
-                    isRefreshing = isRefreshing,
-                    onRefresh = { racoViewModel.refresh() }) {
-                    RacoGradesList(
-                        subjects = sortedSubjects,
-                        evaluations = sortedEvaluations,
-                        onGradeClick = { evaluationWithGrade ->
-                            detailedEvaluationWithGrades = evaluationWithGrade
-                            navHostController.navigate("${RacoScreen.Notes.name}/details")
-                        },
-                        onAddEvaluationClick = { showAddEvaluationDialog = true }
-                    )
-                }
+                RacoEvaluationList(
+                    subjects = sortedSubjects,
+                    evaluations = sortedEvaluations,
+                    onGradeClick = { evaluationWithGrade ->
+                        navHostController.navigate("${RacoScreen.Notes.name}/details/${evaluationWithGrade.evaluation.id}")
+                    },
+                    onAddEvaluationClick = { showAddEvaluationDialog = true }
+                )
             }
 
             if (showAddEvaluationDialog) {
@@ -187,22 +177,86 @@ fun RacoMainNavHost(
             }
         }
 
-        composable("${RacoScreen.Notes.name}/details") {
-            Column {
-                detailedEvaluationWithGrades?.let { evaluationWithGrades ->
-                    DetailedEvaluationWithGradeCall(
-                        subjects = sortedSubjects,
-                        evaluation = evaluationWithGrades,
-                        onEvaluationUpdate = { evaluationWithGrade ->
-                            racoViewModel.evaluationSave(
-                                evaluationWithGrade
-                            )
-                        },
-                        onEvaluationDelete = {
-                            navHostController.popBackStack()
-                            racoViewModel.deleteEvaluation(it)
-                        }
+        composable(
+            route = "${RacoScreen.Notes.name}/details/{evaluation_id}",
+            arguments = listOf(
+                navArgument("evaluation_id") {
+                    type = NavType.IntType
+                }
+            )
+        ) { entry ->
+            entry.arguments?.getInt("evaluation_id")?.let { evaluationId ->
+                val detailedEvaluation by racoViewModel.getLiveEvaluationDetails(evaluationId)
+                    .observeAsState()
+
+                detailedEvaluation?.let { evaluationWithGrades ->
+                    Column {
+                        DetailedEvaluation(
+                            evaluation = evaluationWithGrades,
+                            onEditClick = {
+                                navHostController.navigate("${RacoScreen.Notes.name}/details/${evaluationId}/edit")
+                            },
+                            onGradeUpdate = { updatedGrade -> racoViewModel.updateGrade(updatedGrade) },
+                        )
+                    }
+                }
+            }
+        }
+
+        composable(
+            route = "${RacoScreen.Notes.name}/details/{evaluation_id}/edit",
+            arguments = listOf(
+                navArgument("evaluation_id") {
+                    type = NavType.IntType
+                }
+            )
+        ) { entry ->
+            entry.arguments?.getInt("evaluation_id")?.let { evaluationId ->
+                val detailedEvaluationState by produceState(
+                    initialValue = DetailsUiState<EvaluationWithGrades>(
+                        isLoading = true
                     )
+                ) {
+                    val noticeWithFilesResult = racoViewModel.getEvaluationDetails(evaluationId)
+                    value = if (noticeWithFilesResult is Result.Success<EvaluationWithGrades>) {
+                        DetailsUiState(noticeWithFilesResult.data)
+                    } else {
+                        DetailsUiState(throwError = true)
+                    }
+                }
+
+                when {
+                    detailedEvaluationState.detailed != null -> {
+                        detailedEvaluationState.detailed?.let { detailedEvaluation ->
+                            val editableEvaluationState =
+                                rememberEditableEvaluationState(evaluationWithGrades = detailedEvaluation)
+                            val context = LocalContext.current
+
+                            Column {
+                                EditableEvaluation(
+                                    editableEvaluationState = editableEvaluationState,
+                                    onEvaluationSave = {
+                                        try {
+                                            racoViewModel.saveEvaluation(editableEvaluationState.getEvaluationWithGrades())
+                                            navHostController.popBackStack()
+                                        } catch (e: IllegalArgumentException) {
+                                            Toast.makeText(
+                                                context,
+                                                "Invalid! :(",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    },
+                                    onEvaluationDelete = {
+                                        racoViewModel.deleteEvaluation(evaluationId)
+                                        navHostController.popBackStack(
+                                            RacoScreen.Notes.name, inclusive = false
+                                        )
+                                    },
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
