@@ -302,7 +302,7 @@ fun EditableEvaluation(
 
             itemsIndexed(
                 items = editableEvaluationState.gradesList,
-                key = { index, evaluation -> evaluation.name + index }
+                key = { index, _ -> "grade$index" }
             ) { index, grade ->
                 EditableGradeWeight(
                     grade = grade,
