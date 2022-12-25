@@ -524,46 +524,55 @@ fun AddEvaluationDialog(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                Box(
+                Column(
                     modifier = Modifier
-                        .clickable { subjectsMenuExpanded = true },
-                ) {
-                    Row(verticalAlignment = CenterVertically) {
-                        Text(
-                            text = subjects.find { it.id == subjectId }?.nom ?: "",
-                            modifier = Modifier.weight(1f)
+                        .weight(1f, fill = false)
+                        .verticalScroll(
+                            rememberScrollState()
                         )
-                        IconButton(onClick = { subjectsMenuExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = ""
-                            )
-                        }
-                    }
-                    DropdownMenu(
-                        expanded = subjectsMenuExpanded,
-                        onDismissRequest = { subjectsMenuExpanded = false },
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clickable { subjectsMenuExpanded = true },
                     ) {
-                        subjects.forEach { subject ->
-                            DropdownMenuItem(text = { Text(text = subject.nom) }, onClick = {
-                                setSubjectId(subject.id)
-                                subjectsMenuExpanded = false
-                            })
+                        Row(verticalAlignment = CenterVertically) {
+                            Text(
+                                text = subjects.find { it.id == subjectId }?.nom ?: "",
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = { subjectsMenuExpanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = ""
+                                )
+                            }
+                        }
+                        DropdownMenu(
+                            expanded = subjectsMenuExpanded,
+                            onDismissRequest = { subjectsMenuExpanded = false },
+                        ) {
+                            subjects.forEach { subject ->
+                                DropdownMenuItem(text = { Text(text = subject.nom) }, onClick = {
+                                    setSubjectId(subject.id)
+                                    subjectsMenuExpanded = false
+                                })
+                            }
                         }
                     }
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(top = 16.dp, bottom = 24.dp),
+                        value = evaluationName,
+                        onValueChange = setEvaluationName,
+                        singleLine = true,
+                        maxLines = 1,
+                        placeholder = {
+                            Text(text = stringResource(id = R.string.evaluation_name))
+                        }
+                    )
                 }
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp, bottom = 24.dp),
-                    value = evaluationName,
-                    onValueChange = setEvaluationName,
-                    singleLine = true,
-                    maxLines = 1,
-                    placeholder = {
-                        Text(text = stringResource(id = R.string.evaluation_name))
-                    }
-                )
 
                 TextButton(
                     onClick = { onAddClick(subjectId, evaluationName) },
