@@ -19,10 +19,12 @@ data class MutableGrade(
         Grade(
             id = id ?: 0,
             name = name,
-            weight = weight.toDoubleOrNull() ?: throw IllegalArgumentException(),
+            weight = weight.replace(",", ".").toDoubleOrNull() ?: throw IllegalArgumentException(),
             mark = if (mark == "") null
-            else if (mark.toDoubleOrNull() == null) throw IllegalArgumentException()
-            else mark.toDoubleOrNull(),
+            else if (mark.replace(",", ".")
+                    .toDoubleOrNull() == null
+            ) throw IllegalArgumentException()
+            else mark.replace(",", ".").toDoubleOrNull(),
             evaluationId = evaluationId
         )
 }

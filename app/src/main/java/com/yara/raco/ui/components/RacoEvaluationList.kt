@@ -389,8 +389,8 @@ fun EditableGradeMark(
                 setEditableMark(newMark)
                 if (newMark == "") {
                     onMarkUpdate(null)
-                } else if (newMark.toDoubleOrNull() != null) {
-                    onMarkUpdate(newMark.toDoubleOrNull())
+                } else if (newMark.replace(",", ".").toDoubleOrNull() != null) {
+                    onMarkUpdate(newMark.replace(",", ".").toDoubleOrNull())
                 }
             },
             placeholder = {
@@ -402,7 +402,7 @@ fun EditableGradeMark(
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            isError = editableMark != "" && editableMark.toDoubleOrNull() == null
+            isError = editableMark != "" && editableMark.replace(",", ".").toDoubleOrNull() == null
         )
     }
 }
@@ -447,7 +447,7 @@ fun EditableGradeWeight(
             trailingIcon = {
                 Icon(imageVector = Icons.Default.Percent, contentDescription = "")
             },
-            isError = grade.weight != "" && grade.weight.toDoubleOrNull() == null
+            isError = grade.weight != "" && grade.weight.replace(",", ".").toDoubleOrNull() == null
         )
         IconButton(onClick = { onGradeDelete(grade) }) {
             Icon(
