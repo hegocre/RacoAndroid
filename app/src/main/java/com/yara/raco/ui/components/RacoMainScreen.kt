@@ -1,10 +1,15 @@
 package com.yara.raco.ui.components
 
 import android.content.Intent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -18,7 +23,7 @@ import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun RacoMainScreen(
     racoViewModel: RacoViewModel,
@@ -93,7 +98,6 @@ fun RacoMainScreen(
                     }
                 )
             },
-            contentWindowInsets = WindowInsets.systemBars,
         ) { paddingValues ->
             RacoMainNavHost(
                 navHostController = navController,
@@ -101,7 +105,8 @@ fun RacoMainScreen(
                 dayCalendarViewSelected = dayCalendarViewSelected,
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .padding(paddingValues),
+                    .padding(paddingValues)
+                    .consumedWindowInsets(paddingValues),
             )
 
             if (showLogOutDialog) {

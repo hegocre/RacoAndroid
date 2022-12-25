@@ -17,6 +17,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -102,12 +103,12 @@ fun RacoEvaluationList(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             FloatingActionButton(onClick = onAddEvaluationClick) {
                 Icon(Icons.Outlined.Add, contentDescription = "Add grade")
             }
-        }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         val filteredEvaluations = remember(evaluations, subjects) {
             subjects.associate { subject ->
@@ -158,7 +159,7 @@ fun RacoEvaluationList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEvaluation(
     evaluation: EvaluationWithGrades,
@@ -167,7 +168,6 @@ fun DetailedEvaluation(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onEditClick
@@ -177,7 +177,8 @@ fun DetailedEvaluation(
                     contentDescription = stringResource(id = R.string.edit)
                 )
             }
-        }
+        },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         val sortedGrades by remember {
             derivedStateOf { evaluation.listOfGrade.sortedBy { it.name } }
@@ -187,9 +188,10 @@ fun DetailedEvaluation(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .consumedWindowInsets(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            item {
+            item(key = "evaluation_header") {
                 ElevatedCard(modifier = Modifier) {
                     Row(
                         modifier = Modifier.padding(all = 24.dp),
@@ -225,24 +227,27 @@ fun DetailedEvaluation(
                 items = sortedGrades,
                 key = { grade -> grade.id }
             ) { grade ->
-                Spacer(modifier = Modifier.height(8.dp))
-                EditableGradeMark(
-                    grade = grade,
-                    neededMark = evaluation.getPassMark(),
-                    onMarkUpdate = { newMark ->
-                        onGradeUpdate(grade.copy(mark = newMark))
-                    }
-                )
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    EditableGradeMark(
+                        grade = grade,
+                        neededMark = evaluation.getPassMark(),
+                        onMarkUpdate = { newMark ->
+                            onGradeUpdate(grade.copy(mark = newMark))
+                        }
+                    )
+                }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
+            //Workaround, see https://stackoverflow.com/questions/73894748/compose-how-to-have-ime-padding-and-scaffold-padding-with-edge-to-edge-and-wind
+            item(key = "ime_spacer") {
+                Spacer(modifier = Modifier.imePadding())
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun EditableEvaluation(
     editableEvaluationState: EditableEvaluationState,
@@ -251,7 +256,6 @@ fun EditableEvaluation(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
-        contentWindowInsets = WindowInsets.ime,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onEvaluationSave,
@@ -262,34 +266,44 @@ fun EditableEvaluation(
                 )
             }
         },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
+                .consumedWindowInsets(paddingValues)
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 24.dp),
-                value = editableEvaluationState.evaluationName,
-                onValueChange = { newValue -> editableEvaluationState.evaluationName = newValue },
-                singleLine = true,
-                maxLines = 1,
-                placeholder = {
-                    Text(text = stringResource(id = R.string.evaluation_name))
-                }
-            )
+            item(key = "evaluation_name") {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 24.dp),
+                    value = editableEvaluationState.evaluationName,
+                    onValueChange = { newValue ->
+                        editableEvaluationState.evaluationName = newValue
+                    },
+                    singleLine = true,
+                    maxLines = 1,
+                    placeholder = {
+                        Text(text = stringResource(id = R.string.evaluation_name))
+                    }
+                )
+            }
 
-            Text(
-                text = stringResource(id = R.string.grades),
-                style = MaterialTheme.typography.titleMedium
-            )
+            item(key = "grades_title") {
+                Text(
+                    text = stringResource(id = R.string.grades),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
 
-            editableEvaluationState.gradesList.forEachIndexed { index, grade ->
+            itemsIndexed(
+                items = editableEvaluationState.gradesList,
+                key = { index, evaluation -> evaluation.name + index }
+            ) { index, grade ->
                 EditableGradeWeight(
                     grade = grade,
                     onNameChange = { newName ->
@@ -304,37 +318,42 @@ fun EditableEvaluation(
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                IconButton(
-                    onClick = {
-                        val newGrade = MutableGrade(
-                            id = null,
-                            name = "",
-                            mark = "",
-                            weight = "0.0",
-                            evaluationId = editableEvaluationState.evaluationId
-                        )
-                        editableEvaluationState.gradesList.add(newGrade)
+            item(key = "new_grade_button") {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    IconButton(
+                        onClick = {
+                            val newGrade = MutableGrade(
+                                id = null,
+                                name = "",
+                                mark = "",
+                                weight = "0.0",
+                                evaluationId = editableEvaluationState.evaluationId
+                            )
+                            editableEvaluationState.gradesList.add(newGrade)
+                        },
+                        modifier = Modifier.align(CenterHorizontally)
+                    ) {
+                        Icon(Icons.Outlined.AddCircleOutline, contentDescription = "Add Weight")
                     }
-                ) {
-                    Icon(Icons.Outlined.AddCircleOutline, contentDescription = "Add Weight")
                 }
             }
 
-            Button(
-                onClick = { onEvaluationDelete() },
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.delete_evaluation))
+            item(key = "delete_evaluation_button") {
+                Button(
+                    onClick = { onEvaluationDelete() },
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = stringResource(id = R.string.delete_evaluation))
+                }
+            }
+
+            //Workaround, see https://stackoverflow.com/questions/73894748/compose-how-to-have-ime-padding-and-scaffold-padding-with-edge-to-edge-and-wind
+            item(key = "ime_spacer") {
+                Spacer(modifier = Modifier.imePadding())
             }
         }
     }
