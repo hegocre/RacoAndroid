@@ -16,17 +16,17 @@ enum class RacoScreen(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector
 ) {
-    Avisos(
+    Notes(
         title = R.string.notices,
         selectedIcon = Icons.Filled.Notifications,
         unselectedIcon = Icons.Outlined.Notifications
     ),
-    Horari(
+    Schedule(
         title = R.string.planning,
         selectedIcon = Icons.Filled.CalendarToday,
         unselectedIcon = Icons.Outlined.CalendarToday
     ),
-    Notes(
+    Grades(
         title = R.string.grades,
         selectedIcon = Icons.Filled.School,
         unselectedIcon = Icons.Outlined.School
@@ -35,10 +35,10 @@ enum class RacoScreen(
     companion object {
         fun fromRoute(route: String?): RacoScreen =
             when (route?.substringBefore("/")) {
-                Avisos.name -> Avisos
-                Horari.name -> Horari
                 Notes.name -> Notes
-                null -> Avisos
+                Schedule.name -> Schedule
+                Grades.name -> Grades
+                null -> Notes
                 else -> throw IllegalArgumentException("Route $route is not recognized.")
             }
     }

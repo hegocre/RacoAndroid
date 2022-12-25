@@ -69,10 +69,10 @@ fun RacoMainNavHost(
 
     NavHost(
         navController = navHostController,
-        startDestination = RacoScreen.Avisos.name,
+        startDestination = RacoScreen.Notes.name,
         modifier = modifier
     ) {
-        composable(RacoScreen.Avisos.name) {
+        composable(RacoScreen.Notes.name) {
             Column {
                 val pagerState = rememberPagerState()
 
@@ -90,7 +90,7 @@ fun RacoMainNavHost(
                         noticesWithFiles = sortedNoticesWithFiles,
                         onNoticeClick = { noticeWithFiles ->
                             navHostController.navigate(
-                                "${RacoScreen.Avisos.name}/details/${noticeWithFiles.notice.id}"
+                                "${RacoScreen.Notes.name}/details/${noticeWithFiles.notice.id}"
                             )
                         }
                     )
@@ -99,7 +99,7 @@ fun RacoMainNavHost(
         }
 
         composable(
-            route = "${RacoScreen.Avisos.name}/details/{notice_id}",
+            route = "${RacoScreen.Notes.name}/details/{notice_id}",
             arguments = listOf(
                 navArgument("notice_id") {
                     type = NavType.IntType
@@ -149,7 +149,7 @@ fun RacoMainNavHost(
             }
         }
 
-        composable(RacoScreen.Horari.name) {
+        composable(RacoScreen.Schedule.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = { racoViewModel.refresh() }) {
                 Crossfade(targetState = dayCalendarViewSelected) { isDayCalendarViewSelected ->
                     if (isDayCalendarViewSelected) {
@@ -161,7 +161,7 @@ fun RacoMainNavHost(
             }
         }
 
-        composable(RacoScreen.Notes.name) {
+        composable(RacoScreen.Grades.name) {
             var showAddEvaluationDialog by remember { mutableStateOf(false) }
 
             Column {
@@ -169,7 +169,7 @@ fun RacoMainNavHost(
                     subjects = sortedSubjects,
                     evaluations = sortedEvaluations,
                     onGradeClick = { evaluationWithGrade ->
-                        navHostController.navigate("${RacoScreen.Notes.name}/details/${evaluationWithGrade.evaluation.id}")
+                        navHostController.navigate("${RacoScreen.Grades.name}/details/${evaluationWithGrade.evaluation.id}")
                     },
                     onAddEvaluationClick = { showAddEvaluationDialog = true }
                 )
@@ -188,7 +188,7 @@ fun RacoMainNavHost(
         }
 
         composable(
-            route = "${RacoScreen.Notes.name}/details/{evaluation_id}",
+            route = "${RacoScreen.Grades.name}/details/{evaluation_id}",
             arguments = listOf(
                 navArgument("evaluation_id") {
                     type = NavType.IntType
@@ -204,7 +204,7 @@ fun RacoMainNavHost(
                         DetailedEvaluation(
                             evaluation = evaluationWithGrades,
                             onEditClick = {
-                                navHostController.navigate("${RacoScreen.Notes.name}/details/${evaluationId}/edit")
+                                navHostController.navigate("${RacoScreen.Grades.name}/details/${evaluationId}/edit")
                             },
                             onGradeUpdate = { updatedGrade -> racoViewModel.updateGrade(updatedGrade) },
                         )
@@ -214,7 +214,7 @@ fun RacoMainNavHost(
         }
 
         composable(
-            route = "${RacoScreen.Notes.name}/details/{evaluation_id}/edit",
+            route = "${RacoScreen.Grades.name}/details/{evaluation_id}/edit",
             arguments = listOf(
                 navArgument("evaluation_id") {
                     type = NavType.IntType
@@ -260,7 +260,7 @@ fun RacoMainNavHost(
                                     onEvaluationDelete = {
                                         racoViewModel.deleteEvaluation(evaluationId)
                                         navHostController.popBackStack(
-                                            RacoScreen.Notes.name, inclusive = false
+                                            RacoScreen.Grades.name, inclusive = false
                                         )
                                     },
                                 )

@@ -42,8 +42,8 @@ fun RacoMainScreen(
     val currentRoute = backStackEntry.value?.destination?.route
     val onBackPress: (() -> Unit)? = when {
         //Declare back action for button to appear
-        currentRoute?.startsWith("${RacoScreen.Notes.name}/details") == true ||
-                currentRoute?.startsWith("${RacoScreen.Avisos.name}/details") == true -> {
+        currentRoute?.startsWith("${RacoScreen.Grades.name}/details") == true ||
+                currentRoute?.startsWith("${RacoScreen.Notes.name}/details") == true -> {
             {
                 navController.popBackStack()
             }
@@ -53,7 +53,7 @@ fun RacoMainScreen(
     }
 
     val onEventSettingsPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
-        RacoScreen.Horari.name -> {
+        RacoScreen.Schedule.name -> {
             {
                 dayCalendarViewSelected = !dayCalendarViewSelected
             }
