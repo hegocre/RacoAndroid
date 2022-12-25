@@ -333,7 +333,10 @@ fun EditableEvaluation(
                         },
                         modifier = Modifier.align(CenterHorizontally)
                     ) {
-                        Icon(Icons.Outlined.AddCircleOutline, contentDescription = "Add Weight")
+                        Icon(
+                            Icons.Outlined.AddCircleOutline,
+                            contentDescription = stringResource(id = R.string.add_grade)
+                        )
                     }
                 }
             }
@@ -447,7 +450,10 @@ fun EditableGradeWeight(
             isError = grade.weight != "" && grade.weight.toDoubleOrNull() == null
         )
         IconButton(onClick = { onGradeDelete(grade) }) {
-            Icon(Icons.Outlined.Delete, contentDescription = "Delete Weight")
+            Icon(
+                Icons.Outlined.Delete,
+                contentDescription = stringResource(id = R.string.delete_grade)
+            )
         }
     }
 }
@@ -543,7 +549,7 @@ fun AddEvaluationDialog(
                             IconButton(onClick = { subjectsMenuExpanded = true }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = ""
+                                    contentDescription = null
                                 )
                             }
                         }

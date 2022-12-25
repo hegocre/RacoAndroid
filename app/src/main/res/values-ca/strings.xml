@@ -32,4 +32,8 @@
     <string name="grade_name">Nom de la nota</string>
     <string name="edit">Editar</string>
     <string name="save">Desar</string>
+    <string name="error_message">S\'ha produït un error</string>
+    <string name="evaluation_invalid_arguments">L\'avaluació conté valors invàlids</string>
+    <string name="add_grade">Afegir nota</string>
+    <string name="delete_grade">Esborrar nota</string>
 </resources>
