@@ -36,4 +36,5 @@
     <string name="evaluation_invalid_arguments">The evaluation has invalid values</string>
     <string name="add_grade">Add grade</string>
     <string name="delete_grade">Delete grade</string>
+    <string name="attachments">Attachments</string>
 </resources>

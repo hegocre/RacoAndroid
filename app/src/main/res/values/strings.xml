@@ -36,4 +36,5 @@
     <string name="evaluation_invalid_arguments">L\'avaluació conté valors invàlids</string>
     <string name="add_grade">Afegir nota</string>
     <string name="delete_grade">Esborrar nota</string>
+    <string name="attachments">Fitxers adjunts</string>
 </resources>
