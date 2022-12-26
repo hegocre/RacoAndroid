@@ -188,9 +188,10 @@ fun BasicSidebarLabel(
 ) {
     Text(
         text = time.format(HourFormatter),
+        style = MaterialTheme.typography.bodySmall,
         modifier = modifier
             .fillMaxHeight()
-            .padding(4.dp)
+            .padding(6.dp)
     )
 }
 
