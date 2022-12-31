@@ -54,11 +54,6 @@ class MainActivity : ComponentActivity() {
             setupNotification()
         }
 
-        //Dismiss existing notifications
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancelAll()
-
         val racoViewModel by viewModels<RacoViewModel>()
 
         racoViewModel.shouldLogOut.observe(this) { shouldLogOut ->
@@ -71,6 +66,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             RacoMainScreen(racoViewModel = racoViewModel, onLogOut = this::logout)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        //Dismiss existing notifications
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
     }
 
     private fun setupNotification() {
