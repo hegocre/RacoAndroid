@@ -9,16 +9,14 @@ import androidx.room.PrimaryKey
  * @param name Name of the grade.
  * @param weight Weight of the grade.
  * @param mark Mark of the grade.
- * @param description Description of the grade.
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "grade")
-data class Grade @JvmOverloads constructor(
+data class Grade(
     @PrimaryKey(autoGenerate = true)
-    var id: Int,
-    var name: String,
-    var weight: Double,
-    var mark: Double?,
-    var description: String = "",
-    var evaluationId: Int
+    val id: Int,
+    val name: String,
+    val weight: Double,
+    val mark: Double?,
+    val evaluationId: Int
 )

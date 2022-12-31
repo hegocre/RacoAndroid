@@ -2,11 +2,11 @@ package com.yara.raco.model.user
 
 import android.content.Context
 import com.yara.raco.api.ApiController
-import com.yara.raco.api.Result
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.notices.NoticeController
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.utils.PreferencesManager
+import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

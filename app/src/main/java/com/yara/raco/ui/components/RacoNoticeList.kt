@@ -10,8 +10,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -210,7 +216,37 @@ fun NoticeListEntry(
             }
         } else null,
         overlineText = {
-            Text(text = "$codiSub - $dateString")
+            val attachmentInlineContent = mapOf(
+                Pair(
+                    "attachment_icon",
+                    InlineTextContent(
+                        placeholder = Placeholder(
+                            width = LocalTextStyle.current.fontSize,
+                            height = LocalTextStyle.current.fontSize,
+                            placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.AttachFile,
+                            contentDescription = stringResource(
+                                id = R.string.attachments
+                            )
+                        )
+                    }
+                )
+            )
+
+            Text(
+                text = buildAnnotatedString {
+                    append("$codiSub - $dateString")
+                    if (noticeWithFiles.files.isNotEmpty()) {
+                        append(" -")
+                        appendInlineContent("attachment_icon")
+                        append("${noticeWithFiles.files.size}")
+                    }
+                },
+                inlineContent = attachmentInlineContent
+            )
         }
     )
 }

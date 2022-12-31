@@ -28,4 +28,13 @@
     <string name="evaluation_name">Nom de l\'avaluació</string>
     <string name="privacy_policy_url">https://hegocre.com/raco/privacy_ca.html</string>
     <string name="privacy_policy">Política de Privadesa</string>
+    <string name="logout_confirmation">Segur que vols tancar la sessió?</string>
+    <string name="grade_name">Nom de la nota</string>
+    <string name="edit">Editar</string>
+    <string name="save">Desar</string>
+    <string name="error_message">S\'ha produït un error</string>
+    <string name="evaluation_invalid_arguments">L\'avaluació conté valors invàlids</string>
+    <string name="add_grade">Afegir nota</string>
+    <string name="delete_grade">Esborrar nota</string>
+    <string name="attachments">Fitxers adjunts</string>
 </resources>

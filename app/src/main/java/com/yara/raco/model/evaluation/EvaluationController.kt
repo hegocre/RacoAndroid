@@ -2,6 +2,7 @@ package com.yara.raco.model.evaluation
 
 import android.content.Context
 import com.yara.raco.database.RacoDatabase
+import com.yara.raco.model.grade.Grade
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -23,19 +24,31 @@ class EvaluationController private constructor(context: Context) {
         }
     }
 
+    suspend fun getEvaluationWithGrades(id: Int) =
+        racoDatabase.evaluationDAO.getEvaluationWithGrades(id)
+
+    fun getLiveEvaluationWithGrades(id: Int) =
+        racoDatabase.evaluationDAO.getLiveEvaluationWithGrades(id)
+
     suspend fun deleteEvaluation(evaluationId: Int) {
         withContext(Dispatchers.IO) {
             racoDatabase.evaluationDAO.deleteEvaluation(evaluationId)
         }
     }
 
-    suspend fun evaluationSave(evaluationWithGrade: EvaluationWithGrade) {
+    suspend fun saveEvaluation(evaluationWithGrades: EvaluationWithGrades) {
         withContext(Dispatchers.IO) {
-            racoDatabase.evaluationDAO.insertEvaluation(evaluationWithGrade.evaluation)
-            racoDatabase.gradeDAO.deleteEvaluationGrades(evaluationWithGrade.evaluation.id)
-            for (grade in evaluationWithGrade.listOfGrade) {
+            racoDatabase.evaluationDAO.insertEvaluation(evaluationWithGrades.evaluation)
+            racoDatabase.gradeDAO.deleteEvaluationGrades(evaluationWithGrades.evaluation.id)
+            for (grade in evaluationWithGrades.listOfGrade) {
                 racoDatabase.gradeDAO.insertGrade(grade)
             }
+        }
+    }
+
+    suspend fun updateGrade(grade: Grade) {
+        withContext(Dispatchers.IO) {
+            racoDatabase.gradeDAO.insertGrade(grade)
         }
     }
 

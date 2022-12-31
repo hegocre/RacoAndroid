@@ -21,6 +21,7 @@ import com.yara.raco.R
 @Composable
 fun RacoMainTopAppBar(
     title: String,
+    scrollBehavior: TopAppBarScrollBehavior,
     onLogOut: () -> Unit,
     onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
@@ -34,6 +35,7 @@ fun RacoMainTopAppBar(
     CenterAlignedTopAppBar(
         title = { Text(text = title) },
         windowInsets = WindowInsets.statusBars,
+        scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
         navigationIcon = {
             AnimatedVisibility(

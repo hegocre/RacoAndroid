@@ -1,26 +1,29 @@
 package com.yara.raco.ui.components
 
 import android.content.Intent
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.yara.raco.R
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
-import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun RacoMainScreen(
     racoViewModel: RacoViewModel,
@@ -32,15 +35,15 @@ fun RacoMainScreen(
         backStackEntry.value?.destination?.route
     )
 
-    val isRefreshing by racoViewModel.isRefreshing.collectAsState()
-
     val context = LocalContext.current
 
-    var dayCalendarViewSelected by rememberSaveable{ mutableStateOf(true)}
+    var dayCalendarViewSelected by rememberSaveable { mutableStateOf(true) }
 
-    val onBackPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
+    val currentRoute = backStackEntry.value?.destination?.route
+    val onBackPress: (() -> Unit)? = when {
         //Declare back action for button to appear
-        "${RacoScreen.Avisos.name}/details", "${RacoScreen.Notes.name}/details" -> {
+        currentRoute?.startsWith("${RacoScreen.Grades.name}/details") == true ||
+                currentRoute?.startsWith("${RacoScreen.Notes.name}/details") == true -> {
             {
                 navController.popBackStack()
             }
@@ -50,7 +53,7 @@ fun RacoMainScreen(
     }
 
     val onEventSettingsPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
-        "${RacoScreen.Horari.name}" -> {
+        RacoScreen.Schedule.name -> {
             {
                 dayCalendarViewSelected = !dayCalendarViewSelected
             }
@@ -59,19 +62,19 @@ fun RacoMainScreen(
         else -> null
     }
 
-    val onDeleteEvaluation: ((Int) -> Unit) = {
-        navController.popBackStack()
-        racoViewModel.deleteEvaluation(it)
-    }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        rememberTopAppBarState()
+    )
 
-    var showAddEvaluationDialog by remember { mutableStateOf(false) }
+    var showLogOutDialog by rememberSaveable { mutableStateOf(false) }
 
     RacoTheme {
         Scaffold(
             topBar = {
                 RacoMainTopAppBar(
                     title = stringResource(id = currentScreen.title),
-                    onLogOut = onLogOut,
+                    scrollBehavior = scrollBehavior,
+                    onLogOut = { showLogOutDialog = true },
                     onBackPress = onBackPress,
                     isDayViewSelected = dayCalendarViewSelected,
                     onEventSettingsPress = onEventSettingsPress,
@@ -95,50 +98,35 @@ fun RacoMainScreen(
                     }
                 )
             },
-            contentWindowInsets = WindowInsets.systemBars,
         ) { paddingValues ->
-            val noticesWithFiles by racoViewModel.notices.observeAsState(initial = emptyList())
-            val sortedNoticesWithFiles = remember(noticesWithFiles) {
-                noticesWithFiles.sortedByDescending { it.notice.dataModificacio }
-            }
-            val subjects by racoViewModel.subjects.observeAsState(initial = emptyList())
-            val sortedSubjects = remember(subjects) {
-                subjects.sortedBy { it.nom }
-            }
-            val schedules by racoViewModel.schedules.observeAsState(initial = emptyList())
-            val evaluations by racoViewModel.evaluation.observeAsState(initial = emptyList())
-            val sortedEvaluations = remember(evaluations) {
-                evaluations.sortedBy { it.evaluation.name }
-            }
-
             RacoMainNavHost(
                 navHostController = navController,
-                noticesWithFiles = sortedNoticesWithFiles,
-                evaluationWithGrade = sortedEvaluations,
-                onFileClick = { file -> racoViewModel.downloadFile(file) },
-                onEvaluationUpdate = { evaluationWithGrade ->
-                    racoViewModel.evaluationSave(
-                        evaluationWithGrade
-                    )
-                },
-                onEvaluationDelete = onDeleteEvaluation,
-                onAddEvaluationClick = { showAddEvaluationDialog = true },
-                subjects = sortedSubjects,
-                schedules = schedules,
+                racoViewModel = racoViewModel,
                 dayCalendarViewSelected = dayCalendarViewSelected,
-                modifier = Modifier.padding(paddingValues),
-                onRefresh = { racoViewModel.refresh() },
-                isRefreshing = isRefreshing
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .padding(paddingValues)
+                    .consumedWindowInsets(paddingValues),
             )
 
-            if (showAddEvaluationDialog) {
-                AddEvaluationDialog(
-                    subjects = sortedSubjects,
-                    onAddClick = { subjectId, evaluationName ->
-                        racoViewModel.addEvaluation(subjectId, evaluationName)
-                        showAddEvaluationDialog = false
+            if (showLogOutDialog) {
+                AlertDialog(
+                    onDismissRequest = { showLogOutDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showLogOutDialog = false
+                            onLogOut()
+                        }) {
+                            Text(text = stringResource(id = R.string.logout))
+                        }
                     },
-                    onDismissRequest = { showAddEvaluationDialog = false }
+                    dismissButton = {
+                        TextButton(onClick = { showLogOutDialog = false }) {
+                            Text(text = stringResource(id = android.R.string.cancel))
+                        }
+                    },
+                    title = { Text(text = stringResource(id = R.string.logout)) },
+                    text = { Text(text = stringResource(id = R.string.logout_confirmation)) }
                 )
             }
         }

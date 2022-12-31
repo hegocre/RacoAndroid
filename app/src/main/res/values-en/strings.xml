@@ -28,4 +28,13 @@
     <string name="evaluation_name">Evaluation name</string>
     <string name="privacy_policy_url">https://hegocre.com/raco/privacy.html</string>
     <string name="privacy_policy">Privacy Policy</string>
+    <string name="logout_confirmation">Are you sure you want to log out?</string>
+    <string name="edit">Edit</string>
+    <string name="grade_name">Grade name</string>
+    <string name="save">Save</string>
+    <string name="error_message">An error has occurred</string>
+    <string name="evaluation_invalid_arguments">The evaluation has invalid values</string>
+    <string name="add_grade">Add grade</string>
+    <string name="delete_grade">Delete grade</string>
+    <string name="attachments">Attachments</string>
 </resources>

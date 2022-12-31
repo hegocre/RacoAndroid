@@ -269,7 +269,7 @@ fun LicensesDialog(
 
                 val uriHandler = LocalUriHandler.current
 
-                LazyColumn {
+                LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                     items(items = licenses, key = { it.name }) { license ->
                         ListItem(
                             headlineText = {

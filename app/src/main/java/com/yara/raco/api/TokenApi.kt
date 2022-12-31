@@ -3,6 +3,7 @@ package com.yara.raco.api
 import com.yara.raco.BuildConfig
 import com.yara.raco.model.user.AccessToken
 import com.yara.raco.utils.OkHttpRequest
+import com.yara.raco.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
