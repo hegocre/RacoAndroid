@@ -5,11 +5,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +24,7 @@ import com.yara.raco.ui.viewmodel.RacoViewModel
 @Composable
 fun RacoMainScreen(
     racoViewModel: RacoViewModel,
+    notificationNoticeId: Int,
     onLogOut: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -129,6 +127,12 @@ fun RacoMainScreen(
                     text = { Text(text = stringResource(id = R.string.logout_confirmation)) }
                 )
             }
+        }
+    }
+
+    LaunchedEffect(key1 = notificationNoticeId) {
+        if (notificationNoticeId != -1) {
+            navController.navigate("${RacoScreen.Notes.name}/details/${notificationNoticeId}")
         }
     }
 }

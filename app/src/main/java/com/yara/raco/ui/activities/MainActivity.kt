@@ -63,8 +63,15 @@ class MainActivity : ComponentActivity() {
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val notificationNoticeId = intent.getIntExtra("NOTICE_ID", -1)
+
         setContent {
-            RacoMainScreen(racoViewModel = racoViewModel, onLogOut = this::logout)
+            RacoMainScreen(
+                racoViewModel = racoViewModel,
+                notificationNoticeId = notificationNoticeId,
+                onLogOut = this::logout
+            )
         }
     }
 

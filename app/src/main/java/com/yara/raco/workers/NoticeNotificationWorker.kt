@@ -74,7 +74,14 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
                     notifications.add(
                         Pair(
                             notice.id,
-                            generateNotification(applicationContext, title, text, date, subText)
+                            generateNotification(
+                                applicationContext,
+                                title,
+                                text,
+                                date,
+                                subText,
+                                newNotice
+                            )
                         )
                     )
                     lines.add("<b>$subText:</b> $title")
@@ -138,9 +145,12 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
         title: String,
         text: String,
         date: Date,
-        subText: String
+        subText: String,
+        noticeId: Int
     ): Notification {
-        val notificationIntent = Intent(context, MainActivity::class.java)
+        val notificationIntent = Intent(context, MainActivity::class.java).apply {
+            putExtra("NOTICE_ID", noticeId)
+        }
         val intentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.FLAG_IMMUTABLE
         } else {
