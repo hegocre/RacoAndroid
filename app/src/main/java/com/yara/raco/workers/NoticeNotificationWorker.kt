@@ -1,12 +1,15 @@
 package com.yara.raco.workers
 
+import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.work.*
 import com.yara.raco.R
@@ -25,6 +28,17 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
     CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
+            // Check for notification permission
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(
+                        applicationContext, Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    //Permission not granted
+                    return@withContext Result.failure()
+                }
+            }
+
             val userController = UserController.getInstance(applicationContext)
             if (!userController.isLoggedIn) {
                 return@withContext Result.failure()
