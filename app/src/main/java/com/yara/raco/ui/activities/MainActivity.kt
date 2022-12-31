@@ -75,15 +75,13 @@ class MainActivity : ComponentActivity() {
 
     private fun setupNotification() {
         //Create notices notification channel (can be executed always, no effect when present)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.notices)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(name, name, importance)
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-            notificationManager.cancelAll()
-        }
+        val name = getString(R.string.notices)
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(name, name, importance)
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+        notificationManager.cancelAll()
 
         //Create periodic task
         NoticeNotificationWorker.enqueueSelf(this)
