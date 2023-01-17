@@ -1,5 +1,6 @@
 package com.yara.raco.ui.components
 
+import android.text.Html
 import android.text.format.DateUtils
 import android.text.format.Formatter.formatShortFileSize
 import androidx.compose.foundation.background
@@ -213,9 +214,10 @@ fun NoticeListEntry(
         supportingText = if (noticeText.isNotBlank()) {
             {
                 if (noticeText.isNotBlank()) {
-                    if (noticeText.contains("<p>")) {
-                        HtmlText(
-                            text = noticeText,
+                    if (noticeText.isHtml()) {
+                        Text(
+                            text = Html.fromHtml(noticeText, Html.FROM_HTML_MODE_COMPACT)
+                                .toString(),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -308,7 +310,7 @@ fun DetailedNoticeWithFiles(
 
         val noticeText = noticeWithFiles.notice.text
         if (noticeText.isNotBlank()) {
-            if (noticeText.contains("<p>")) {
+            if (noticeText.isHtml()) {
                 HtmlText(
                     text = noticeText,
                 )
@@ -393,6 +395,8 @@ fun NoticeWithFilesPreview() {
         )
     }
 }
+
+fun String.isHtml(): Boolean = ("<[^>]+>".toRegex(RegexOption.IGNORE_CASE).containsMatchIn(this))
 
 @Preview
 @Composable
