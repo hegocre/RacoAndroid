@@ -102,16 +102,8 @@ fun RacoTheme(
             val insetsController = getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = colorScheme.isLight()
 
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                if (colorScheme.isLight()) {
-                    window.navigationBarColor = Color.Black.copy(alpha = 0.3f).toArgb()
-                } else {
-                    window.navigationBarColor = Color.Transparent.toArgb()
-                }
-            } else {
-                insetsController.isAppearanceLightNavigationBars = colorScheme.isLight()
-                window.navigationBarColor = Color.Transparent.toArgb()
-            }
+            insetsController.isAppearanceLightNavigationBars = colorScheme.isLight()
+            window.navigationBarColor = Color.Transparent.toArgb()
         }
     }
 
