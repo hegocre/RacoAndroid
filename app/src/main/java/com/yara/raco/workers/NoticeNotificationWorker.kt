@@ -152,9 +152,9 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
             putExtra("NOTICE_ID", noticeId)
         }
         val intentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         } else {
-            0
+            Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         }
         val contentIntent = PendingIntent.getActivity(
             context, 0, notificationIntent, intentFlags
