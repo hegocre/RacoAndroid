@@ -1,6 +1,7 @@
 package com.yara.raco.model.user
 
 import android.content.Context
+import com.yara.raco.BuildConfig
 import com.yara.raco.api.ApiController
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.notices.NoticeController
@@ -39,6 +40,24 @@ class UserController private constructor(context: Context) {
             apiController.language = deviceLanguage
         } else {
             apiController.language = "ca"
+        }
+
+        if (!preferencesManager.getIsFirstLaunch()) {
+            // System aimed to apply changes on version update
+            val lastStartedVersion = preferencesManager.getLastStartedVersionCode()
+
+            if (lastStartedVersion < BuildConfig.VERSION_CODE) {
+                //Fixed deleted notice files not being deleted, clear notices to force refresh
+                if (lastStartedVersion < 12) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        noticeController.deleteAllNotices()
+                    }
+                }
+
+                preferencesManager.setLastStartedVersionCode(BuildConfig.VERSION_CODE)
+            }
+        } else {
+            preferencesManager.setIsFirstLaunch(false)
         }
     }
 
