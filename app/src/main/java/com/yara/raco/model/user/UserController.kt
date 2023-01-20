@@ -42,22 +42,18 @@ class UserController private constructor(context: Context) {
             apiController.language = "ca"
         }
 
-        if (!preferencesManager.getIsFirstLaunch()) {
-            // System aimed to apply changes on version update
-            val lastStartedVersion = preferencesManager.getLastStartedVersionCode()
+        // System aimed to apply changes on version update
+        val lastStartedVersion = preferencesManager.getLastStartedVersionCode()
 
-            if (lastStartedVersion < BuildConfig.VERSION_CODE) {
-                //Fixed deleted notice files not being deleted, clear notices to force refresh
-                if (lastStartedVersion < 12) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        noticeController.deleteAllNotices()
-                    }
+        if (lastStartedVersion < BuildConfig.VERSION_CODE) {
+            //Fixed deleted notice files not being deleted, clear notices to force refresh
+            if (lastStartedVersion < 12) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    noticeController.deleteAllNotices()
                 }
-
-                preferencesManager.setLastStartedVersionCode(BuildConfig.VERSION_CODE)
             }
-        } else {
-            preferencesManager.setIsFirstLaunch(false)
+
+            preferencesManager.setLastStartedVersionCode(BuildConfig.VERSION_CODE)
         }
     }
 
