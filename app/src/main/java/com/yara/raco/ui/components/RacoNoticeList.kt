@@ -1,5 +1,6 @@
 package com.yara.raco.ui.components
 
+import android.text.Html
 import android.text.format.DateUtils
 import android.text.format.Formatter.formatShortFileSize
 import androidx.compose.foundation.background
@@ -27,10 +28,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.text.HtmlCompat.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -195,14 +198,12 @@ fun NoticeListEntry(
     val parsedTitle =
         remember { fromHtml(noticeWithFiles.notice.titol, FROM_HTML_MODE_COMPACT).toString() }
 
-    val parsedText =
-        remember { fromHtml(noticeWithFiles.notice.text, FROM_HTML_MODE_COMPACT).toString() }
-
     val codiSub = remember(noticeWithFiles.notice) {
         if (noticeWithFiles.notice.codiAssig.startsWith("#"))
             "FIB" else noticeWithFiles.notice.codiAssig
     }
 
+    val noticeText = noticeWithFiles.notice.text
     ListItem(
         modifier = modifier.clickable {
             onNoticeClick(noticeWithFiles)
@@ -210,9 +211,26 @@ fun NoticeListEntry(
         headlineText = {
             Text(text = parsedTitle)
         },
-        supportingText = if (parsedText.isNotBlank()) {
+        supportingText = if (noticeText.isNotBlank()) {
             {
-                Text(text = parsedText.trim(), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (noticeText.isNotBlank()) {
+                    if (noticeText.isHtml()) {
+                        Text(
+                            text = Html.fromHtml(noticeText, Html.FROM_HTML_MODE_COMPACT)
+                                .toString(),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    } else {
+                        Text(
+                            text = noticeText,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 12.sp,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         } else null,
         overlineText = {
@@ -290,10 +308,19 @@ fun DetailedNoticeWithFiles(
         Text(text = parsedTitle, style = MaterialTheme.typography.headlineLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (noticeWithFiles.notice.text.isNotBlank()) {
-            HtmlText(
-                text = noticeWithFiles.notice.text,
-            )
+        val noticeText = noticeWithFiles.notice.text
+        if (noticeText.isNotBlank()) {
+            if (noticeText.isHtml()) {
+                HtmlText(
+                    text = noticeText,
+                )
+            } else {
+                Text(
+                    text = noticeText,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp
+                )
+            }
         }
         if (noticeWithFiles.files.isNotEmpty()) {
             OutlinedCard(
@@ -368,6 +395,8 @@ fun NoticeWithFilesPreview() {
         )
     }
 }
+
+fun String.isHtml(): Boolean = ("<[^>]+>".toRegex(RegexOption.IGNORE_CASE).containsMatchIn(this))
 
 @Preview
 @Composable

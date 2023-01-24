@@ -22,6 +22,7 @@ class NoticeController private constructor(context: Context)  {
                         racoDatabase.noticeDAO.getNoticeModificationDate(notice.id) != notice.dataModificacio
                     ) {
                         racoDatabase.noticeDAO.insertNotice(notice)
+                        racoDatabase.fileDAO.deleteNoticeFiles(notice.id)
                         notice.adjunts.forEach { file ->
                             racoDatabase.fileDAO.insertFile(file.copy(noticeId = notice.id))
                         }

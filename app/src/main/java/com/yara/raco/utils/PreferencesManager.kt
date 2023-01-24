@@ -30,6 +30,14 @@ class PreferencesManager private constructor(context: Context) {
     fun setFirstTimeNotification(isFirstTime: Boolean) = _sharedPreferences.edit()
         .putBoolean("first_time_notification", isFirstTime).apply()
 
+
+    fun getLastStartedVersionCode(): Int =
+        _sharedPreferences.getInt("last_started_version", -1)
+
+    fun setLastStartedVersionCode(lastStartedVersion: Int) = _sharedPreferences.edit()
+        .putInt("last_started_version", lastStartedVersion).apply()
+
+
     companion object {
         private var instance: PreferencesManager? = null
 
