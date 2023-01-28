@@ -37,4 +37,5 @@
     <string name="add_grade">Afegir nota</string>
     <string name="delete_grade">Esborrar nota</string>
     <string name="attachments">Fitxers adjunts</string>
+    <string name="calendar">Calendari</string>
 </resources>

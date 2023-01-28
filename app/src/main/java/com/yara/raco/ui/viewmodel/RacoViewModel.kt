@@ -1,12 +1,17 @@
 package com.yara.raco.ui.viewmodel
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.evaluation.EvaluationWithGrades
+import com.yara.raco.model.exam.Exam
+import com.yara.raco.model.exam.ExamController
 import com.yara.raco.model.files.File
 import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.notices.NoticeController
@@ -30,6 +35,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     private val noticeController = NoticeController.getInstance(application)
     private val scheduleController = ScheduleController.getInstance(application)
     private val evaluationController = EvaluationController.getInstance(application)
+    private val examController = ExamController.getInstance(application)
 
     private var shouldRefreshToken = false
 
@@ -49,6 +55,13 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         get() = scheduleController.getSchedule()
     val evaluation: LiveData<List<EvaluationWithGrades>>
         get() = evaluationController.getEvaluations()
+    val exams: LiveData<List<Exam>>
+        get() = examController.getExams()
+
+
+    private var _calendarShowingTitle by mutableStateOf("")
+    val calendarShowingTitle: String
+        get() = _calendarShowingTitle
 
     init {
         viewModelScope.launch {
@@ -81,6 +94,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
             subjectController.syncSubjects()
             noticeController.syncNotices()
             scheduleController.syncSchedule()
+            examController.syncExams()
             _isRefreshing.emit(false)
         }
     }
@@ -128,5 +142,9 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             evaluationController.updateGrade(grade)
         }
+    }
+
+    fun setCalendarShowingTitle(title: String) {
+        _calendarShowingTitle = title
     }
 }

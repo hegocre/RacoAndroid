@@ -1,16 +1,16 @@
 package com.yara.raco.ui.components
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
@@ -30,20 +30,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerState
+import com.yara.raco.model.exam.Exam
 import com.yara.raco.model.schedule.Schedule
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 import java.util.*
 import kotlin.math.roundToInt
 
-data class Event(
+data class ScheduleEvent(
     val name: String,
     val color: Color,
     val start: LocalDateTime,
@@ -62,7 +63,7 @@ value class SplitType private constructor(val value: Int) {
 }
 
 data class PositionedEvent(
-    val event: Event,
+    val scheduleEvent: ScheduleEvent,
     val splitType: SplitType,
     val date: LocalDate,
     val start: LocalTime,
@@ -72,16 +73,16 @@ data class PositionedEvent(
     val colTotal: Int = 1,
 )
 
-val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-
 @Composable
 fun BasicEvent(
     positionedEvent: PositionedEvent,
     modifier: Modifier = Modifier,
 ) {
-    val event = positionedEvent.event
-    val topRadius = if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
-    val bottomRadius = if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
+    val event = positionedEvent.scheduleEvent
+    val topRadius =
+        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
+    val bottomRadius =
+        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -102,23 +103,11 @@ fun BasicEvent(
             .padding(4.dp)
     ) {
         Text(
-            text = "${event.start.format(EventTimeFormatter)} - ${
-                event.end.format(
-                    EventTimeFormatter
-                )
-            }",
-            style = MaterialTheme.typography.labelMedium,
-            color = Color.DarkGray,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
-        )
-
-        Text(
             text = event.name,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = Color.DarkGray,
             fontWeight = FontWeight.Bold,
-            maxLines = 1,
+            maxLines = 5,
             overflow = TextOverflow.Ellipsis,
         )
 
@@ -127,7 +116,7 @@ fun BasicEvent(
                 text = event.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.DarkGray,
-                maxLines = 1,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
             )
         }
@@ -151,13 +140,34 @@ fun BasicDayHeader(
     day: LocalDate,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = day.format(DayFormatter),
-        textAlign = TextAlign.Center,
+    Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    )
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = day.format(DayFormatter),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        val selected = day == LocalDate.now()
+
+        Box(
+            modifier = Modifier
+                .clip(shape = CircleShape)
+                .size(size = 36.dp)
+                .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent),
+            contentAlignment = Center,
+        ) {
+            Text(
+                text = day.dayOfMonth.toString(),
+                fontSize = 16.sp,
+                color = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
 }
 
 
@@ -169,13 +179,17 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
 ) {
-    Row(modifier = modifier) {
-        val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
-        repeat(numDays) { i ->
-            Box(modifier = Modifier.width(dayWidth)) {
-                dayHeader(minDate.plusDays(i.toLong()))
+    Column {
+        Row(modifier = modifier) {
+            val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
+            repeat(numDays) { i ->
+                Box(modifier = Modifier.width(dayWidth), contentAlignment = Center) {
+                    dayHeader(minDate.plusDays(i.toLong()))
+                }
             }
         }
+
+        Divider()
     }
 }
 
@@ -192,6 +206,7 @@ fun BasicSidebarLabel(
         modifier = modifier
             .fillMaxHeight()
             .padding(6.dp)
+            .padding(horizontal = 2.dp)
     )
 }
 
@@ -220,13 +235,21 @@ fun ScheduleSidebar(
 }
 
 
-private fun splitEvents(events: List<Event>): List<PositionedEvent> {
-    return events
+private fun splitEvents(scheduleEvents: List<ScheduleEvent>): List<PositionedEvent> {
+    return scheduleEvents
         .map { event ->
             val startDate = event.start.toLocalDate()
             val endDate = event.end.toLocalDate()
             if (startDate == endDate) {
-                listOf(PositionedEvent(event, SplitType.None, event.start.toLocalDate(), event.start.toLocalTime(), event.end.toLocalTime()))
+                listOf(
+                    PositionedEvent(
+                        event,
+                        SplitType.None,
+                        event.start.toLocalDate(),
+                        event.start.toLocalTime(),
+                        event.end.toLocalTime()
+                    )
+                )
             } else {
                 val days = ChronoUnit.DAYS.between(startDate, endDate)
                 val splitEvents = mutableListOf<PositionedEvent>()
@@ -316,13 +339,19 @@ sealed class ScheduleSize {
 
 @Composable
 fun Schedule(
-    events: List<Event>,
+    scheduleEvents: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
-    eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = { BasicEvent(positionedEvent = it) },
+    eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
+        BasicEvent(
+            positionedEvent = it
+        )
+    },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
     timeLabel: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
-    minDate: LocalDate = events.minByOrNull(Event::start)?.start?.toLocalDate() ?: LocalDate.now(),
-    maxDate: LocalDate = events.maxByOrNull(Event::end)?.end?.toLocalDate() ?: LocalDate.now(),
+    minDate: LocalDate = scheduleEvents.minByOrNull(ScheduleEvent::start)?.start?.toLocalDate()
+        ?: LocalDate.now(),
+    maxDate: LocalDate = scheduleEvents.maxByOrNull(ScheduleEvent::end)?.end?.toLocalDate()
+        ?: LocalDate.now(),
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
     daySize: ScheduleSize = ScheduleSize.FixedSize(256.dp),
@@ -362,7 +391,7 @@ fun Schedule(
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .align(Alignment.Start)
+                    .align(Start)
             ) {
                 ScheduleSidebar(
                     hourHeight = hourHeight,
@@ -374,7 +403,7 @@ fun Schedule(
                         .onGloballyPositioned { sidebarWidth = it.size.width }
                 )
                 BasicSchedule(
-                    events = events,
+                    scheduleEvents = scheduleEvents,
                     eventContent = eventContent,
                     minDate = minDate,
                     maxDate = maxDate,
@@ -386,7 +415,7 @@ fun Schedule(
                         .weight(1f)
                         .verticalScroll(verticalScrollState)
                         .then(
-                            if (daySize !is ScheduleSize.FixedCount || daySize.count != 1f)
+                            if (daySize !is ScheduleSize.FixedCount)
                                 Modifier.horizontalScroll(horizontalScrollState) else Modifier
                         )
                 )
@@ -397,11 +426,17 @@ fun Schedule(
 
 @Composable
 fun BasicSchedule(
-    events: List<Event>,
+    scheduleEvents: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
-    eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = { BasicEvent(positionedEvent = it) },
-    minDate: LocalDate = events.minByOrNull(Event::start)?.start?.toLocalDate() ?: LocalDate.now(),
-    maxDate: LocalDate = events.maxByOrNull(Event::end)?.end?.toLocalDate() ?: LocalDate.now(),
+    eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
+        BasicEvent(
+            positionedEvent = it
+        )
+    },
+    minDate: LocalDate = scheduleEvents.minByOrNull(ScheduleEvent::start)?.start?.toLocalDate()
+        ?: LocalDate.now(),
+    maxDate: LocalDate = scheduleEvents.maxByOrNull(ScheduleEvent::end)?.end?.toLocalDate()
+        ?: LocalDate.now(),
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
     dayWidth: Dp,
@@ -410,9 +445,9 @@ fun BasicSchedule(
     val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes / 60
-    val dividerColor = MaterialTheme.colorScheme.outlineVariant
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
     val positionedEvents =
-        remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
+        remember(scheduleEvents) { arrangeEvents(splitEvents(scheduleEvents.sortedBy(ScheduleEvent::start))).filter { it.end > minTime && it.start < maxTime } }
     Layout(
         content = {
             positionedEvents.forEach { positionedEvent ->
@@ -487,93 +522,87 @@ var predefinedColors = listOf(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RacoScheduleDay(
-    schedules: List<Schedule>
+    schedules: List<Schedule>,
+    exams: List<Exam>,
+    setTitle: (String) -> Unit,
+    pagerState: PagerState
 ) {
-    val firstDay = LocalDate.now()
-        .with(TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek))
-
-    val colorSubject = HashMap<String, Color>()
-    for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
-        colorSubject[subject.value.codiAssig] =
-            predefinedColors[subject.index % predefinedColors.size]
+    val today = remember {
+        LocalDateTime.now()
     }
 
-    val events = Array(7) { ArrayList<Event>() }
-
-    for (schedule in schedules) {
-        events[schedule.diaSetmana - 1].add(schedule.toEvent(colorSubject))
+    val firstCalendarDay = remember {
+        today.minusMonths(4L).with(
+            TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+        )
     }
-    val coroutineScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(
-        initialPage = (LocalDate.now().dayOfWeek.value + 7 - firstDay.dayOfWeek.value) % 7
-    )
 
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
+    val lastCalendarDay = remember {
+        today.plusMonths(6L).with(
+            TemporalAdjusters.nextOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+        ).minusDays(1L)
+    }
 
-            for (i in 0 until 7) {
-                val day = firstDay.plusDays(i.toLong())
-                val selected = pagerState.currentPage == i
-                val isToday = day == LocalDate.now()
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = day.format(DayFormatter),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .border(
-                                border = BorderStroke(
-                                    width = if (isToday) 1.dp else 0.dp,
-                                    color = if (isToday) MaterialTheme.colorScheme.outlineVariant else Color.Transparent
-                                ),
-                                shape = CircleShape
-                            )
-                            .clip(shape = CircleShape)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = rememberRipple(bounded = true)
-                            ) {
-                                coroutineScope.launch {
-                                    pagerState.animateScrollToPage(i)
-                                }
-                            }
-                            .size(size = 56.dp)
-                            .background(color = if (selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = day.dayOfMonth.toString(),
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
-                            fontSize = 16.sp,
-                            color = if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
+    val colorSubject = remember {
+        HashMap<String, Color>().apply {
+            for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
+                set(
+                    subject.value.codiAssig,
+                    predefinedColors[subject.index % predefinedColors.size]
+                )
             }
         }
-        Divider()
+    }
 
-        HorizontalPager(count = 7, state = pagerState) { page ->
+    val examEvents = remember {
+        ArrayList<ScheduleEvent>().apply {
+            for (exam in exams) {
+                add(exam.toScheduleEvent(colorSubject))
+            }
+        }
+    }
+
+    val pages = ChronoUnit.DAYS.between(firstCalendarDay, lastCalendarDay).toInt()
+
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        val currentDay = firstCalendarDay.plusDays(pagerState.currentPage.toLong())
+        setTitle(currentDay.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
+    }
+
+    HorizontalPager(count = pages, state = pagerState) { page ->
+        Column(horizontalAlignment = Start) {
+            val currentDay = firstCalendarDay.plusDays(page.toLong())
+
+            val weekExams =
+                remember { examEvents.filter { it.start.toLocalDate() == currentDay.toLocalDate() } }
+            val scheduleEvents = remember {
+                val firstWeekDay = currentDay.with(
+                    TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+                )
+                ArrayList<ScheduleEvent>().apply {
+                    for (schedule in schedules) {
+                        val scheduleEvent = schedule.toScheduleEvent(colorSubject, firstWeekDay)
+                        if (scheduleEvent.start.toLocalDate() == currentDay.toLocalDate())
+                            add(schedule.toScheduleEvent(colorSubject, firstWeekDay))
+                    }
+                    addAll(weekExams)
+                }
+            }
+
+            BasicDayHeader(day = currentDay.toLocalDate(), modifier = Modifier.align(Start))
+
+            Divider()
+
             Schedule(
-                events = events[(firstDay.dayOfWeek.value + page - 1) % 7],
+                scheduleEvents = scheduleEvents,
                 daySize = ScheduleSize.FixedCount(1f),
                 minTime = minOf(
-                    events[page].minByOrNull { it.start }?.start?.toLocalTime()
+                    scheduleEvents.minByOrNull { it.start }?.start?.toLocalTime()
                         ?: LocalTime.of(8, 0), LocalTime.of(8, 0)
                 ),
                 maxTime = maxOf(
-                    events[page].maxByOrNull { it.end }?.end?.toLocalTime()
+                    scheduleEvents.maxByOrNull { it.end }?.end?.toLocalTime()
                         ?: LocalTime.of(20, 0), LocalTime.of(20, 0)
                 )
             )
@@ -581,30 +610,84 @@ fun RacoScheduleDay(
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RacoScheduleWeek(
-    schedules: List<Schedule>
+    schedules: List<Schedule>,
+    exams: List<Exam>,
+    setTitle: (String) -> Unit,
+    pagerState: PagerState
 ) {
-    val colorSubject = HashMap<String, Color>()
-    for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
-        colorSubject[subject.value.codiAssig] =
-            predefinedColors[subject.index % predefinedColors.size]
+    val today = remember {
+        LocalDateTime.now()
     }
 
-    val events = ArrayList<Event>()
-
-    for (schedule in schedules) {
-        events.add(schedule.toEvent(colorSubject))
-    }
-    Schedule(
-        events = events, daySize = ScheduleSize.Adaptive(0.dp),
-        minTime = minOf(
-            events.minByOrNull { it.start.hour }?.start?.toLocalTime()
-                ?: LocalTime.of(8, 0), LocalTime.of(8, 0)
-        ),
-        maxTime = maxOf(
-            events.maxByOrNull { it.end.hour }?.end?.toLocalTime()
-                ?: LocalTime.of(20, 0), LocalTime.of(20, 0)
+    val firstCalendarDay = remember {
+        today.minusMonths(4L).with(
+            TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
         )
-    )
+    }
+
+    val lastCalendarDay = remember {
+        today.plusMonths(6L).with(
+            TemporalAdjusters.nextOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+        ).minusDays(1L)
+    }
+
+    val colorSubject = remember {
+        HashMap<String, Color>().apply {
+            for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
+                set(
+                    subject.value.codiAssig,
+                    predefinedColors[subject.index % predefinedColors.size]
+                )
+            }
+        }
+    }
+
+    val examEvents = remember {
+        ArrayList<ScheduleEvent>().apply {
+            for (exam in exams) {
+                add(exam.toScheduleEvent(colorSubject))
+            }
+        }
+    }
+
+    val pages = ChronoUnit.WEEKS.between(firstCalendarDay, lastCalendarDay).toInt()
+
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        val firstWeekDay = firstCalendarDay.plusWeeks(pagerState.currentPage.toLong())
+        setTitle(firstWeekDay.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
+    }
+
+    HorizontalPager(count = pages, state = pagerState) { page ->
+        val firstWeekDay = firstCalendarDay.plusWeeks(page.toLong())
+        val lastWeekDay = firstCalendarDay.plusWeeks(page.toLong() + 1).minusDays(1L)
+
+        val weekExams =
+            remember { examEvents.filter { it.start >= firstWeekDay && it.start < lastWeekDay } }
+        val scheduleEvents = remember {
+            ArrayList<ScheduleEvent>().apply {
+                for (schedule in schedules) {
+                    add(schedule.toScheduleEvent(colorSubject, firstWeekDay))
+                }
+                addAll(weekExams)
+            }
+        }
+
+        Schedule(
+            scheduleEvents = scheduleEvents, daySize = ScheduleSize.FixedCount(7f),
+            minTime = minOf(
+                scheduleEvents.minByOrNull { it.start.hour }?.start?.toLocalTime()
+                    ?: LocalTime.of(8, 0), LocalTime.of(8, 0)
+            ),
+            maxTime = maxOf(
+                scheduleEvents.maxByOrNull { it.end.hour }?.end?.toLocalTime()
+                    ?: LocalTime.of(20, 0), LocalTime.of(20, 0)
+            ),
+            minDate = firstWeekDay.toLocalDate(),
+            maxDate = lastWeekDay.toLocalDate()
+        )
+    }
 }

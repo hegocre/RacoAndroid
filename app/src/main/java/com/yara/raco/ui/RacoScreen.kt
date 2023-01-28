@@ -22,7 +22,7 @@ enum class RacoScreen(
         unselectedIcon = Icons.Outlined.Notifications
     ),
     Schedule(
-        title = R.string.planning,
+        title = R.string.calendar,
         selectedIcon = Icons.Filled.CalendarToday,
         unselectedIcon = Icons.Outlined.CalendarToday
     ),

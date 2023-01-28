@@ -23,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
@@ -33,6 +34,7 @@ import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.viewmodel.RacoViewModel
 import com.yara.raco.utils.Result
+import java.util.*
 
 data class DetailsUiState<T>(
     val detailed: T? = null,
@@ -46,6 +48,8 @@ fun RacoMainNavHost(
     navHostController: NavHostController,
     racoViewModel: RacoViewModel,
     dayCalendarViewSelected: Boolean,
+    dayPagerState: PagerState,
+    weekPagerState: PagerState,
     modifier: Modifier = Modifier
 ) {
     val isRefreshing by racoViewModel.isRefreshing.collectAsState()
@@ -66,6 +70,8 @@ fun RacoMainNavHost(
     val sortedEvaluations = remember(evaluations) {
         evaluations.sortedBy { it.evaluation.name }
     }
+
+    val exams by racoViewModel.exams.observeAsState(initial = emptyList())
 
     NavHost(
         navController = navHostController,
@@ -153,9 +159,19 @@ fun RacoMainNavHost(
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = { racoViewModel.refresh() }) {
                 Crossfade(targetState = dayCalendarViewSelected) { isDayCalendarViewSelected ->
                     if (isDayCalendarViewSelected) {
-                        RacoScheduleDay(schedules = schedules)
+                        RacoScheduleDay(
+                            schedules = schedules,
+                            exams = exams,
+                            setTitle = racoViewModel::setCalendarShowingTitle,
+                            dayPagerState
+                        )
                     } else {
-                        RacoScheduleWeek(schedules = schedules)
+                        RacoScheduleWeek(
+                            schedules = schedules,
+                            exams = exams,
+                            setTitle = racoViewModel::setCalendarShowingTitle,
+                            weekPagerState
+                        )
                     }
                 }
             }
