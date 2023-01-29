@@ -32,15 +32,16 @@ data class Exam(
         val dateEnd = dateFormat.parse(fi) ?: Date(System.currentTimeMillis() + 3600000L)
 
         return ScheduleEvent(
-            name = "[$assig] Examen ${
+            name = "[GRAU-$assig] Examen ${
                 when (tipus) {
-                    "P" -> "Parcial"; "F" -> "Final"; else -> ""
+                    "P" -> "parcial"; "F" -> "final"; else -> ""
                 }
             }",
             color = colorSubject.getValue(assig),
             start = dateStart.toInstant().atZone(ZoneId.of("Europe/Madrid")).toLocalDateTime(),
             end = dateEnd.toInstant().atZone(ZoneId.of("Europe/Madrid")).toLocalDateTime(),
-            description = aules
+            description = comentaris,
+            location = aules
         )
     }
 }

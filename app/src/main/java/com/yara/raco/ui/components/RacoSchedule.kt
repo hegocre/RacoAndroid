@@ -4,9 +4,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -21,6 +23,10 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,15 +34,18 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
+import com.yara.raco.R
 import com.yara.raco.model.exam.Exam
 import com.yara.raco.model.schedule.Schedule
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
@@ -50,6 +59,7 @@ data class ScheduleEvent(
     val start: LocalDateTime,
     val end: LocalDateTime,
     val description: String? = null,
+    val location: String? = null,
 )
 
 @JvmInline
@@ -77,6 +87,7 @@ data class PositionedEvent(
 fun BasicEvent(
     positionedEvent: PositionedEvent,
     modifier: Modifier = Modifier,
+    onEventClick: ((ScheduleEvent) -> Unit)? = null,
 ) {
     val event = positionedEvent.scheduleEvent
     val topRadius =
@@ -100,6 +111,7 @@ fun BasicEvent(
                     bottomStart = bottomRadius,
                 )
             )
+            .then(if (onEventClick != null) Modifier.clickable { onEventClick(positionedEvent.scheduleEvent) } else Modifier)
             .padding(4.dp)
     ) {
         Text(
@@ -111,9 +123,9 @@ fun BasicEvent(
             overflow = TextOverflow.Ellipsis,
         )
 
-        if (event.description != null) {
+        if (event.location != null) {
             Text(
-                text = event.description,
+                text = event.location,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.DarkGray,
                 maxLines = 3,
@@ -341,9 +353,11 @@ sealed class ScheduleSize {
 fun Schedule(
     scheduleEvents: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
+    onEventClick: ((ScheduleEvent) -> Unit)? = null,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
-            positionedEvent = it
+            positionedEvent = it,
+            onEventClick = onEventClick
         )
     },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
@@ -519,13 +533,85 @@ var predefinedColors = listOf(
     Color(0xfff3b0c3)
 )
 
+val EventTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)
+val EventDateFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+
+@Composable
+fun ScheduleEventDetailsDialog(
+    scheduleEvent: ScheduleEvent,
+    onDismissRequest: () -> Unit,
+) {
+    val locationInlineContent = mapOf(
+        Pair(
+            "location_icon",
+            InlineTextContent(
+                placeholder = Placeholder(
+                    width = LocalTextStyle.current.fontSize,
+                    height = LocalTextStyle.current.fontSize,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.LocationOn,
+                    contentDescription = stringResource(
+                        id = R.string.location
+                    )
+                )
+            }
+        )
+    )
+
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surface),
+            shape = MaterialTheme.shapes.extraLarge,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(all = 24.dp)) {
+                Text(
+                    text = scheduleEvent.name,
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+
+                Text(
+                    text = "${scheduleEvent.start.format(EventDateFormatter)} ⦁ " +
+                            "${scheduleEvent.start.format(EventTimeFormatter)}-${
+                                scheduleEvent.end.format(
+                                    EventTimeFormatter
+                                )
+                            }"
+                )
+
+                if (scheduleEvent.location != null) {
+                    Text(
+                        text = buildAnnotatedString {
+                            appendInlineContent("location_icon")
+                            append(" ${scheduleEvent.location}")
+                        },
+                        inlineContent = locationInlineContent
+                    )
+                }
+
+                if (scheduleEvent.description != null) {
+                    Text(text = scheduleEvent.description, modifier = Modifier.padding(top = 16.dp))
+                }
+            }
+        }
+    }
+
+}
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RacoScheduleDay(
     schedules: List<Schedule>,
     exams: List<Exam>,
     setTitle: (String) -> Unit,
-    pagerState: PagerState
+    pagerState: PagerState,
+    onEventClick: (ScheduleEvent) -> Unit
 ) {
     val today = remember {
         LocalDateTime.now()
@@ -604,7 +690,8 @@ fun RacoScheduleDay(
                 maxTime = maxOf(
                     scheduleEvents.maxByOrNull { it.end }?.end?.toLocalTime()
                         ?: LocalTime.of(20, 0), LocalTime.of(20, 0)
-                )
+                ),
+                onEventClick = onEventClick
             )
         }
     }
@@ -616,7 +703,8 @@ fun RacoScheduleWeek(
     schedules: List<Schedule>,
     exams: List<Exam>,
     setTitle: (String) -> Unit,
-    pagerState: PagerState
+    pagerState: PagerState,
+    onEventClick: (ScheduleEvent) -> Unit
 ) {
     val today = remember {
         LocalDateTime.now()
@@ -687,7 +775,8 @@ fun RacoScheduleWeek(
                     ?: LocalTime.of(20, 0), LocalTime.of(20, 0)
             ),
             minDate = firstWeekDay.toLocalDate(),
-            maxDate = lastWeekDay.toLocalDate()
+            maxDate = lastWeekDay.toLocalDate(),
+            onEventClick = onEventClick
         )
     }
 }

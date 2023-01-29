@@ -21,6 +21,7 @@ import com.yara.raco.model.schedule.ScheduleController
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
+import com.yara.raco.ui.components.ScheduleEvent
 import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
 import com.yara.raco.workers.LogOutWorker
@@ -62,6 +63,10 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     private var _calendarShowingTitle by mutableStateOf("")
     val calendarShowingTitle: String
         get() = _calendarShowingTitle
+
+    private var _calendarDialogEvent = mutableStateOf<ScheduleEvent?>(null)
+    val calendarDialogEvent: ScheduleEvent?
+        get() = _calendarDialogEvent.value
 
     init {
         viewModelScope.launch {
@@ -146,5 +151,9 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setCalendarShowingTitle(title: String) {
         _calendarShowingTitle = title
+    }
+
+    fun setCalendarDialogEvent(scheduleEvent: ScheduleEvent?) {
+        _calendarDialogEvent.value = scheduleEvent
     }
 }

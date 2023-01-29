@@ -54,11 +54,11 @@ data class Schedule (
         )
 
         return ScheduleEvent(
-            name = "$codiAssig $grup$tipus",
-            color = colorSubject.getValue(codiAssig),
+            name = "GRAU-$codiAssig $grup $tipus",
+            color = colorSubject.getOrDefault(codiAssig, Color(0xfff3b0c3)),
             start = dateStart,
             end = dateStart.plusHours(durada.toLong()),
-            description = aules
+            location = aules
         )
     }
 }

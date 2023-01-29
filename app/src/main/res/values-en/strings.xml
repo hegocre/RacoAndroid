@@ -38,4 +38,5 @@
     <string name="delete_grade">Delete grade</string>
     <string name="attachments">Attachments</string>
     <string name="calendar">Calendar</string>
+    <string name="location">Location</string>
 </resources>

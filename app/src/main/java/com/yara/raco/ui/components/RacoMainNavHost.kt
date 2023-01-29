@@ -163,16 +163,25 @@ fun RacoMainNavHost(
                             schedules = schedules,
                             exams = exams,
                             setTitle = racoViewModel::setCalendarShowingTitle,
-                            dayPagerState
+                            pagerState = dayPagerState,
+                            onEventClick = { event -> racoViewModel.setCalendarDialogEvent(event) }
                         )
                     } else {
                         RacoScheduleWeek(
                             schedules = schedules,
                             exams = exams,
                             setTitle = racoViewModel::setCalendarShowingTitle,
-                            weekPagerState
+                            pagerState = weekPagerState,
+                            onEventClick = { event -> racoViewModel.setCalendarDialogEvent(event) }
                         )
                     }
+                }
+
+                racoViewModel.calendarDialogEvent?.let { event ->
+                    ScheduleEventDetailsDialog(
+                        scheduleEvent = event,
+                        onDismissRequest = { racoViewModel.setCalendarDialogEvent(null) }
+                    )
                 }
             }
         }
