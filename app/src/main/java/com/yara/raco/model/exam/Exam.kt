@@ -37,7 +37,7 @@ data class Exam(
                     "P" -> "parcial"; "F" -> "final"; else -> ""
                 }
             }",
-            color = colorSubject.getValue(assig),
+            color = colorSubject.getOrDefault(assig, Color(0xfff3b0c3)),
             start = dateStart.toInstant().atZone(ZoneId.of("Europe/Madrid")).toLocalDateTime(),
             end = dateEnd.toInstant().atZone(ZoneId.of("Europe/Madrid")).toLocalDateTime(),
             description = comentaris,

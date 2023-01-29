@@ -629,23 +629,15 @@ fun RacoScheduleDay(
         ).minusDays(1L)
     }
 
-    val colorSubject = remember {
-        HashMap<String, Color>().apply {
-            for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
-                set(
-                    subject.value.codiAssig,
-                    predefinedColors[subject.index % predefinedColors.size]
-                )
-            }
-        }
+    val colorSubject = HashMap<String, Color>()
+    for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
+        colorSubject[subject.value.codiAssig] =
+            predefinedColors[subject.index % predefinedColors.size]
     }
 
-    val examEvents = remember {
-        ArrayList<ScheduleEvent>().apply {
-            for (exam in exams) {
-                add(exam.toScheduleEvent(colorSubject))
-            }
-        }
+    val examEvents = ArrayList<ScheduleEvent>()
+    for (exam in exams) {
+        examEvents.add(exam.toScheduleEvent(colorSubject))
     }
 
     val pages = ChronoUnit.DAYS.between(firstCalendarDay, lastCalendarDay).toInt()
@@ -662,19 +654,16 @@ fun RacoScheduleDay(
 
             val weekExams =
                 remember { examEvents.filter { it.start.toLocalDate() == currentDay.toLocalDate() } }
-            val scheduleEvents = remember {
-                val firstWeekDay = currentDay.with(
-                    TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-                )
-                ArrayList<ScheduleEvent>().apply {
-                    for (schedule in schedules) {
-                        val scheduleEvent = schedule.toScheduleEvent(colorSubject, firstWeekDay)
-                        if (scheduleEvent.start.toLocalDate() == currentDay.toLocalDate())
-                            add(schedule.toScheduleEvent(colorSubject, firstWeekDay))
-                    }
-                    addAll(weekExams)
-                }
+            val scheduleEvents = ArrayList<ScheduleEvent>()
+            val firstWeekDay = currentDay.with(
+                TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+            )
+            for (schedule in schedules) {
+                val scheduleEvent = schedule.toScheduleEvent(colorSubject, firstWeekDay)
+                if (scheduleEvent.start.toLocalDate() == currentDay.toLocalDate())
+                    scheduleEvents.add(schedule.toScheduleEvent(colorSubject, firstWeekDay))
             }
+            scheduleEvents.addAll(weekExams)
 
             BasicDayHeader(day = currentDay.toLocalDate(), modifier = Modifier.align(Start))
 
@@ -722,23 +711,15 @@ fun RacoScheduleWeek(
         ).minusDays(1L)
     }
 
-    val colorSubject = remember {
-        HashMap<String, Color>().apply {
-            for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
-                set(
-                    subject.value.codiAssig,
-                    predefinedColors[subject.index % predefinedColors.size]
-                )
-            }
-        }
+    val colorSubject = HashMap<String, Color>()
+    for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
+        colorSubject[subject.value.codiAssig] =
+            predefinedColors[subject.index % predefinedColors.size]
     }
 
-    val examEvents = remember {
-        ArrayList<ScheduleEvent>().apply {
-            for (exam in exams) {
-                add(exam.toScheduleEvent(colorSubject))
-            }
-        }
+    val examEvents = ArrayList<ScheduleEvent>()
+    for (exam in exams) {
+        examEvents.add(exam.toScheduleEvent(colorSubject))
     }
 
     val pages = ChronoUnit.WEEKS.between(firstCalendarDay, lastCalendarDay).toInt()
@@ -755,14 +736,11 @@ fun RacoScheduleWeek(
 
         val weekExams =
             remember { examEvents.filter { it.start >= firstWeekDay && it.start < lastWeekDay } }
-        val scheduleEvents = remember {
-            ArrayList<ScheduleEvent>().apply {
-                for (schedule in schedules) {
-                    add(schedule.toScheduleEvent(colorSubject, firstWeekDay))
-                }
-                addAll(weekExams)
-            }
+        val scheduleEvents = ArrayList<ScheduleEvent>()
+        for (schedule in schedules) {
+            scheduleEvents.add(schedule.toScheduleEvent(colorSubject, firstWeekDay))
         }
+        scheduleEvents.addAll(weekExams)
 
         Schedule(
             scheduleEvents = scheduleEvents, daySize = ScheduleSize.FixedCount(7f),
