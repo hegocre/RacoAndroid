@@ -595,7 +595,7 @@ fun ScheduleEventDetailsDialog(
                     )
                 }
 
-                if (scheduleEvent.description != null) {
+                if (scheduleEvent.description != null && scheduleEvent.description.isNotBlank()) {
                     Text(text = scheduleEvent.description, modifier = Modifier.padding(top = 16.dp))
                 }
             }
