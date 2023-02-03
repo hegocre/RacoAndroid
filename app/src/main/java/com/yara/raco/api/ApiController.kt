@@ -59,7 +59,7 @@ class ApiController private constructor() {
         } ?: return Result.Error(2)
     }
 
-    suspend fun listExams(subjects: List<String>? = null): Result<List<Exam>> {
+    suspend fun listExams(subjects: List<String>): Result<List<Exam>> {
         accessToken?.let {
             return semesterApi.getExams(it.accessToken, subjects)
         } ?: return Result.Error(2)

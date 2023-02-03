@@ -40,16 +40,17 @@ class SemesterApi private constructor() {
         Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 
-    suspend fun getExams(accessToken: String, subjects: List<String>? = null): Result<List<Exam>> =
-        when (val currentSemesterResponse = getCurrentSemester(accessToken)) {
+    suspend fun getExams(accessToken: String, subjects: List<String>): Result<List<Exam>> =
+        if (subjects.isEmpty()) Result.Success(
+            emptyList()
+        )
+        else when (val currentSemesterResponse = getCurrentSemester(accessToken)) {
             is Result.Error -> Result.Error(currentSemesterResponse.code)
             !is Result.Success -> Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
             else -> try {
                 val currentSemester = currentSemesterResponse.data
-                val requestUrl = String.format(EXAMS_URL, currentSemester).let {
-                    if (subjects != null) it + "&assig=${subjects.joinToString(",")}"
-                    else it
-                }
+                val requestUrl = String.format(EXAMS_URL, currentSemester) +
+                        "&assig=${subjects.joinToString(",")}"
                 val response = withContext(Dispatchers.IO) {
                     OkHttpRequest.getInstance().get(
                         sUrl = requestUrl,
