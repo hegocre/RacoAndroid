@@ -39,4 +39,5 @@
     <string name="attachments">Archivos adjuntos</string>
     <string name="calendar">Calendario</string>
     <string name="location">Ubicación</string>
+    <string name="no_subjects">No estás cursando ninguna asignatura</string>
 </resources>

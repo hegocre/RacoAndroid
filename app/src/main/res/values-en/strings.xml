@@ -39,4 +39,5 @@
     <string name="attachments">Attachments</string>
     <string name="calendar">Calendar</string>
     <string name="location">Location</string>
+    <string name="no_subjects">You are not taking any course</string>
 </resources>

@@ -18,8 +18,8 @@ android {
         applicationId "com.yara.raco"
         minSdk 26
         targetSdk 33
-        versionCode 16
-        versionName "1.0.2"
+        versionCode 18
+        versionName "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

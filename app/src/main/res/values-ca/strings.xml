@@ -39,4 +39,5 @@
     <string name="attachments">Fitxers adjunts</string>
     <string name="calendar">Calendari</string>
     <string name="location">Ubicació</string>
+    <string name="no_subjects">No estàs cursant cap assignatura</string>
 </resources>
