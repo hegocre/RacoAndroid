@@ -176,14 +176,23 @@ fun RacoMainNavHost(
             }
 
             if (showAddEvaluationDialog) {
-                AddEvaluationDialog(
-                    subjects = sortedSubjects,
-                    onAddClick = { subjectId, evaluationName ->
-                        racoViewModel.addEvaluation(subjectId, evaluationName)
-                        showAddEvaluationDialog = false
-                    },
-                    onDismissRequest = { showAddEvaluationDialog = false }
-                )
+                if (sortedSubjects.isNotEmpty()) {
+                    AddEvaluationDialog(
+                        subjects = sortedSubjects,
+                        onAddClick = { subjectId, evaluationName ->
+                            racoViewModel.addEvaluation(subjectId, evaluationName)
+                            showAddEvaluationDialog = false
+                        },
+                        onDismissRequest = { showAddEvaluationDialog = false }
+                    )
+                } else {
+                    Toast.makeText(
+                        LocalContext.current,
+                        stringResource(id = R.string.no_subjects),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    showAddEvaluationDialog = false
+                }
             }
         }
 
