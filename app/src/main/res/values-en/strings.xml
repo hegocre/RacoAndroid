@@ -37,4 +37,5 @@
     <string name="add_grade">Add grade</string>
     <string name="delete_grade">Delete grade</string>
     <string name="attachments">Attachments</string>
+    <string name="no_subjects">You are not taking any course</string>
 </resources>

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.yara.raco.R
@@ -104,8 +105,10 @@ fun RacoEvaluationList(
 ) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddEvaluationClick) {
-                Icon(Icons.Outlined.Add, contentDescription = "Add grade")
+            if (subjects.isNotEmpty()) {
+                FloatingActionButton(onClick = onAddEvaluationClick) {
+                    Icon(Icons.Outlined.Add, contentDescription = "Add grade")
+                }
             }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -123,36 +126,48 @@ fun RacoEvaluationList(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            for (subject in subjects) {
-                val evaluationsList = filteredEvaluations.getOrDefault(subject.id, emptyList())
+            if (subjects.isNotEmpty()) {
+                for (subject in subjects) {
+                    val evaluationsList = filteredEvaluations.getOrDefault(subject.id, emptyList())
 
-                if (evaluationsList.isNotEmpty()) {
-                    stickyHeader {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surface)
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = subject.nom,
-                                style = MaterialTheme.typography.titleMedium
+                    if (evaluationsList.isNotEmpty()) {
+                        stickyHeader {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = subject.nom,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        }
+
+                        itemsIndexed(
+                            items = evaluationsList,
+                            key = { _, evaluation -> evaluation.evaluation.id }
+                        ) { index, evaluation ->
+                            if (index != 0) {
+                                Divider()
+                            }
+                            EvaluationListEntry(
+                                evaluation = evaluation,
+                                onGradeClick = onGradeClick
                             )
                         }
                     }
-
-                    itemsIndexed(
-                        items = evaluationsList,
-                        key = { _, evaluation -> evaluation.evaluation.id }
-                    ) { index, evaluation ->
-                        if (index != 0) {
-                            Divider()
-                        }
-                        EvaluationListEntry(
-                            evaluation = evaluation,
-                            onGradeClick = onGradeClick
-                        )
-                    }
+                }
+            } else {
+                item(key = "no_items") {
+                    Text(
+                        text = stringResource(id = R.string.no_subjects),
+                        modifier = Modifier
+                            .fillParentMaxSize()
+                            .wrapContentHeight(),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
@@ -509,6 +524,7 @@ fun AddEvaluationDialog(
     onAddClick: (String, String) -> Unit,
     onDismissRequest: (() -> Unit)? = null
 ) {
+    if (subjects.isEmpty()) return
     val (subjectId, setSubjectId) = remember { mutableStateOf(subjects.first().id) }
     val (evaluationName, setEvaluationName) = remember { mutableStateOf("") }
 
