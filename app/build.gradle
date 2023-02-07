@@ -25,8 +25,8 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        resConfigs 'ca', 'es', 'en'
 
-        resConfigs "ca", "es", "en"
 
         buildConfigField("String", "CLIENT_ID", apiKeyProperties['CLIENT_ID'])
         buildConfigField("String", "CLIENT_SECRET", apiKeyProperties['CLIENT_SECRET'])
