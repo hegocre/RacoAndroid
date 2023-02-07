@@ -10,6 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.evaluation.EvaluationWithGrades
+import com.yara.raco.model.event.Event
+import com.yara.raco.model.event.EventController
 import com.yara.raco.model.exam.Exam
 import com.yara.raco.model.exam.ExamController
 import com.yara.raco.model.files.File
@@ -37,6 +39,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     private val scheduleController = ScheduleController.getInstance(application)
     private val evaluationController = EvaluationController.getInstance(application)
     private val examController = ExamController.getInstance(application)
+    private val eventController = EventController.getInstance(application)
 
     private var shouldRefreshToken = false
 
@@ -58,6 +61,8 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         get() = evaluationController.getEvaluations()
     val exams: LiveData<List<Exam>>
         get() = examController.getExams()
+    val events: LiveData<List<Event>>
+        get() = eventController.getEvents()
 
 
     private var _calendarShowingTitle by mutableStateOf("")
@@ -100,6 +105,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
             noticeController.syncNotices()
             scheduleController.syncSchedule()
             examController.syncExams()
+            eventController.syncEvents()
             _isRefreshing.emit(false)
         }
     }

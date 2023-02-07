@@ -73,6 +73,8 @@ fun RacoMainNavHost(
 
     val exams by racoViewModel.exams.observeAsState(initial = emptyList())
 
+    val events by racoViewModel.events.observeAsState(initial = emptyList())
+
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Notes.name,
@@ -162,6 +164,7 @@ fun RacoMainNavHost(
                         RacoScheduleDay(
                             schedules = schedules,
                             exams = exams,
+                            events = events,
                             setTitle = racoViewModel::setCalendarShowingTitle,
                             pagerState = dayPagerState,
                             onEventClick = { event -> racoViewModel.setCalendarDialogEvent(event) }
@@ -170,6 +173,7 @@ fun RacoMainNavHost(
                         RacoScheduleWeek(
                             schedules = schedules,
                             exams = exams,
+                            events = events,
                             setTitle = racoViewModel::setCalendarShowingTitle,
                             pagerState = weekPagerState,
                             onEventClick = { event -> racoViewModel.setCalendarDialogEvent(event) }

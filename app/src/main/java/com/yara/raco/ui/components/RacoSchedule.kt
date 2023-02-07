@@ -39,6 +39,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.yara.raco.R
+import com.yara.raco.model.event.Event
 import com.yara.raco.model.exam.Exam
 import com.yara.raco.model.schedule.Schedule
 import java.time.LocalDate
@@ -135,6 +136,47 @@ fun BasicEvent(
     }
 }
 
+@Composable
+fun HeaderEvent(
+    positionedEvent: PositionedEvent,
+    modifier: Modifier = Modifier,
+    onEventClick: ((ScheduleEvent) -> Unit)? = null,
+) {
+    val event = positionedEvent.scheduleEvent
+    val topRadius =
+        if (positionedEvent.splitType == SplitType.Start || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
+    val bottomRadius =
+        if (positionedEvent.splitType == SplitType.End || positionedEvent.splitType == SplitType.Both) 0.dp else 4.dp
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(
+                end = 2.dp,
+                bottom = if (positionedEvent.splitType == SplitType.End) 0.dp else 2.dp
+            )
+            .clipToBounds()
+            .background(
+                event.color,
+                shape = RoundedCornerShape(
+                    topStart = topRadius,
+                    topEnd = topRadius,
+                    bottomEnd = bottomRadius,
+                    bottomStart = bottomRadius,
+                )
+            )
+            .then(if (onEventClick != null) Modifier.clickable { onEventClick(positionedEvent.scheduleEvent) } else Modifier)
+            .padding(4.dp)
+    ) {
+        Text(
+            text = event.name,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.DarkGray,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+        )
+    }
+}
+
 
 private class EventDataModifier(
     val positionedEvent: PositionedEvent,
@@ -142,7 +184,8 @@ private class EventDataModifier(
     override fun Density.modifyParentData(parentData: Any?) = positionedEvent
 }
 
-private fun Modifier.eventData(positionedEvent: PositionedEvent) = this.then(EventDataModifier(positionedEvent))
+private fun Modifier.eventData(positionedEvent: PositionedEvent) =
+    this.then(EventDataModifier(positionedEvent))
 
 //private val DayFormatter = DateTimeFormatter.ofPattern("EE, MMM d")
 private val DayFormatter = DateTimeFormatter.ofPattern("EE")
@@ -200,8 +243,6 @@ fun ScheduleHeader(
                 }
             }
         }
-
-        Divider()
     }
 }
 
@@ -352,10 +393,17 @@ sealed class ScheduleSize {
 @Composable
 fun Schedule(
     scheduleEvents: List<ScheduleEvent>,
+    headerEvents: List<ScheduleEvent>,
     modifier: Modifier = Modifier,
     onEventClick: ((ScheduleEvent) -> Unit)? = null,
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
         BasicEvent(
+            positionedEvent = it,
+            onEventClick = onEventClick
+        )
+    },
+    headerEventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
+        HeaderEvent(
             positionedEvent = it,
             onEventClick = onEventClick
         )
@@ -398,10 +446,36 @@ fun Schedule(
                     dayHeader = dayHeader,
                     modifier = Modifier
                         .padding(start = with(LocalDensity.current) { sidebarWidth.toDp() })
-                        .horizontalScroll(horizontalScrollState)
+                        .then(
+                            if (daySize !is ScheduleSize.FixedCount)
+                                Modifier.horizontalScroll(horizontalScrollState) else Modifier
+                        )
                         .onGloballyPositioned { headerHeight = it.size.height }
                 )
             }
+            if (headerEvents.isNotEmpty()) {
+                Row(modifier = Modifier.align(Start)) {
+                    HeaderDaySchedule(
+                        scheduleEvents = headerEvents,
+                        dayWidth = dayWidth,
+                        dayHeight = 26.dp,
+                        minDate = minDate,
+                        maxDate = maxDate,
+                        eventContent = headerEventContent,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(
+                                if (daySize !is ScheduleSize.FixedCount)
+                                    Modifier.horizontalScroll(horizontalScrollState) else Modifier
+                            )
+                            .padding(
+                                start = with(LocalDensity.current) { sidebarWidth.toDp() },
+                                bottom = 4.dp
+                            )
+                    )
+                }
+            }
+            Divider()
             Row(
                 modifier = Modifier
                     .weight(1f)
@@ -508,11 +582,74 @@ fun BasicSchedule(
         }
         layout(width, height) {
             placeablesWithEvents.forEach { (placeable, splitEvent) ->
-                val eventOffsetMinutes = if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(minTime, splitEvent.start) else 0
+                val eventOffsetMinutes = if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(
+                    minTime,
+                    splitEvent.start
+                ) else 0
                 val eventY = ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt()
                 val eventOffsetDays = ChronoUnit.DAYS.between(minDate, splitEvent.date).toInt()
-                val eventX = eventOffsetDays * dayWidth.roundToPx() + (splitEvent.col * (dayWidth.toPx() / splitEvent.colTotal.toFloat())).roundToInt()
+                val eventX =
+                    eventOffsetDays * dayWidth.roundToPx() + (splitEvent.col * (dayWidth.toPx() / splitEvent.colTotal.toFloat())).roundToInt()
                 placeable.place(eventX, eventY)
+            }
+        }
+    }
+}
+
+@Composable
+fun HeaderDaySchedule(
+    scheduleEvents: List<ScheduleEvent>,
+    modifier: Modifier = Modifier,
+    eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = {
+        HeaderEvent(
+            positionedEvent = it
+        )
+    },
+    minDate: LocalDate = scheduleEvents.minByOrNull(ScheduleEvent::start)?.start?.toLocalDate()
+        ?: LocalDate.now(),
+    maxDate: LocalDate = scheduleEvents.maxByOrNull(ScheduleEvent::end)?.end?.toLocalDate()
+        ?: LocalDate.now(),
+    dayWidth: Dp,
+    dayHeight: Dp
+) {
+    val numDays = ChronoUnit.DAYS.between(minDate, maxDate).toInt() + 1
+    val positionedEvents =
+        remember(scheduleEvents) { arrangeEvents(splitEvents(scheduleEvents.sortedBy(ScheduleEvent::start))) }
+    Layout(
+        content = {
+            positionedEvents.forEach { positionedEvent ->
+                Box(
+                    modifier = Modifier.eventData(positionedEvent),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    eventContent(positionedEvent)
+                }
+            }
+        },
+        modifier = modifier,
+    ) { measureables, constraints ->
+        val eventHeight = dayHeight.roundToPx()
+        val width = dayWidth.roundToPx() * numDays
+        val placeablesWithEvents = measureables.map { measurable ->
+            val splitEvent = measurable.parentData as PositionedEvent
+            val eventWidth =
+                ((splitEvent.colSpan.toFloat() / splitEvent.colTotal.toFloat()) * dayWidth.toPx()).roundToInt()
+            val placeable = measurable.measure(
+                constraints.copy(
+                    minWidth = eventWidth,
+                    maxWidth = eventWidth,
+                    minHeight = eventHeight,
+                    maxHeight = eventHeight
+                )
+            )
+            Pair(placeable, splitEvent)
+        }
+        layout(width, eventHeight) {
+            placeablesWithEvents.forEach { (placeable, splitEvent) ->
+                val eventOffsetDays = ChronoUnit.DAYS.between(minDate, splitEvent.date).toInt()
+                val eventX =
+                    eventOffsetDays * dayWidth.roundToPx() + (splitEvent.col * (dayWidth.toPx() / splitEvent.colTotal.toFloat())).roundToInt()
+                placeable.place(eventX, 0)
             }
         }
     }
@@ -577,12 +714,14 @@ fun ScheduleEventDetailsDialog(
                 )
 
                 Text(
-                    text = "${scheduleEvent.start.format(EventDateFormatter)} ⦁ " +
-                            "${scheduleEvent.start.format(EventTimeFormatter)}-${
-                                scheduleEvent.end.format(
-                                    EventTimeFormatter
-                                )
-                            }"
+                    text = scheduleEvent.start.format(EventDateFormatter) +
+                            if (scheduleEvent.start.toLocalTime() != scheduleEvent.end.toLocalTime())
+                                " ⦁ ${scheduleEvent.start.format(EventTimeFormatter)}-${
+                                    scheduleEvent.end.format(
+                                        EventTimeFormatter
+                                    )
+                                }"
+                            else ""
                 )
 
                 if (scheduleEvent.location != null) {
@@ -609,6 +748,7 @@ fun ScheduleEventDetailsDialog(
 fun RacoScheduleDay(
     schedules: List<Schedule>,
     exams: List<Exam>,
+    events: List<Event>,
     setTitle: (String) -> Unit,
     pagerState: PagerState,
     onEventClick: (ScheduleEvent) -> Unit
@@ -638,6 +778,11 @@ fun RacoScheduleDay(
     val examEvents = ArrayList<ScheduleEvent>()
     for (exam in exams) {
         examEvents.add(exam.toScheduleEvent(colorSubject))
+    }
+
+    val eventEvents = ArrayList<ScheduleEvent>()
+    for (event in events) {
+        eventEvents.add(event.toScheduleEvent())
     }
 
     val pages = ChronoUnit.DAYS.between(firstCalendarDay, lastCalendarDay).toInt()
@@ -665,12 +810,20 @@ fun RacoScheduleDay(
             }
             scheduleEvents.addAll(weekExams)
 
-            BasicDayHeader(day = currentDay.toLocalDate(), modifier = Modifier.align(Start))
+            val headerEvents = ArrayList<ScheduleEvent>()
+            for (headerEvent in eventEvents) {
+                if (headerEvent.start.toLocalDate() == currentDay.toLocalDate() ||
+                    (headerEvent.start.toLocalDate() < currentDay.toLocalDate() && headerEvent.end.toLocalDate() > currentDay.toLocalDate())
+                ) {
+                    headerEvents.add(headerEvent.copy(start = currentDay, end = currentDay))
+                }
+            }
 
-            Divider()
+            BasicDayHeader(day = currentDay.toLocalDate(), modifier = Modifier.align(Start))
 
             Schedule(
                 scheduleEvents = scheduleEvents,
+                headerEvents = headerEvents,
                 daySize = ScheduleSize.FixedCount(1f),
                 minTime = minOf(
                     scheduleEvents.minByOrNull { it.start }?.start?.toLocalTime()
@@ -691,12 +844,13 @@ fun RacoScheduleDay(
 fun RacoScheduleWeek(
     schedules: List<Schedule>,
     exams: List<Exam>,
+    events: List<Event>,
     setTitle: (String) -> Unit,
     pagerState: PagerState,
     onEventClick: (ScheduleEvent) -> Unit
 ) {
     val today = remember {
-        LocalDateTime.now()
+        LocalDate.now().atTime(0, 0)
     }
 
     val firstCalendarDay = remember {
@@ -722,6 +876,11 @@ fun RacoScheduleWeek(
         examEvents.add(exam.toScheduleEvent(colorSubject))
     }
 
+    val eventEvents = ArrayList<ScheduleEvent>()
+    for (event in events) {
+        eventEvents.add(event.toScheduleEvent())
+    }
+
     val pages = ChronoUnit.WEEKS.between(firstCalendarDay, lastCalendarDay).toInt()
 
     LaunchedEffect(key1 = pagerState.currentPage) {
@@ -742,8 +901,27 @@ fun RacoScheduleWeek(
         }
         scheduleEvents.addAll(weekExams)
 
+        val headerEvents = ArrayList<ScheduleEvent>()
+        for (headerEvent in eventEvents) {
+            if ((headerEvent.start >= firstWeekDay && headerEvent.start <= lastWeekDay) ||
+                (headerEvent.start < firstWeekDay && headerEvent.end >= firstWeekDay)
+            ) {
+                val firstEventDay = maxOf(headerEvent.start, firstWeekDay)
+                val lastEventDay = minOf(headerEvent.end, lastWeekDay)
+                for (day in 0..ChronoUnit.DAYS.between(firstEventDay, lastEventDay)) {
+                    headerEvents.add(
+                        headerEvent.copy(
+                            start = firstEventDay.plusDays(day),
+                            end = firstEventDay.plusDays(day)
+                        )
+                    )
+                }
+            }
+        }
+
         Schedule(
             scheduleEvents = scheduleEvents, daySize = ScheduleSize.FixedCount(7f),
+            headerEvents = headerEvents,
             minTime = minOf(
                 scheduleEvents.minByOrNull { it.start.hour }?.start?.toLocalTime()
                     ?: LocalTime.of(8, 0), LocalTime.of(8, 0)
