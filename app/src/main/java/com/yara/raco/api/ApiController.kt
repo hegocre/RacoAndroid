@@ -1,6 +1,8 @@
 package com.yara.raco.api
 
 import android.content.Context
+import com.yara.raco.model.event.Event
+import com.yara.raco.model.exam.Exam
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.schedule.Schedule
@@ -15,6 +17,8 @@ class ApiController private constructor() {
     private val subjectApi = SubjectsAPI.getInstance()
     private val noticeApi = NoticesApi.getInstance()
     private val scheduleApi = ScheduleApi.getInstance()
+    private val semesterApi = SemesterApi.getInstance()
+    private val eventApi = EventsApi.getInstance()
 
     suspend fun login(authorizationCode: String): Result<AccessToken> {
         val loginResult = tokenApi.getToken(authorizationCode)
@@ -54,6 +58,18 @@ class ApiController private constructor() {
     suspend fun listSchedule(): Result<List<Schedule>> {
         accessToken?.let {
             return scheduleApi.getSchedule(it.accessToken)
+        } ?: return Result.Error(2)
+    }
+
+    suspend fun listExams(subjects: List<String>): Result<List<Exam>> {
+        accessToken?.let {
+            return semesterApi.getExams(it.accessToken, subjects)
+        } ?: return Result.Error(2)
+    }
+
+    suspend fun listEvents(): Result<List<Event>> {
+        accessToken?.let {
+            return eventApi.getEvents(it.accessToken)
         } ?: return Result.Error(2)
     }
 

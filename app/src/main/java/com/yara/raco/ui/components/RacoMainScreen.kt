@@ -4,23 +4,36 @@ import android.content.Intent
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.ViewDay
+import androidx.compose.material.icons.filled.ViewWeek
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.yara.raco.R
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
+import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalPagerApi::class)
 @Composable
 fun RacoMainScreen(
     racoViewModel: RacoViewModel,
@@ -35,7 +48,7 @@ fun RacoMainScreen(
 
     val context = LocalContext.current
 
-    var dayCalendarViewSelected by rememberSaveable { mutableStateOf(true) }
+    var dayCalendarViewSelected by rememberSaveable { mutableStateOf(false) }
 
     val currentRoute = backStackEntry.value?.destination?.route
     val onBackPress: (() -> Unit)? = when {
@@ -50,35 +63,79 @@ fun RacoMainScreen(
         else -> null
     }
 
-    val onEventSettingsPress: (() -> Unit)? = when (backStackEntry.value?.destination?.route) {
-        RacoScreen.Schedule.name -> {
-            {
-                dayCalendarViewSelected = !dayCalendarViewSelected
-            }
-        }
-        //Default to not visible
-        else -> null
+    var showLogOutDialog by rememberSaveable { mutableStateOf(false) }
+
+    val today = remember {
+        LocalDateTime.now()
     }
+    val firstCalendarDay = remember {
+        today.minusMonths(4L).with(
+            TemporalAdjusters.previousOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+        )
+    }
+    val dayPagerState = rememberPagerState(
+        initialPage = ChronoUnit.DAYS.between(firstCalendarDay, today).toInt()
+    )
+    val weekPagerState = rememberPagerState(
+        initialPage = ChronoUnit.WEEKS.between(firstCalendarDay, today).toInt()
+    )
+
+    val dropdownActions = mapOf(
+        stringResource(id = R.string.about) to {
+            context.startActivity(Intent(context, AboutActivity::class.java))
+        },
+        stringResource(id = R.string.logout) to { showLogOutDialog = true }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
+    val iconActions: Map<ImageVector, () -> Unit>? =
+        when (backStackEntry.value?.destination?.route) {
+            RacoScreen.Schedule.name -> mapOf(
+                Icons.Default.Today to {
+                    if (dayCalendarViewSelected) {
+                        coroutineScope.launch {
+                            dayPagerState.animateScrollToPage(
+                                ChronoUnit.DAYS.between(
+                                    firstCalendarDay,
+                                    today
+                                ).toInt()
+                            )
+                        }
+                    } else {
+                        coroutineScope.launch {
+                            weekPagerState.animateScrollToPage(
+                                ChronoUnit.WEEKS.between(
+                                    firstCalendarDay,
+                                    today
+                                ).toInt()
+                            )
+                        }
+                    }
+                },
+                (if (dayCalendarViewSelected) Icons.Default.ViewWeek else Icons.Default.ViewDay) to {
+                    dayCalendarViewSelected = !dayCalendarViewSelected
+                }
+            )
+            else -> null
+        }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState()
     )
 
-    var showLogOutDialog by rememberSaveable { mutableStateOf(false) }
 
     RacoTheme {
         Scaffold(
             topBar = {
                 RacoMainTopAppBar(
-                    title = stringResource(id = currentScreen.title),
+                    title = when (currentScreen) {
+                        RacoScreen.Schedule -> racoViewModel.calendarShowingTitle
+                        else -> stringResource(id = currentScreen.title)
+                    },
                     scrollBehavior = scrollBehavior,
-                    onLogOut = { showLogOutDialog = true },
                     onBackPress = onBackPress,
-                    isDayViewSelected = dayCalendarViewSelected,
-                    onEventSettingsPress = onEventSettingsPress,
-                    onAbout = {
-                        context.startActivity(Intent(context, AboutActivity::class.java))
-                    }
+                    iconActions = iconActions,
+                    dropdownActions = dropdownActions
                 )
             },
             bottomBar = {
@@ -101,6 +158,8 @@ fun RacoMainScreen(
                 navHostController = navController,
                 racoViewModel = racoViewModel,
                 dayCalendarViewSelected = dayCalendarViewSelected,
+                dayPagerState = dayPagerState,
+                weekPagerState = weekPagerState,
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                     .padding(paddingValues)

@@ -43,7 +43,7 @@ fun RacoAboutScreen(
     RacoTheme {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
+                TopAppBar(
                     title = {
                         Text(text = stringResource(id = R.string.about))
                     },

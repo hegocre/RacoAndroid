@@ -18,15 +18,15 @@ class ScheduleController private constructor(context: Context)  {
             if (result is Result.Success) {
                 val savedScheduleSet = racoDatabase.scheduleDAO.fetchAllSchedulePrimaryKeys().toHashSet()
                 for (schedule in result.data) {
-                    var primarykey = ScheduleDAO.SchedulePrimaryKey(
+                    val primaryKey = ScheduleDAO.SchedulePrimaryKey(
                         schedule.codiAssig,
                         schedule.diaSetmana,
                         schedule.inici
                     )
-                    if (!savedScheduleSet.contains(primarykey)) {
+                    if (!savedScheduleSet.contains(primaryKey)) {
                         racoDatabase.scheduleDAO.insertSchedule(schedule)
                     }
-                    savedScheduleSet.remove(primarykey)
+                    savedScheduleSet.remove(primaryKey)
                 }
                 for (pk in savedScheduleSet) {
                     racoDatabase.scheduleDAO.deleteSchedule(pk.codiAssig, pk.diaSetmana, pk.inici)

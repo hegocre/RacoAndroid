@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import com.yara.raco.R
@@ -22,17 +23,15 @@ import com.yara.raco.R
 fun RacoMainTopAppBar(
     title: String,
     scrollBehavior: TopAppBarScrollBehavior,
-    onLogOut: () -> Unit,
-    onAbout: () -> Unit,
     onBackPress: (() -> Unit)? = null,
-    onEventSettingsPress: (() -> Unit)? = null,
-    isDayViewSelected: Boolean,
+    iconActions: Map<ImageVector, () -> Unit>? = null,
+    dropdownActions: Map<String, () -> Unit>? = null,
 ) {
     var menuExpanded by rememberSaveable {
         mutableStateOf(false)
     }
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = { Text(text = title) },
         windowInsets = WindowInsets.statusBars,
         scrollBehavior = scrollBehavior,
@@ -53,24 +52,12 @@ fun RacoMainTopAppBar(
             }
         },
         actions = {
-            if (onEventSettingsPress != null && !isDayViewSelected) {
-                IconButton(onClick = onEventSettingsPress) {
-                    Icon(
-                        imageVector = Icons.Default.ViewDay, contentDescription = stringResource(
-                            id = R.string.calendar_menu
-                        )
-                    )
+            iconActions?.forEach { (imageVector, function) ->
+                IconButton(onClick = function) {
+                    Icon(imageVector = imageVector, contentDescription = null)
                 }
             }
-            if (onEventSettingsPress != null && isDayViewSelected) {
-                IconButton(onClick = onEventSettingsPress) {
-                    Icon(
-                        imageVector = Icons.Default.ViewWeek, contentDescription = stringResource(
-                            id = R.string.calendar_menu
-                        )
-                    )
-                }
-            }
+
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(
@@ -79,21 +66,20 @@ fun RacoMainTopAppBar(
                         )
                     )
                 }
-                DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.logout)) },
-                        onClick = {
-                            onLogOut()
-                            menuExpanded = false
+                dropdownActions?.let {
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false }) {
+                        it.forEach { (title, function) ->
+                            DropdownMenuItem(
+                                text = { Text(text = title) },
+                                onClick = {
+                                    function()
+                                    menuExpanded = false
+                                }
+                            )
                         }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.about)) },
-                        onClick = {
-                            onAbout()
-                            menuExpanded = false
-                        }
-                    )
+                    }
                 }
             }
         }
