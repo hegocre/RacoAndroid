@@ -410,9 +410,11 @@ fun Schedule(
     },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(day = it) },
     timeLabel: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
-    minDate: LocalDate = scheduleEvents.minByOrNull(ScheduleEvent::start)?.start?.toLocalDate()
+    minDate: LocalDate = scheduleEvents.plus(headerEvents)
+        .minByOrNull(ScheduleEvent::start)?.start?.toLocalDate()
         ?: LocalDate.now(),
-    maxDate: LocalDate = scheduleEvents.maxByOrNull(ScheduleEvent::end)?.end?.toLocalDate()
+    maxDate: LocalDate = scheduleEvents.plus(headerEvents)
+        .maxByOrNull(ScheduleEvent::end)?.end?.toLocalDate()
         ?: LocalDate.now(),
     minTime: LocalTime = LocalTime.MIN,
     maxTime: LocalTime = LocalTime.MAX,
@@ -754,7 +756,7 @@ fun RacoScheduleDay(
     onEventClick: (ScheduleEvent) -> Unit
 ) {
     val today = remember {
-        LocalDateTime.now()
+        LocalDate.now().atTime(0, 0)
     }
 
     val firstCalendarDay = remember {
@@ -813,7 +815,7 @@ fun RacoScheduleDay(
             val headerEvents = ArrayList<ScheduleEvent>()
             for (headerEvent in eventEvents) {
                 if (headerEvent.start.toLocalDate() == currentDay.toLocalDate() ||
-                    (headerEvent.start.toLocalDate() < currentDay.toLocalDate() && headerEvent.end.toLocalDate() > currentDay.toLocalDate())
+                    (headerEvent.start.toLocalDate() < currentDay.toLocalDate() && headerEvent.end.toLocalDate() >= currentDay.toLocalDate())
                 ) {
                     headerEvents.add(headerEvent.copy(start = currentDay, end = currentDay))
                 }
