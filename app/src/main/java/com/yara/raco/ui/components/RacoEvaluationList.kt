@@ -204,10 +204,9 @@ fun DetailedEvaluation(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .consumedWindowInsets(paddingValues)
-                .padding(horizontal = 16.dp)
         ) {
             item(key = "evaluation_header") {
-                ElevatedCard(modifier = Modifier) {
+                ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Row(
                         modifier = Modifier.padding(all = 24.dp),
                         verticalAlignment = CenterVertically
@@ -234,7 +233,9 @@ fun DetailedEvaluation(
                 Text(
                     text = stringResource(id = R.string.grades),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 24.dp)
+                    modifier = Modifier
+                        .padding(top = 24.dp)
+                        .padding(horizontal = 16.dp)
                 )
             }
 
@@ -390,36 +391,43 @@ fun EditableGradeMark(
         )
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = CenterVertically,
-    ) {
-        Text(
-            text = grade.name,
-            modifier = Modifier.weight(1f)
-        )
-        OutlinedTextField(
-            value = editableMark,
-            onValueChange = { newMark ->
-                setEditableMark(newMark)
-                if (newMark == "") {
-                    onMarkUpdate(null)
-                } else if (newMark.replace(",", ".").toDoubleOrNull() != null) {
-                    onMarkUpdate(newMark.replace(",", ".").toDoubleOrNull())
-                }
-            },
-            placeholder = {
-                Text(
-                    text = String.format("%.2f", neededMark)
-                )
-            },
-            modifier = Modifier.width(80.dp),
-            maxLines = 1,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            isError = editableMark != "" && editableMark.replace(",", ".").toDoubleOrNull() == null
-        )
-    }
+    ListItem(
+        headlineText = {
+            Text(
+                text = grade.name
+            )
+        },
+        supportingText = {
+            Text(
+                text = "${String.format("%.0f", grade.weight)}%"
+            )
+        },
+        trailingContent = {
+            OutlinedTextField(
+                value = editableMark,
+                onValueChange = { newMark ->
+                    setEditableMark(newMark)
+                    if (newMark == "") {
+                        onMarkUpdate(null)
+                    } else if (newMark.replace(",", ".").toDoubleOrNull() != null) {
+                        onMarkUpdate(newMark.replace(",", ".").toDoubleOrNull())
+                    }
+                },
+                placeholder = {
+                    Text(
+                        text = String.format("%.2f", neededMark)
+                    )
+                },
+                modifier = Modifier.width(80.dp),
+                maxLines = 1,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                isError = editableMark != "" && editableMark.replace(",", ".")
+                    .toDoubleOrNull() == null,
+                textStyle = MaterialTheme.typography.bodyLarge
+            )
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
