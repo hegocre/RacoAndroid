@@ -26,7 +26,7 @@ data class Subject (
     @SerialName("url")
     val url: String,
     @SerialName("guia")
-    val guia: String,
+    val guia: String?,
     @SerialName("grup")
     val grup: String,
     @SerialName("sigles")
