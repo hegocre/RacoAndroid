@@ -30,6 +30,9 @@ interface NoticeDAO {
     @Delete
     suspend fun deleteNotice(notice: Notice)
 
+    @Query("UPDATE notices SET llegit = true WHERE id = :id")
+    suspend fun setReadNotice(id: Int)
+
     @Query("DELETE FROM notices WHERE id = :id")
     suspend fun deleteNotice(id: Int)
 

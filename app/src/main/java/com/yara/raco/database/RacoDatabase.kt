@@ -24,9 +24,11 @@ import com.yara.raco.model.subject.Subject
 
 @Database(
     entities = [Subject::class, Notice::class, File::class, Schedule::class, Grade::class, Evaluation::class, Event::class, Exam::class],
-    version = 7,
+    version = 8,
     autoMigrations = [
-        AutoMigration(from = 5, to = 6), AutoMigration(from = 6, to = 7)
+        AutoMigration(from = 5, to = 6),
+        AutoMigration(from = 6, to = 7),
+        AutoMigration(from = 7, to = 8)
     ]
 )
 abstract class RacoDatabase : RoomDatabase() {

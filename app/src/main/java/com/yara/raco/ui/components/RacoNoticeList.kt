@@ -3,17 +3,14 @@ package com.yara.raco.ui.components
 import android.text.Html
 import android.text.format.DateUtils
 import android.text.format.Formatter.formatShortFileSize
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.outlined.Description
@@ -25,10 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -109,30 +105,39 @@ fun RacoNoticeTabs(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RacoNoticePager(
+    showAllNoticesSelected: Boolean,
     pagerState: PagerState,
     subjects: List<Subject>,
     noticesWithFiles: List<NoticeWithFiles>,
     onNoticeClick: (NoticeWithFiles) -> Unit
 ) {
+    val filteredNotices = remember(showAllNoticesSelected, noticesWithFiles) {
+        noticesWithFiles.filter {
+            if (showAllNoticesSelected) !it.notice.llegit else true
+        }
+    }
+
     HorizontalPager(
         count = subjects.size + 1,
         state = pagerState,
     ) { page ->
         if (page == 0) {
             RacoNoticeList(
-                noticesWithFiles = noticesWithFiles,
+                noticesWithFiles = filteredNotices,
                 selectedSubject = null,
                 onNoticeClick = onNoticeClick
             )
         } else {
             RacoNoticeList(
-                noticesWithFiles = noticesWithFiles,
+                noticesWithFiles = filteredNotices,
                 selectedSubject = subjects.getOrNull(page - 1),
                 onNoticeClick = onNoticeClick
             )
         }
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoNoticeList(
     noticesWithFiles: List<NoticeWithFiles>,
@@ -161,6 +166,7 @@ fun RacoNoticeList(
                 NoticeListEntry(
                     noticeWithFiles = noticeWithFiles,
                     onNoticeClick = onNoticeClick,
+                    modifier = Modifier.animateItemPlacement()
                 )
             }
         } else {
@@ -209,7 +215,20 @@ fun NoticeListEntry(
             onNoticeClick(noticeWithFiles)
         },
         headlineText = {
-            Text(text = parsedTitle)
+            Text(
+                text = buildAnnotatedString {
+                    append(parsedTitle)
+                    if (!noticeWithFiles.notice.llegit) {
+                        withStyle(
+                            LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary)
+                                .toSpanStyle()
+                        ) {
+                            append(" ⦁")
+                        }
+                    }
+                },
+                fontWeight = if (noticeWithFiles.notice.llegit) FontWeight.Normal else FontWeight.ExtraBold
+            )
         },
         supportingText = if (noticeText.isNotBlank()) {
             {

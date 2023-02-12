@@ -55,11 +55,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildFeatures {
         compose true
@@ -78,6 +78,7 @@ dependencies {
     //Android dependencies
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
     //Compose dependencies
     implementation 'androidx.activity:activity-compose:1.6.1'
@@ -103,6 +104,8 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
 
+    implementation 'dev.patrickgold.compose.tooltip:tooltip:0.1.0'
+
     //Debug and test implementations
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -115,7 +118,7 @@ dependencies {
 // Compiler flag to use experimental Compose APIs
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
         freeCompilerArgs += [
                 "-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all-compatibility"
         ]

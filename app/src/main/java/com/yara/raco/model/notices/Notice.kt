@@ -1,9 +1,11 @@
 package com.yara.raco.model.notices
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import com.yara.raco.model.files.File
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Transient
 
 /**
  * Class that represents a notice.
@@ -36,5 +38,8 @@ data class Notice @JvmOverloads constructor(
     val dataCaducitat: String,
     @SerialName("adjunts")
     @Ignore
-    val adjunts: ArrayList<File> = arrayListOf()
+    val adjunts: ArrayList<File> = arrayListOf(),
+    @Transient
+    @ColumnInfo(defaultValue = "1")
+    var llegit: Boolean = false
 )

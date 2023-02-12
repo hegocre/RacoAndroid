@@ -40,4 +40,9 @@
     <string name="calendar">Calendario</string>
     <string name="location">Ubicación</string>
     <string name="no_subjects">No estás cursando ninguna asignatura</string>
+    <string name="scroll_to_today">Ir al día de hoy</string>
+    <string name="week">Semana</string>
+    <string name="day">Día</string>
+    <string name="show_unread_notices">Mostrar avisos no leídos</string>
+    <string name="show_all_notices">Mostrar todos los avisos</string>
 </resources>
