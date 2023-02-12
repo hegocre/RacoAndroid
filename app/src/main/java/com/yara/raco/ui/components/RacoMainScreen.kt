@@ -46,8 +46,14 @@ fun RacoMainScreen(
     )
 
     val context = LocalContext.current
+    val preferencesManager = PreferencesManager.getInstance(context)
 
-    var dayCalendarViewSelected by rememberSaveable { mutableStateOf(false) }
+    val showAllNoticesSelected by preferencesManager.getShowAllNoticesSelected().collectAsState(
+        initial = true
+    )
+    val dayCalendarViewSelected by preferencesManager.getDayCalendarViewSelected().collectAsState(
+        initial = false
+    )
 
     val currentRoute = backStackEntry.value?.destination?.route
     val onBackPress: (() -> Unit)? = when {
