@@ -113,7 +113,7 @@ fun RacoNoticePager(
 ) {
     val filteredNotices = remember(showAllNoticesSelected, noticesWithFiles) {
         noticesWithFiles.filter {
-            if (showAllNoticesSelected) !it.notice.llegit else true
+            if (!showAllNoticesSelected) !it.notice.llegit else true
         }
     }
 

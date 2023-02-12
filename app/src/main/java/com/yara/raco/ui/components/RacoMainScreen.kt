@@ -132,8 +132,8 @@ fun RacoMainScreen(
             )
             RacoScreen.Notes.name -> mapOf(
                 Pair(
-                    if (!showAllNoticesSelected) Icons.Default.MarkEmailUnread else Icons.Default.Markunread,
-                    if (!showAllNoticesSelected) stringResource(id = R.string.show_unread_notices) else stringResource(
+                    if (showAllNoticesSelected) Icons.Default.MarkEmailUnread else Icons.Default.Drafts,
+                    if (showAllNoticesSelected) stringResource(id = R.string.show_unread_notices) else stringResource(
                         id = R.string.show_all_notices
                     )
                 ) to {

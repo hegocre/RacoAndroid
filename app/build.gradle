@@ -18,7 +18,7 @@ android {
         applicationId "com.yara.raco"
         minSdk 26
         targetSdk 33
-        versionCode 20
+        versionCode 22
         versionName "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -103,8 +103,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
-
-    implementation 'dev.patrickgold.compose.tooltip:tooltip:0.1.0'
 
     //Debug and test implementations
     testImplementation 'junit:junit:4.13.2'

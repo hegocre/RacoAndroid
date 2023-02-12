@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import com.yara.raco.R
-import dev.patrickgold.compose.tooltip.tooltip
+import com.yara.raco.ui.components.tooltip.tooltip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
