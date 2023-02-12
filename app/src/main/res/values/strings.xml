@@ -40,4 +40,9 @@
     <string name="calendar">Calendari</string>
     <string name="location">Ubicació</string>
     <string name="no_subjects">No estàs cursant cap assignatura</string>
+    <string name="scroll_to_today">Ves al dia d\'avui</string>
+    <string name="week">Setmana</string>
+    <string name="day">Dia</string>
+    <string name="show_unread_notices">Mostrar avisos no llegits</string>
+    <string name="show_all_notices">Mostrar tots els avisos</string>
 </resources>

@@ -40,4 +40,9 @@
     <string name="calendar">Calendar</string>
     <string name="location">Location</string>
     <string name="no_subjects">You are not taking any course</string>
+    <string name="scroll_to_today">Go to today</string>
+    <string name="week">Week</string>
+    <string name="day">Day</string>
+    <string name="show_unread_notices">Show unread notices</string>
+    <string name="show_all_notices">Show all notices</string>
 </resources>

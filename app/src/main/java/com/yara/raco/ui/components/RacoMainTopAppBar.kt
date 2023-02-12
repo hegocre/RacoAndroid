@@ -13,10 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import com.yara.raco.R
+import dev.patrickgold.compose.tooltip.tooltip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +26,7 @@ fun RacoMainTopAppBar(
     title: String,
     scrollBehavior: TopAppBarScrollBehavior,
     onBackPress: (() -> Unit)? = null,
-    iconActions: Map<ImageVector, () -> Unit>? = null,
+    iconActions: Map<Pair<ImageVector, String>, () -> Unit>? = null,
     dropdownActions: Map<String, () -> Unit>? = null,
 ) {
     var menuExpanded by rememberSaveable {
@@ -53,8 +55,8 @@ fun RacoMainTopAppBar(
         },
         actions = {
             iconActions?.forEach { (imageVector, function) ->
-                IconButton(onClick = function) {
-                    Icon(imageVector = imageVector, contentDescription = null)
+                IconButton(onClick = function, modifier = Modifier.tooltip(imageVector.second)) {
+                    Icon(imageVector = imageVector.first, contentDescription = imageVector.second)
                 }
             }
 

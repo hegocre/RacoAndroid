@@ -103,6 +103,8 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
 
+    implementation 'dev.patrickgold.compose.tooltip:tooltip:0.1.0'
+
     //Debug and test implementations
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
