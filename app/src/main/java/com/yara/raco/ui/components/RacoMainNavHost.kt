@@ -105,11 +105,6 @@ fun RacoMainNavHost(
                             navHostController.navigate(
                                 "${RacoScreen.Notes.name}/details/${noticeWithFiles.notice.id}"
                             )
-                            if (!noticeWithFiles.notice.llegit) {
-                                coroutineScope.launch {
-                                    racoViewModel.setNoticeRead(noticeWithFiles.notice.id)
-                                }
-                            }
                         }
                     )
                 }
@@ -142,6 +137,13 @@ fun RacoMainNavHost(
                     detailedNoticeState.detailed != null -> {
                         detailedNoticeState.detailed?.let { noticeWithFiles ->
                             Column {
+                                LaunchedEffect(noticeWithFiles.notice.id) {
+                                    if (!noticeWithFiles.notice.llegit) {
+                                        coroutineScope.launch {
+                                            racoViewModel.setNoticeRead(noticeWithFiles.notice.id)
+                                        }
+                                    }
+                                }
                                 DetailedNoticeWithFiles(
                                     noticeWithFiles = noticeWithFiles,
                                     onFileClick = { file -> racoViewModel.downloadFile(file) }
