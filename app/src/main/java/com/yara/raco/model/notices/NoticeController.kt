@@ -39,6 +39,8 @@ class NoticeController private constructor(context: Context)  {
 
     fun getNotices() = racoDatabase.noticeDAO.fetchAllNotices()
 
+    suspend fun setNoticeRead(noticeId: Int) = racoDatabase.noticeDAO.setReadNotice(noticeId)
+
     suspend fun getNoticeWithFiles(id: Int) = racoDatabase.noticeDAO.fetchNoticeWithFiles(id)
 
     fun downloadAttachment(context: Context, file: File) {

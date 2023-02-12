@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Today
-import androidx.compose.material.icons.filled.ViewDay
-import androidx.compose.material.icons.filled.ViewWeek
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,6 +24,7 @@ import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
 import com.yara.raco.ui.theme.RacoTheme
 import com.yara.raco.ui.viewmodel.RacoViewModel
+import com.yara.raco.utils.PreferencesManager
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -88,10 +87,12 @@ fun RacoMainScreen(
     )
 
     val coroutineScope = rememberCoroutineScope()
-    val iconActions: Map<ImageVector, () -> Unit>? =
+    val iconActions: Map<Pair<ImageVector, String>, () -> Unit>? =
         when (backStackEntry.value?.destination?.route) {
             RacoScreen.Schedule.name -> mapOf(
-                Icons.Default.Today to {
+                Pair(
+                    Icons.Default.Today, stringResource(id = R.string.scroll_to_today)
+                ) to {
                     if (dayCalendarViewSelected) {
                         coroutineScope.launch {
                             dayPagerState.animateScrollToPage(
@@ -112,8 +113,27 @@ fun RacoMainScreen(
                         }
                     }
                 },
-                (if (dayCalendarViewSelected) Icons.Default.ViewWeek else Icons.Default.ViewDay) to {
-                    dayCalendarViewSelected = !dayCalendarViewSelected
+                Pair(
+                    if (dayCalendarViewSelected) Icons.Default.ViewWeek else Icons.Default.ViewDay,
+                    if (dayCalendarViewSelected) stringResource(id = R.string.week) else stringResource(
+                        id = R.string.day
+                    )
+                ) to {
+                    coroutineScope.launch {
+                        preferencesManager.setDayCalendarViewSelected(!dayCalendarViewSelected)
+                    }
+                }
+            )
+            RacoScreen.Notes.name -> mapOf(
+                Pair(
+                    if (!showAllNoticesSelected) Icons.Default.MarkEmailUnread else Icons.Default.Markunread,
+                    if (!showAllNoticesSelected) stringResource(id = R.string.show_unread_notices) else stringResource(
+                        id = R.string.show_all_notices
+                    )
+                ) to {
+                    coroutineScope.launch {
+                        preferencesManager.setShowAllNoticesSelected(!showAllNoticesSelected)
+                    }
                 }
             )
             else -> null
@@ -157,6 +177,7 @@ fun RacoMainScreen(
             RacoMainNavHost(
                 navHostController = navController,
                 racoViewModel = racoViewModel,
+                showAllNoticesSelected = showAllNoticesSelected,
                 dayCalendarViewSelected = dayCalendarViewSelected,
                 dayPagerState = dayPagerState,
                 weekPagerState = weekPagerState,

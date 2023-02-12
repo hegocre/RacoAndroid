@@ -34,6 +34,7 @@ import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.viewmodel.RacoViewModel
 import com.yara.raco.utils.Result
+import kotlinx.coroutines.launch
 import java.util.*
 
 data class DetailsUiState<T>(
@@ -47,6 +48,7 @@ data class DetailsUiState<T>(
 fun RacoMainNavHost(
     navHostController: NavHostController,
     racoViewModel: RacoViewModel,
+    showAllNoticesSelected: Boolean,
     dayCalendarViewSelected: Boolean,
     dayPagerState: PagerState,
     weekPagerState: PagerState,
@@ -75,6 +77,8 @@ fun RacoMainNavHost(
 
     val events by racoViewModel.events.observeAsState(initial = emptyList())
 
+    val coroutineScope = rememberCoroutineScope()
+
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Notes.name,
@@ -93,6 +97,7 @@ fun RacoMainNavHost(
                     isRefreshing = isRefreshing,
                     onRefresh = { racoViewModel.refresh() }) {
                     RacoNoticePager(
+                        showAllNoticesSelected = showAllNoticesSelected,
                         pagerState = pagerState,
                         subjects = sortedSubjects,
                         noticesWithFiles = sortedNoticesWithFiles,
@@ -100,6 +105,11 @@ fun RacoMainNavHost(
                             navHostController.navigate(
                                 "${RacoScreen.Notes.name}/details/${noticeWithFiles.notice.id}"
                             )
+                            if (!noticeWithFiles.notice.llegit) {
+                                coroutineScope.launch {
+                                    racoViewModel.setNoticeRead(noticeWithFiles.notice.id)
+                                }
+                            }
                         }
                     )
                 }

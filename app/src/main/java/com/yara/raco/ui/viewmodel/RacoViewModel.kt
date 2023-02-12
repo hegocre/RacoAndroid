@@ -115,6 +115,10 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
         return if (noticeWithFiles != null) Result.Success(noticeWithFiles) else Result.Error(0)
     }
 
+    suspend fun setNoticeRead(noticeId: Int) {
+        noticeController.setNoticeRead(noticeId)
+    }
+
     suspend fun getEvaluationDetails(evaluationId: Int): Result<EvaluationWithGrades> {
         val evaluationWithGrades = evaluationController.getEvaluationWithGrades(evaluationId)
         return if (evaluationWithGrades != null) Result.Success(evaluationWithGrades) else Result.Error(
