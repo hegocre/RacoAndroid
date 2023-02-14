@@ -181,13 +181,15 @@ class NoticeNotificationWorker(context: Context, workerParams: WorkerParameters)
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
             return PeriodicWorkRequest.Builder(
-                NoticeNotificationWorker::class.java, 15, TimeUnit.MINUTES
+                NoticeNotificationWorker::class.java,
+                PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS,
+                TimeUnit.MILLISECONDS
             )
                 .addTag("com.yara.raco.NOTICE_NOTIFICATION_WORK")
                 .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .build()

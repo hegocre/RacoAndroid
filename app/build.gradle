@@ -18,8 +18,8 @@ android {
         applicationId "com.yara.raco"
         minSdk 26
         targetSdk 33
-        versionCode 23
-        versionName "1.0.3"
+        versionCode 24
+        versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -98,7 +98,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-swiperefresh:$accompanist_version"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
 
-    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
 
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 

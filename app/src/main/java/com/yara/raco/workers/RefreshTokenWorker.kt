@@ -56,7 +56,7 @@ class RefreshTokenWorker(context: Context, workerParams: WorkerParameters) :
                 .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .build()
