@@ -56,12 +56,6 @@ class MainActivity : ComponentActivity() {
 
         val racoViewModel by viewModels<RacoViewModel>()
 
-        racoViewModel.shouldLogOut.observe(this) { shouldLogOut ->
-            if (shouldLogOut) {
-                logout()
-            }
-        }
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val notificationNoticeId = intent.getIntExtra("NOTICE_ID", -1)
@@ -70,7 +64,8 @@ class MainActivity : ComponentActivity() {
             RacoMainScreen(
                 racoViewModel = racoViewModel,
                 notificationNoticeId = notificationNoticeId,
-                onLogOut = this::logout
+                onLogOut = this::logout,
+                onReLogin = this::launchLogin
             )
         }
     }

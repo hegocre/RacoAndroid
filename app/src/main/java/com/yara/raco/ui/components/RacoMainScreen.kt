@@ -37,7 +37,8 @@ import java.util.*
 fun RacoMainScreen(
     racoViewModel: RacoViewModel,
     notificationNoticeId: Int,
-    onLogOut: () -> Unit
+    onLogOut: () -> Unit,
+    onReLogin: () -> Unit
 ) {
     val navController = rememberNavController()
     val backStackEntry = navController.currentBackStackEntryAsState()
@@ -149,6 +150,18 @@ fun RacoMainScreen(
         rememberTopAppBarState()
     )
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    if (racoViewModel.shouldReLogin) {
+        LaunchedEffect(snackbarHostState) {
+            when (snackbarHostState.showSnackbar(
+                message = context.getString(R.string.session_expired),
+                actionLabel = context.getString(R.string.login)
+            )) {
+                SnackbarResult.ActionPerformed -> onReLogin()
+                SnackbarResult.Dismissed -> {}
+            }
+        }
+    }
 
     RacoTheme {
         Scaffold(
@@ -179,6 +192,7 @@ fun RacoMainScreen(
                     }
                 )
             },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { paddingValues ->
             RacoMainNavHost(
                 navHostController = navController,
