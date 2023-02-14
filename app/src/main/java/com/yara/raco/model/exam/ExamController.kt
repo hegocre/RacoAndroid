@@ -34,6 +34,12 @@ class ExamController private constructor(context: Context) {
 
     fun getExams() = racoDatabase.examDAO.fetchAllExams()
 
+    suspend fun deleteAllExams() {
+        withContext(Dispatchers.IO) {
+            racoDatabase.examDAO.deleteAllExams()
+        }
+    }
+
     companion object {
         private var INSTANCE: ExamController? = null
 

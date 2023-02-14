@@ -54,8 +54,8 @@ class EvaluationController private constructor(context: Context) {
 
     suspend fun deleteAllEvaluations() {
         withContext(Dispatchers.IO) {
-            racoDatabase.evaluationDAO.deleteAllEvaluations()
             racoDatabase.gradeDAO.deleteAllGrades()
+            racoDatabase.evaluationDAO.deleteAllEvaluations()
         }
     }
 
