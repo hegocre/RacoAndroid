@@ -26,7 +26,7 @@ import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.components.ScheduleEvent
 import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
-import com.yara.raco.workers.LogOutWorker
+import com.yara.raco.workers.RefreshTokenWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

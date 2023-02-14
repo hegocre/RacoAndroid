@@ -1,9 +1,11 @@
 package com.yara.raco.workers
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import com.yara.raco.model.user.UserController
-import com.yara.raco.utils.ResultCode
 
 class LogOutWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
@@ -17,26 +19,6 @@ class LogOutWorker(context: Context, workerParams: WorkerParameters) :
             return OneTimeWorkRequest.Builder(LogOutWorker::class.java)
                 .addTag("com.yara.raco.LOG_OUT_WORK")
                 .build()
-        }
-
-        fun getLastExecutionResult(context: Context): Int {
-            val workInfos =
-                WorkManager.getInstance(context).getWorkInfosByTag("com.yara.raco.LOG_OUT_WORK")
-                    .get()
-            val lastWork = workInfos.lastOrNull {
-                it.state != WorkInfo.State.RUNNING && it.state != WorkInfo.State.ENQUEUED
-            } ?: return ResultCode.SUCCESS
-            return if (lastWork.state == WorkInfo.State.SUCCEEDED) {
-                ResultCode.SUCCESS
-            } else {
-                if (lastWork.outputData.getInt(
-                        "RESULT_CODE",
-                        ResultCode.UNKNOWN
-                    ) == ResultCode.INVALID_TOKEN
-                ) {
-                    ResultCode.INVALID_TOKEN
-                } else ResultCode.UNKNOWN
-            }
         }
 
         fun executeSelf(context: Context) {
