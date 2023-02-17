@@ -23,9 +23,9 @@ import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.components.ScheduleEvent
+import com.yara.raco.utils.PreferencesManager
 import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
-import com.yara.raco.workers.RefreshTokenWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -73,15 +73,17 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     init {
         viewModelScope.launch {
             _isRefreshing.emit(true)
-            when (RefreshTokenWorker.getLastExecutionResult(application)) {
-                ResultCode.INVALID_TOKEN -> shouldReLogin = true
+            when (PreferencesManager.getInstance(application).getLastRefreshWorkerStatusCode()) {
+                ResultCode.INVALID_TOKEN -> {
+                    shouldReLogin = true
+                    _isRefreshing.emit(false)
+                }
                 ResultCode.SUCCESS -> {
                     shouldRefreshToken = false
                     refresh()
                 }
                 ResultCode.UNKNOWN, ResultCode.ERROR_API_BAD_RESPONSE -> {
                     shouldRefreshToken = true
-                    _isRefreshing.emit(false)
                     refresh()
                 }
             }

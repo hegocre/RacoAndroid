@@ -70,6 +70,7 @@ class UserController private constructor(context: Context) {
         if (loginResult is Result.Success) {
             val accessToken = loginResult.data
             preferencesManager.setAccessToken(accessToken)
+            preferencesManager.setLastRefreshWorkerStatusCode(ResultCode.UNKNOWN)
             return true
         }
 
@@ -82,15 +83,19 @@ class UserController private constructor(context: Context) {
         if (refreshResult is Result.Success) {
             val accessToken = refreshResult.data
             preferencesManager.setAccessToken(accessToken)
+            preferencesManager.setLastRefreshWorkerStatusCode(ResultCode.SUCCESS)
             return ResultCode.SUCCESS
         }
         if (refreshResult is Result.Error) {
             return if (refreshResult.code == 400) {
+                preferencesManager.setLastRefreshWorkerStatusCode(ResultCode.INVALID_TOKEN)
                 ResultCode.INVALID_TOKEN
             } else {
+                preferencesManager.setLastRefreshWorkerStatusCode(ResultCode.ERROR_API_BAD_RESPONSE)
                 ResultCode.ERROR_API_BAD_RESPONSE
             }
         }
+        preferencesManager.setLastRefreshWorkerStatusCode(ResultCode.UNKNOWN)
         return ResultCode.UNKNOWN
     }
 
