@@ -18,7 +18,7 @@ android {
         applicationId "com.yara.raco"
         minSdk 26
         targetSdk 33
-        versionCode 24
+        versionCode 26
         versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

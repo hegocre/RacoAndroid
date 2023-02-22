@@ -82,7 +82,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
                     shouldRefreshToken = false
                     refresh()
                 }
-                ResultCode.UNKNOWN, ResultCode.ERROR_API_BAD_RESPONSE -> {
+                else -> {
                     shouldRefreshToken = true
                     refresh()
                 }
