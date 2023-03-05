@@ -22,4 +22,7 @@ interface EventDAO {
 
     @Query("DELETE FROM events WHERE nom = :nom and inici = :inici")
     suspend fun deleteEvent(nom: String, inici: String)
+
+    @Query("DELETE FROM events")
+    suspend fun deleteAllEvents()
 }

@@ -37,6 +37,12 @@ class ScheduleController private constructor(context: Context)  {
 
     fun getSchedule() = racoDatabase.scheduleDAO.fetchAllSchedules()
 
+    suspend fun deleteAllSchedules() {
+        withContext(Dispatchers.IO) {
+            racoDatabase.scheduleDAO.deleteAllSchedules()
+        }
+    }
+
     companion object {
         private var INSTANCE: ScheduleController? = null
 

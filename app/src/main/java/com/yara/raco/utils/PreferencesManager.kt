@@ -48,6 +48,12 @@ class PreferencesManager private constructor(context: Context) {
     fun setLastStartedVersionCode(lastStartedVersion: Int) = _sharedPreferences.edit()
         .putInt("last_started_version", lastStartedVersion).apply()
 
+    fun getLastRefreshWorkerStatusCode(): Int =
+        _sharedPreferences.getInt("last_refresh_worker_token", ResultCode.UNKNOWN)
+
+    fun setLastRefreshWorkerStatusCode(lastRefreshStatus: Int) = _sharedPreferences.edit()
+        .putInt("last_refresh_worker_token", lastRefreshStatus).apply()
+
     fun getDayCalendarViewSelected(): Flow<Boolean> =
         _dataStore.getPreference(PreferenceKeys.DAY_CALENDAR_VIEW_SELECTED, false)
 

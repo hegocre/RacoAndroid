@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.yara.raco.model.evaluation.EvaluationController
 import com.yara.raco.model.evaluation.EvaluationWithGrades
@@ -24,9 +23,9 @@ import com.yara.raco.model.subject.Subject
 import com.yara.raco.model.subject.SubjectController
 import com.yara.raco.model.user.UserController
 import com.yara.raco.ui.components.ScheduleEvent
+import com.yara.raco.utils.PreferencesManager
 import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
-import com.yara.raco.workers.LogOutWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,9 +46,7 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
-    private val _shouldLogOut = MutableLiveData(false)
-    val shouldLogOut: LiveData<Boolean>
-        get() = _shouldLogOut
+    var shouldReLogin by mutableStateOf(false)
 
     val subjects: LiveData<List<Subject>>
         get() = subjectController.getSubjects()
@@ -76,13 +73,19 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     init {
         viewModelScope.launch {
             _isRefreshing.emit(true)
-            when (LogOutWorker.getLastExecutionResult(application)) {
-                ResultCode.INVALID_TOKEN -> _shouldLogOut.value = true
+            when (PreferencesManager.getInstance(application).getLastRefreshWorkerStatusCode()) {
+                ResultCode.INVALID_TOKEN -> {
+                    shouldReLogin = true
+                    _isRefreshing.emit(false)
+                }
                 ResultCode.SUCCESS -> {
                     shouldRefreshToken = false
                     refresh()
                 }
-                ResultCode.UNKNOWN, ResultCode.ERROR_API_BAD_RESPONSE -> _isRefreshing.emit(false)
+                else -> {
+                    shouldRefreshToken = true
+                    refresh()
+                }
             }
         }
     }
@@ -90,10 +93,14 @@ class RacoViewModel(application: Application) : AndroidViewModel(application) {
     fun refresh() {
         viewModelScope.launch {
             _isRefreshing.emit(true)
+            if (shouldReLogin) {
+                _isRefreshing.emit(false)
+                return@launch
+            }
             if (shouldRefreshToken) {
                 when (userController.refreshToken()) {
                     ResultCode.INVALID_TOKEN -> {
-                        _shouldLogOut.value = true
+                        shouldReLogin = true
                         _isRefreshing.emit(false)
                         return@launch
                     }

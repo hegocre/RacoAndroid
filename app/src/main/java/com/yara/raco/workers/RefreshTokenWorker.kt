@@ -3,6 +3,7 @@ package com.yara.raco.workers
 import android.content.Context
 import androidx.work.*
 import com.yara.raco.model.user.UserController
+import com.yara.raco.utils.PreferencesManager
 import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +13,12 @@ class RefreshTokenWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
+            if (PreferencesManager.getInstance(applicationContext).getLastRefreshWorkerStatusCode()
+                == ResultCode.INVALID_TOKEN
+            ) {
+                return@withContext Result.failure()
+            }
+
             val userController = UserController.getInstance(applicationContext)
 
             if (!userController.isLoggedIn) {
@@ -38,7 +45,7 @@ class RefreshTokenWorker(context: Context, workerParams: WorkerParameters) :
                 .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .build()

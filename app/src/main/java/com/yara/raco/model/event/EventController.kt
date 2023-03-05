@@ -39,6 +39,12 @@ class EventController private constructor(context: Context) {
 
     fun getEvents() = racoDatabase.eventDAO.fetchAllEvents()
 
+    suspend fun deleteAllEvents() {
+        withContext(Dispatchers.IO) {
+            racoDatabase.eventDAO.deleteAllEvents()
+        }
+    }
+
     companion object {
         private var INSTANCE: EventController? = null
 
