@@ -323,6 +323,7 @@ fun RacoMainNavHost(
     }
 }
 
+@Suppress("deprecation")
 @Composable
 fun RacoSwipeRefresh(
     isRefreshing: Boolean,
