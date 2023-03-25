@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.yara.raco.ui.components
+package com.yara.raco.ui.components.htmltext
 
 import android.graphics.Typeface
 import android.text.Html
