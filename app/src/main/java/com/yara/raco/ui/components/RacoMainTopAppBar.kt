@@ -55,8 +55,13 @@ fun RacoMainTopAppBar(
         },
         actions = {
             iconActions?.forEach { (imageVector, function) ->
-                IconButton(onClick = function, modifier = Modifier.tooltip(imageVector.second)) {
-                    Icon(imageVector = imageVector.first, contentDescription = imageVector.second)
+                RichTooltipBox(text = { Text(text = imageVector.second) }) {
+                    IconButton(onClick = function, modifier = Modifier.tooltipAnchor()) {
+                        Icon(
+                            imageVector = imageVector.first,
+                            contentDescription = imageVector.second
+                        )
+                    }
                 }
             }
 

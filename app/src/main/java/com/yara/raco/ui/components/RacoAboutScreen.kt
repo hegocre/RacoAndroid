@@ -341,12 +341,6 @@ val licenses = listOf(
         licenseUrl = "https://github.com/square/okhttp/blob/master/LICENSE.txt"
     ),
     LicenseNotice(
-        name = "Compose Tooltip",
-        copyright = "Copyright 2022 Patrick Goldinger",
-        licenseName = "Apache License 2.0",
-        licenseUrl = "https://github.com/patrickgold/compose-tooltip/blob/main/LICENSE"
-    ),
-    LicenseNotice(
         name = "WeekSchedule",
         copyright = "Copyright 2021 Daniel Rampelt",
         licenseName = "MIT License",
