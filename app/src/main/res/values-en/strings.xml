@@ -46,4 +46,5 @@
     <string name="show_unread_notices">Show unread notices</string>
     <string name="show_all_notices">Show all notices</string>
     <string name="session_expired">Your session has expired. Please, log in again</string>
+    <string name="subject">Subject</string>
 </resources>

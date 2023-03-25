@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -434,20 +432,14 @@ fun EditableGradeWeight(
     onGradeDelete: (MutableGrade) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalAlignment = CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+        //horizontalArrangement = Arrangement.SpaceBetween
     ) {
         OutlinedTextField(
             value = grade.name,
             onValueChange = onNameChange,
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.grade_name),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
-                )
-            },
+            label = { Text(text = stringResource(id = R.string.grade_name)) },
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 16.dp),
@@ -457,17 +449,17 @@ fun EditableGradeWeight(
         OutlinedTextField(
             value = grade.weight,
             onValueChange = onWeightChange,
-            modifier = Modifier
-                .width(120.dp),
+            modifier = Modifier.width(90.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            trailingIcon = {
-                Icon(imageVector = Icons.Default.Percent, contentDescription = "")
-            },
+            suffix = { Text(text = "%") },
             isError = grade.weight != "" && grade.weight.replace(",", ".").toDoubleOrNull() == null
         )
-        IconButton(onClick = { onGradeDelete(grade) }) {
+        IconButton(
+            onClick = { onGradeDelete(grade) },
+            modifier = Modifier.align(CenterVertically)
+        ) {
             Icon(
                 Icons.Outlined.Delete,
                 contentDescription = stringResource(id = R.string.delete_grade)
@@ -555,45 +547,44 @@ fun AddEvaluationDialog(
                             rememberScrollState()
                         )
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable { subjectsMenuExpanded = true },
+                    ExposedDropdownMenuBox(
+                        expanded = subjectsMenuExpanded,
+                        onExpandedChange = { subjectsMenuExpanded = !subjectsMenuExpanded }
                     ) {
-                        Row(verticalAlignment = CenterVertically) {
-                            Text(
-                                text = subjects.find { it.id == subjectId }?.nom ?: "",
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = { subjectsMenuExpanded = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                        DropdownMenu(
+                        OutlinedTextField(
+                            modifier = Modifier.menuAnchor(),
+                            value = subjects.find { it.id == subjectId }?.nom ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectsMenuExpanded) },
+                            label = { Text(text = stringResource(id = R.string.subject)) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+
+                        ExposedDropdownMenu(
                             expanded = subjectsMenuExpanded,
-                            onDismissRequest = { subjectsMenuExpanded = false },
+                            onDismissRequest = { subjectsMenuExpanded = false }
                         ) {
                             subjects.forEach { subject ->
-                                DropdownMenuItem(text = { Text(text = subject.nom) }, onClick = {
-                                    setSubjectId(subject.id)
-                                    subjectsMenuExpanded = false
-                                })
+                                DropdownMenuItem(
+                                    text = { Text(text = subject.nom) },
+                                    onClick = {
+                                        setSubjectId(subject.id)
+                                        subjectsMenuExpanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
                             }
                         }
                     }
 
                     OutlinedTextField(
-                        modifier = Modifier
-                            .padding(top = 16.dp, bottom = 24.dp),
+                        modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
                         value = evaluationName,
                         onValueChange = setEvaluationName,
                         singleLine = true,
                         maxLines = 1,
-                        placeholder = {
-                            Text(text = stringResource(id = R.string.evaluation_name))
-                        }
+                        label = { Text(text = stringResource(id = R.string.evaluation_name)) }
                     )
                 }
 

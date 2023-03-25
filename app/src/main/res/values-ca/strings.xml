@@ -46,4 +46,5 @@
     <string name="show_unread_notices">Mostrar avisos no llegits</string>
     <string name="show_all_notices">Mostrar tots els avisos</string>
     <string name="session_expired">La sessió ha caducat. Si us plau, inicia sessió de nou</string>
+    <string name="subject">Assignatura</string>
 </resources>
