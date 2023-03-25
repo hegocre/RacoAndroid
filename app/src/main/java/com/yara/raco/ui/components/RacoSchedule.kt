@@ -2,6 +2,8 @@ package com.yara.raco.ui.components
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
@@ -35,9 +37,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
 import com.yara.raco.R
 import com.yara.raco.model.event.Event
 import com.yara.raco.model.exam.Exam
@@ -745,7 +744,7 @@ fun ScheduleEventDetailsDialog(
 
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoScheduleDay(
     schedules: List<Schedule>,
@@ -795,7 +794,7 @@ fun RacoScheduleDay(
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
     }
 
-    HorizontalPager(count = pages, state = pagerState) { page ->
+    HorizontalPager(pageCount = pages, state = pagerState) { page ->
         Column(horizontalAlignment = Start) {
             val currentDay = firstCalendarDay.plusDays(page.toLong())
 
@@ -841,7 +840,7 @@ fun RacoScheduleDay(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoScheduleWeek(
     schedules: List<Schedule>,
@@ -891,7 +890,7 @@ fun RacoScheduleWeek(
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
     }
 
-    HorizontalPager(count = pages, state = pagerState) { page ->
+    HorizontalPager(pageCount = pages, state = pagerState) { page ->
         val firstWeekDay = firstCalendarDay.plusWeeks(page.toLong())
         val lastWeekDay = firstCalendarDay.plusWeeks(page.toLong() + 1).minusDays(1L)
 
