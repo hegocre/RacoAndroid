@@ -39,6 +39,8 @@ import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
+import com.yara.raco.ui.components.htmltext.HtmlText
+import com.yara.raco.ui.components.pager.pagerTabIndicatorOffset
 import com.yara.raco.ui.theme.RacoTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -183,7 +185,6 @@ fun RacoNoticeList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoticeListEntry(
     noticeWithFiles: NoticeWithFiles,
@@ -214,7 +215,7 @@ fun NoticeListEntry(
         modifier = modifier.clickable {
             onNoticeClick(noticeWithFiles)
         },
-        headlineText = {
+        headlineContent = {
             Text(
                 text = buildAnnotatedString {
                     append(parsedTitle)
@@ -230,7 +231,7 @@ fun NoticeListEntry(
                 fontWeight = if (noticeWithFiles.notice.llegit) FontWeight.Normal else FontWeight.ExtraBold
             )
         },
-        supportingText = if (noticeText.isNotBlank()) {
+        supportingContent = if (noticeText.isNotBlank()) {
             {
                 if (noticeText.isNotBlank()) {
                     if (noticeText.isHtml()) {
@@ -252,7 +253,7 @@ fun NoticeListEntry(
                 }
             }
         } else null,
-        overlineText = {
+        overlineContent = {
             val attachmentInlineContent = mapOf(
                 Pair(
                     "attachment_icon",

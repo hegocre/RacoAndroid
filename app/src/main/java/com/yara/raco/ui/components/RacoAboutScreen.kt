@@ -243,7 +243,6 @@ fun AboutTextField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LicensesDialog(
     licenses: List<LicenseNotice>,
@@ -272,13 +271,13 @@ fun LicensesDialog(
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                     items(items = licenses, key = { it.name }) { license ->
                         ListItem(
-                            headlineText = {
+                            headlineContent = {
                                 Text(text = license.name)
                             },
-                            overlineText = {
+                            overlineContent = {
                                 Text(text = license.licenseName)
                             },
-                            supportingText = {
+                            supportingContent = {
                                 Text(text = license.copyright)
                             },
                             modifier = Modifier

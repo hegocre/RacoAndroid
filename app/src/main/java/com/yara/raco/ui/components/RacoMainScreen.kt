@@ -1,9 +1,11 @@
 package com.yara.raco.ui.components
 
 import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,8 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
 import com.yara.raco.R
 import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.activities.AboutActivity
@@ -204,7 +204,7 @@ fun RacoMainScreen(
                 modifier = Modifier
                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                     .padding(paddingValues)
-                    .consumedWindowInsets(paddingValues),
+                    .consumeWindowInsets(paddingValues),
             )
 
             if (showLogOutDialog) {

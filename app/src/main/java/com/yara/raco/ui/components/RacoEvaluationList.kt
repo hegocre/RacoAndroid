@@ -91,10 +91,7 @@ fun rememberEditableEvaluationState(evaluationWithGrades: EvaluationWithGrades):
         EditableEvaluationState(evaluationWithGrades)
     }
 
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoEvaluationList(
     subjects: List<Subject>,
@@ -174,7 +171,7 @@ fun RacoEvaluationList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEvaluation(
     evaluation: EvaluationWithGrades,
@@ -203,7 +200,7 @@ fun DetailedEvaluation(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .consumedWindowInsets(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
             item(key = "evaluation_header") {
                 ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -263,7 +260,7 @@ fun DetailedEvaluation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditableEvaluation(
     editableEvaluationState: EditableEvaluationState,
@@ -288,7 +285,7 @@ fun EditableEvaluation(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .consumedWindowInsets(paddingValues)
+                .consumeWindowInsets(paddingValues)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -378,7 +375,6 @@ fun EditableEvaluation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableGradeMark(
     grade: Grade,
@@ -392,12 +388,12 @@ fun EditableGradeMark(
     }
 
     ListItem(
-        headlineText = {
+        headlineContent = {
             Text(
                 text = grade.name
             )
         },
-        supportingText = {
+        supportingContent = {
             Text(
                 text = "${String.format("%.0f", grade.weight)}%"
             )
@@ -430,7 +426,6 @@ fun EditableGradeMark(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableGradeWeight(
     grade: MutableGrade,
@@ -481,7 +476,6 @@ fun EditableGradeWeight(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EvaluationListEntry(
     evaluation: EvaluationWithGrades,
@@ -493,13 +487,13 @@ fun EvaluationListEntry(
             .clickable {
                 onGradeClick(evaluation)
             },
-        headlineText = {
+        headlineContent = {
             Text(
                 text = evaluation.evaluation.name,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        supportingText = {
+        supportingContent = {
             GradeMarkWithColor(
                 evaluation.getFinalMark(),
                 MaterialTheme.typography.titleLarge
