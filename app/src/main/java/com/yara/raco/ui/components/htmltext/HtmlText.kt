@@ -105,7 +105,7 @@ fun HtmlText(
                             .firstOrNull()
                             ?.let { sa ->
                                 if (sa.tag == "url") {
-                                    if (sa.tag.startsWith("http://") || sa.tag.startsWith("https://"))
+                                    if (sa.item.startsWith("http://") || sa.item.startsWith("https://"))
                                         uriHandler.openUri(sa.item)
                                     else
                                         uriHandler.openUri("https://raco.fib.upc.edu${sa.item}")
