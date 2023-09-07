@@ -210,7 +210,7 @@ fun RacoMainScreen(
             },
             bottomBar = {
                 RacoMainNavigationBar(
-                    allScreens = RacoScreen.entries,
+                    allScreens = RacoScreen.values().asList(),
                     currentScreen = currentScreen,
                     onScreenSelected = { racoScreen ->
                         navController.navigate(racoScreen.name) {
