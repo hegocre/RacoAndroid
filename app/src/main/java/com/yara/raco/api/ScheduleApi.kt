@@ -1,14 +1,13 @@
 package com.yara.raco.api
 
 import com.yara.raco.model.schedule.Schedule
+import com.yara.raco.utils.Json
 import com.yara.raco.utils.OkHttpRequest
 import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class ScheduleApi private constructor() {
 
