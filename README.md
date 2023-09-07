@@ -6,12 +6,12 @@ de l'assignatura de Software Lliure i Desenvolupament Social.
 # Funcionalitats
 
 - Consultar els avisos i rebre notificacions
-- Consultar el teu horari
+- Consultar el teu horari, els teus examens, i dies festius.
 - Dur a terme un control sobre les avaluacions
 
 # Captures de pantalla
 
-| ![Screenshot 1](/screenshots/screenshot1.png) | ![Screenshot 2](/screenshots/screenshot2.png) | ![Screenshot 3](/screenshots/screenshot3.png) | ![Screenshot 4](/screenshots/screenshot4.png) | ![Screenshot 5](/screenshots/screenshot5.png)
+| ![Screenshot 1](/screenshots/screenshot1.png) | ![Screenshot 2](/screenshots/screenshot2.png) | ![Screenshot 3](/screenshots/screenshot3.png) | ![Screenshot 4](/screenshots/screenshot4.png) | ![Screenshot 5](/screenshots/screenshot5.png) |
 |-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|-----------------------------------------------|
 
 

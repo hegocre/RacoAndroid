@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">Racó</string>
     <string name="notices">Avisos</string>
-    <string name="planning">Horari</string>
     <string name="grades">Notes</string>
     <string name="menu">Menú</string>
-    <string name="calendar_menu">Menú del calendari</string>
     <string name="logout">Tancar sessió</string>
     <string name="login">Iniciar sessió</string>
     <string name="login_failed">No s\'ha pogut iniciar sessió</string>
@@ -22,7 +20,6 @@
     <string name="no_notices_yet">Encara no tens cap avís</string>
     <string name="all">Tots</string>
     <string name="you_have_new_notices">Tens avisos nous</string>
-    <string name="new_notices">Avisos nous</string>
     <string name="evaluation_name">Nom de l\'avaluació</string>
     <string name="add_evaluation">Afegir avaluació</string>
     <string name="delete_evaluation">Esborrar avaluació</string>

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notices">Avisos</string>
-    <string name="planning">Horario</string>
     <string name="grades">Notas</string>
     <string name="menu">Menú</string>
-    <string name="calendar_menu">Menú del calendario</string>
     <string name="logout">Cerrar sesión</string>
     <string name="login">Iniciar sesión</string>
     <string name="login_failed">No se ha podido iniciar sesión</string>
@@ -22,7 +20,6 @@
     <string name="no_notices_yet">Aún no tienes ningún aviso</string>
     <string name="all">Todos</string>
     <string name="you_have_new_notices">Tienes avisos nuevos</string>
-    <string name="new_notices">Avisos nuevos</string>
     <string name="add_evaluation">Añadir evaluación</string>
     <string name="delete_evaluation">Borrar evaluación</string>
     <string name="evaluation_name">Nombre de la evaluación</string>
