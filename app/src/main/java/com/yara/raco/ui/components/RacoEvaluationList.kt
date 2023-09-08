@@ -1,21 +1,64 @@
 package com.yara.raco.ui.components
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Percent
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -31,9 +74,7 @@ import com.yara.raco.model.evaluation.EvaluationWithGrades
 import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.grade.MutableGrade
 import com.yara.raco.model.subject.Subject
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.yara.raco.utils.Json
 
 class EditableEvaluationState(private val evaluationWithGrades: EvaluationWithGrades) {
     private constructor(
@@ -91,10 +132,7 @@ fun rememberEditableEvaluationState(evaluationWithGrades: EvaluationWithGrades):
         EditableEvaluationState(evaluationWithGrades)
     }
 
-@OptIn(
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoEvaluationList(
     subjects: List<Subject>,
@@ -174,7 +212,7 @@ fun RacoEvaluationList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEvaluation(
     evaluation: EvaluationWithGrades,
@@ -203,7 +241,7 @@ fun DetailedEvaluation(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .consumedWindowInsets(paddingValues)
+                .consumeWindowInsets(paddingValues)
         ) {
             item(key = "evaluation_header") {
                 ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -263,7 +301,7 @@ fun DetailedEvaluation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditableEvaluation(
     editableEvaluationState: EditableEvaluationState,
@@ -288,7 +326,7 @@ fun EditableEvaluation(
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .consumedWindowInsets(paddingValues)
+                .consumeWindowInsets(paddingValues)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -378,7 +416,6 @@ fun EditableEvaluation(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableGradeMark(
     grade: Grade,
@@ -392,12 +429,12 @@ fun EditableGradeMark(
     }
 
     ListItem(
-        headlineText = {
+        headlineContent = {
             Text(
                 text = grade.name
             )
         },
-        supportingText = {
+        supportingContent = {
             Text(
                 text = "${String.format("%.0f", grade.weight)}%"
             )
@@ -430,7 +467,6 @@ fun EditableGradeMark(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditableGradeWeight(
     grade: MutableGrade,
@@ -439,20 +475,14 @@ fun EditableGradeWeight(
     onGradeDelete: (MutableGrade) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalAlignment = CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+        //horizontalArrangement = Arrangement.SpaceBetween
     ) {
         OutlinedTextField(
             value = grade.name,
             onValueChange = onNameChange,
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.grade_name),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5F)
-                )
-            },
+            label = { Text(text = stringResource(id = R.string.grade_name)) },
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 16.dp),
@@ -462,17 +492,17 @@ fun EditableGradeWeight(
         OutlinedTextField(
             value = grade.weight,
             onValueChange = onWeightChange,
-            modifier = Modifier
-                .width(120.dp),
+            modifier = Modifier.width(90.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            trailingIcon = {
-                Icon(imageVector = Icons.Default.Percent, contentDescription = "")
-            },
+            suffix = { Text(text = "%") },
             isError = grade.weight != "" && grade.weight.replace(",", ".").toDoubleOrNull() == null
         )
-        IconButton(onClick = { onGradeDelete(grade) }) {
+        IconButton(
+            onClick = { onGradeDelete(grade) },
+            modifier = Modifier.align(CenterVertically)
+        ) {
             Icon(
                 Icons.Outlined.Delete,
                 contentDescription = stringResource(id = R.string.delete_grade)
@@ -481,7 +511,6 @@ fun EditableGradeWeight(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EvaluationListEntry(
     evaluation: EvaluationWithGrades,
@@ -493,13 +522,13 @@ fun EvaluationListEntry(
             .clickable {
                 onGradeClick(evaluation)
             },
-        headlineText = {
+        headlineContent = {
             Text(
                 text = evaluation.evaluation.name,
                 style = MaterialTheme.typography.labelMedium,
             )
         },
-        supportingText = {
+        supportingContent = {
             GradeMarkWithColor(
                 evaluation.getFinalMark(),
                 MaterialTheme.typography.titleLarge
@@ -561,45 +590,44 @@ fun AddEvaluationDialog(
                             rememberScrollState()
                         )
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable { subjectsMenuExpanded = true },
+                    ExposedDropdownMenuBox(
+                        expanded = subjectsMenuExpanded,
+                        onExpandedChange = { subjectsMenuExpanded = !subjectsMenuExpanded }
                     ) {
-                        Row(verticalAlignment = CenterVertically) {
-                            Text(
-                                text = subjects.find { it.id == subjectId }?.nom ?: "",
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = { subjectsMenuExpanded = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = null
-                                )
-                            }
-                        }
-                        DropdownMenu(
+                        OutlinedTextField(
+                            modifier = Modifier.menuAnchor(),
+                            value = subjects.find { it.id == subjectId }?.nom ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectsMenuExpanded) },
+                            label = { Text(text = stringResource(id = R.string.subject)) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        )
+
+                        ExposedDropdownMenu(
                             expanded = subjectsMenuExpanded,
-                            onDismissRequest = { subjectsMenuExpanded = false },
+                            onDismissRequest = { subjectsMenuExpanded = false }
                         ) {
                             subjects.forEach { subject ->
-                                DropdownMenuItem(text = { Text(text = subject.nom) }, onClick = {
-                                    setSubjectId(subject.id)
-                                    subjectsMenuExpanded = false
-                                })
+                                DropdownMenuItem(
+                                    text = { Text(text = subject.nom) },
+                                    onClick = {
+                                        setSubjectId(subject.id)
+                                        subjectsMenuExpanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
                             }
                         }
                     }
 
                     OutlinedTextField(
-                        modifier = Modifier
-                            .padding(top = 16.dp, bottom = 24.dp),
+                        modifier = Modifier.padding(bottom = 16.dp, top = 8.dp),
                         value = evaluationName,
                         onValueChange = setEvaluationName,
                         singleLine = true,
                         maxLines = 1,
-                        placeholder = {
-                            Text(text = stringResource(id = R.string.evaluation_name))
-                        }
+                        label = { Text(text = stringResource(id = R.string.evaluation_name)) }
                     )
                 }
 

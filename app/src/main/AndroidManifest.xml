@@ -40,8 +40,11 @@
             android:theme="@style/Theme.Raco">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.yara.raco.action.main" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <meta-data
@@ -50,13 +53,28 @@
         </activity>
         <activity
             android:name=".ui.activities.LoginActivity"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.yara.raco.action.login" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.activities.WebLoginActivity"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.yara.raco.action.weblogin" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.activities.AboutActivity"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.yara.raco.action.about" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

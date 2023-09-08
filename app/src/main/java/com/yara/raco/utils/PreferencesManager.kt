@@ -11,9 +11,6 @@ import com.yara.raco.model.user.AccessToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.IOException
 
 class PreferencesManager private constructor(context: Context) {

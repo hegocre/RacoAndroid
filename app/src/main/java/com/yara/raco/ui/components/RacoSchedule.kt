@@ -1,15 +1,44 @@
 package com.yara.raco.ui.components
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.Start
@@ -35,9 +64,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
 import com.yara.raco.R
 import com.yara.raco.model.event.Event
 import com.yara.raco.model.exam.Exam
@@ -51,7 +77,7 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
-import java.util.*
+import java.util.Locale
 import kotlin.math.roundToInt
 
 data class ScheduleEvent(
@@ -426,18 +452,28 @@ fun Schedule(
     val numHours = numMinutes.toFloat() / 60f
     val verticalScrollState = rememberScrollState()
     val horizontalScrollState = rememberScrollState()
-    var sidebarWidth by remember { mutableStateOf(0) }
-    var headerHeight by remember { mutableStateOf(0) }
+    var sidebarWidth by remember { mutableIntStateOf(0) }
+    var headerHeight by remember { mutableIntStateOf(0) }
     BoxWithConstraints(modifier = modifier) {
         val dayWidth: Dp = when (daySize) {
             is ScheduleSize.FixedSize -> daySize.size
             is ScheduleSize.FixedCount -> with(LocalDensity.current) { ((constraints.maxWidth - sidebarWidth) / daySize.count).toDp() }
-            is ScheduleSize.Adaptive -> with(LocalDensity.current) { maxOf(((constraints.maxWidth - sidebarWidth) / numDays).toDp(), daySize.minSize) }
+            is ScheduleSize.Adaptive -> with(LocalDensity.current) {
+                maxOf(
+                    ((constraints.maxWidth - sidebarWidth) / numDays).toDp(),
+                    daySize.minSize
+                )
+            }
         }
         val hourHeight: Dp = when (hourSize) {
             is ScheduleSize.FixedSize -> hourSize.size
             is ScheduleSize.FixedCount -> with(LocalDensity.current) { ((constraints.maxHeight - headerHeight) / hourSize.count).toDp() }
-            is ScheduleSize.Adaptive -> with(LocalDensity.current) { maxOf(((constraints.maxHeight - headerHeight) / numHours).toDp(), hourSize.minSize) }
+            is ScheduleSize.Adaptive -> with(LocalDensity.current) {
+                maxOf(
+                    ((constraints.maxHeight - headerHeight) / numHours).toDp(),
+                    hourSize.minSize
+                )
+            }
         }
         Column(modifier = modifier) {
             if (daySize !is ScheduleSize.FixedCount || daySize.count != 1f) {
@@ -736,7 +772,7 @@ fun ScheduleEventDetailsDialog(
                     )
                 }
 
-                if (scheduleEvent.description != null && scheduleEvent.description.isNotBlank()) {
+                if (!scheduleEvent.description.isNullOrBlank()) {
                     Text(text = scheduleEvent.description, modifier = Modifier.padding(top = 16.dp))
                 }
             }
@@ -745,7 +781,7 @@ fun ScheduleEventDetailsDialog(
 
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoScheduleDay(
     schedules: List<Schedule>,
@@ -765,12 +801,6 @@ fun RacoScheduleDay(
         )
     }
 
-    val lastCalendarDay = remember {
-        today.plusMonths(6L).with(
-            TemporalAdjusters.nextOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-        ).minusDays(1L)
-    }
-
     val colorSubject = HashMap<String, Color>()
     for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
         colorSubject[subject.value.codiAssig] =
@@ -787,15 +817,13 @@ fun RacoScheduleDay(
         eventEvents.add(event.toScheduleEvent())
     }
 
-    val pages = ChronoUnit.DAYS.between(firstCalendarDay, lastCalendarDay).toInt()
-
     LaunchedEffect(key1 = pagerState.currentPage) {
         val currentDay = firstCalendarDay.plusDays(pagerState.currentPage.toLong())
         setTitle(currentDay.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
     }
 
-    HorizontalPager(count = pages, state = pagerState) { page ->
+    HorizontalPager(state = pagerState) { page ->
         Column(horizontalAlignment = Start) {
             val currentDay = firstCalendarDay.plusDays(page.toLong())
 
@@ -841,7 +869,7 @@ fun RacoScheduleDay(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoScheduleWeek(
     schedules: List<Schedule>,
@@ -861,12 +889,6 @@ fun RacoScheduleWeek(
         )
     }
 
-    val lastCalendarDay = remember {
-        today.plusMonths(6L).with(
-            TemporalAdjusters.nextOrSame(WeekFields.of(Locale.getDefault()).firstDayOfWeek)
-        ).minusDays(1L)
-    }
-
     val colorSubject = HashMap<String, Color>()
     for (subject in schedules.distinctBy { it.codiAssig }.withIndex()) {
         colorSubject[subject.value.codiAssig] =
@@ -883,15 +905,13 @@ fun RacoScheduleWeek(
         eventEvents.add(event.toScheduleEvent())
     }
 
-    val pages = ChronoUnit.WEEKS.between(firstCalendarDay, lastCalendarDay).toInt()
-
     LaunchedEffect(key1 = pagerState.currentPage) {
         val firstWeekDay = firstCalendarDay.plusWeeks(pagerState.currentPage.toLong())
         setTitle(firstWeekDay.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
     }
 
-    HorizontalPager(count = pages, state = pagerState) { page ->
+    HorizontalPager(state = pagerState) { page ->
         val firstWeekDay = firstCalendarDay.plusWeeks(page.toLong())
         val lastWeekDay = firstCalendarDay.plusWeeks(page.toLong() + 1).minusDays(1L)
 

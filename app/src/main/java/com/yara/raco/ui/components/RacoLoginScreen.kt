@@ -25,7 +25,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.yara.raco.R
 import com.yara.raco.ui.theme.RacoTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RacoLoginScreen(
     modifier: Modifier = Modifier,
@@ -85,13 +84,11 @@ fun RacoLoginScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RacoLoginWebScreen(
     onLoginUrl: (String) -> Unit,
     url: String
 ) {
-
     val (loading, setLoading) = remember { mutableStateOf(false) }
 
     RacoTheme {

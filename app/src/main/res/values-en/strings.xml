@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notices">Notes</string>
-    <string name="planning">Planning</string>
     <string name="grades">Grades</string>
     <string name="menu">Menu</string>
-    <string name="calendar_menu">Calendar Menu</string>
     <string name="logout">Log out</string>
     <string name="login">Log in</string>
     <string name="login_failed">Could not log in</string>
@@ -22,7 +20,6 @@
     <string name="no_notices_yet">You have no notices yet</string>
     <string name="all">All</string>
     <string name="you_have_new_notices">You have new notices</string>
-    <string name="new_notices">New notices</string>
     <string name="add_evaluation">Add evaluation</string>
     <string name="delete_evaluation">Delete evaluation</string>
     <string name="evaluation_name">Evaluation name</string>
@@ -46,4 +43,5 @@
     <string name="show_unread_notices">Show unread notices</string>
     <string name="show_all_notices">Show all notices</string>
     <string name="session_expired">Your session has expired. Please, log in again</string>
+    <string name="subject">Subject</string>
 </resources>

@@ -243,7 +243,6 @@ fun AboutTextField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LicensesDialog(
     licenses: List<LicenseNotice>,
@@ -272,13 +271,13 @@ fun LicensesDialog(
                 LazyColumn(modifier = Modifier.weight(1f, fill = false)) {
                     items(items = licenses, key = { it.name }) { license ->
                         ListItem(
-                            headlineText = {
+                            headlineContent = {
                                 Text(text = license.name)
                             },
-                            overlineText = {
+                            overlineContent = {
                                 Text(text = license.licenseName)
                             },
-                            supportingText = {
+                            supportingContent = {
                                 Text(text = license.copyright)
                             },
                             modifier = Modifier
@@ -340,12 +339,6 @@ val licenses = listOf(
         copyright = "Copyright 2019 Square, Inc.",
         licenseName = "Apache License 2.0",
         licenseUrl = "https://github.com/square/okhttp/blob/master/LICENSE.txt"
-    ),
-    LicenseNotice(
-        name = "Compose Tooltip",
-        copyright = "Copyright 2022 Patrick Goldinger",
-        licenseName = "Apache License 2.0",
-        licenseUrl = "https://github.com/patrickgold/compose-tooltip/blob/main/LICENSE"
     ),
     LicenseNotice(
         name = "WeekSchedule",

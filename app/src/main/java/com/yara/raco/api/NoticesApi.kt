@@ -1,8 +1,10 @@
 package com.yara.raco.api
 
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.*
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.webkit.MimeTypeMap
 import android.widget.Toast
@@ -10,14 +12,13 @@ import androidx.core.content.FileProvider
 import com.yara.raco.R
 import com.yara.raco.model.files.File
 import com.yara.raco.model.notices.Notice
+import com.yara.raco.utils.Json
 import com.yara.raco.utils.OkHttpRequest
 import com.yara.raco.utils.Result
 import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class NoticesApi private constructor() {
 
@@ -50,6 +51,7 @@ class NoticesApi private constructor() {
         Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     fun getAttachment(context: Context, file: File, accessToken: String) {
         val request = DownloadManager.Request(Uri.parse(file.url))
             .setTitle(file.nom)
@@ -116,7 +118,12 @@ class NoticesApi private constructor() {
             }
         }
 
-        context.registerReceiver(downloadReceiver, filter)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(downloadReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            //suppress UnspecifiedRegisterReceiverFlag
+            context.registerReceiver(downloadReceiver, filter)
+        }
 
         downloadManager.enqueue(request)
 

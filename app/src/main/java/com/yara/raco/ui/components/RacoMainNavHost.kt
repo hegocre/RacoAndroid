@@ -2,16 +2,27 @@ package com.yara.raco.ui.components
 
 import android.widget.Toast
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -22,9 +33,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -35,7 +43,6 @@ import com.yara.raco.ui.RacoScreen
 import com.yara.raco.ui.viewmodel.RacoViewModel
 import com.yara.raco.utils.Result
 import kotlinx.coroutines.launch
-import java.util.*
 
 data class DetailsUiState<T>(
     val detailed: T? = null,
@@ -43,7 +50,7 @@ data class DetailsUiState<T>(
     val throwError: Boolean = false
 )
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoMainNavHost(
     navHostController: NavHostController,
@@ -86,7 +93,7 @@ fun RacoMainNavHost(
     ) {
         composable(RacoScreen.Notes.name) {
             Column {
-                val pagerState = rememberPagerState()
+                val pagerState = rememberPagerState { sortedSubjects.size + 1 }
 
                 RacoNoticeTabs(
                     subjects = sortedSubjects,
@@ -171,7 +178,10 @@ fun RacoMainNavHost(
 
         composable(RacoScreen.Schedule.name) {
             RacoSwipeRefresh(isRefreshing = isRefreshing, onRefresh = { racoViewModel.refresh() }) {
-                Crossfade(targetState = dayCalendarViewSelected) { isDayCalendarViewSelected ->
+                Crossfade(
+                    targetState = dayCalendarViewSelected,
+                    label = "dayCalendarViewSelected"
+                ) { isDayCalendarViewSelected ->
                     if (isDayCalendarViewSelected) {
                         RacoScheduleDay(
                             schedules = schedules,
@@ -323,6 +333,7 @@ fun RacoMainNavHost(
     }
 }
 
+@Suppress("deprecation")
 @Composable
 fun RacoSwipeRefresh(
     isRefreshing: Boolean,

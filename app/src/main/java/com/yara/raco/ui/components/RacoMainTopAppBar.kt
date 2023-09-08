@@ -1,13 +1,22 @@
 package com.yara.raco.ui.components
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltipBox
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,9 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
 import com.yara.raco.R
-import com.yara.raco.ui.components.tooltip.tooltip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,12 +46,8 @@ fun RacoMainTopAppBar(
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(scrolledContainerColor = MaterialTheme.colorScheme.surface),
         navigationIcon = {
-            AnimatedVisibility(
-                visible = onBackPress != null,
-                enter = slideIn(tween(), initialOffset = { offset -> IntOffset(-offset.width, 0) }),
-                exit = slideOut(tween(), targetOffset = { offset -> IntOffset(-offset.width, 0) })
-            ) {
-                IconButton(onClick = { onBackPress?.invoke() }) {
+            if (onBackPress != null) {
+                IconButton(onClick = onBackPress) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(
                             id = R.string.back
@@ -55,8 +58,13 @@ fun RacoMainTopAppBar(
         },
         actions = {
             iconActions?.forEach { (imageVector, function) ->
-                IconButton(onClick = function, modifier = Modifier.tooltip(imageVector.second)) {
-                    Icon(imageVector = imageVector.first, contentDescription = imageVector.second)
+                RichTooltipBox(text = { Text(text = imageVector.second) }) {
+                    IconButton(onClick = function, modifier = Modifier.tooltipAnchor()) {
+                        Icon(
+                            imageVector = imageVector.first,
+                            contentDescription = imageVector.second
+                        )
+                    }
                 }
             }
 
