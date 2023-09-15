@@ -44,7 +44,6 @@ data class Notice(
     var llegit: Boolean = false
 ) {
     // Constructor for ksp to not fail building
-    @Suppress("unused")
     constructor(
         id: Int,
         titol: String,

@@ -2,16 +2,47 @@ package com.yara.raco.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.outlined.Campaign
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Policy
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.contentColorFor
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -312,37 +343,31 @@ val authors = mapOf(
 val licenses = listOf(
     LicenseNotice(
         name = "Kotlin Programming Language",
-        copyright = "Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.",
+        copyright = "Copyright © 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors.",
         licenseName = "Apache License 2.0",
         licenseUrl = "https://github.com/JetBrains/kotlin/blob/master/license/LICENSE.txt"
     ),
     LicenseNotice(
         name = "Android Jetpack",
-        copyright = "Copyright 2020 Google LLC",
+        copyright = "Copyright © 2023 The Android Open Source Project",
         licenseName = "Apache License 2.0",
         licenseUrl = "https://github.com/androidx/androidx/blob/androidx-main/LICENSE.txt"
     ),
     LicenseNotice(
-        name = "Accompanist",
-        copyright = "Copyright 2020 The Android Open Source Project",
-        licenseName = "Apache License 2.0",
-        licenseUrl = "https://github.com/google/accompanist/blob/main/LICENSE"
-    ),
-    LicenseNotice(
         name = "HtmlText",
-        copyright = "Copyright 2021 Alexander Karkossa",
+        copyright = "Copyright © 2021 Alexander Karkossa",
         licenseName = "Apache License 2.0",
         licenseUrl = "https://github.com/ch4rl3x/HtmlText/blob/main/LICENSE"
     ),
     LicenseNotice(
         name = "OkHttp",
-        copyright = "Copyright 2019 Square, Inc.",
+        copyright = "Copyright © 2019 Square, Inc.",
         licenseName = "Apache License 2.0",
         licenseUrl = "https://github.com/square/okhttp/blob/master/LICENSE.txt"
     ),
     LicenseNotice(
         name = "WeekSchedule",
-        copyright = "Copyright 2021 Daniel Rampelt",
+        copyright = "Copyright © 2021 Daniel Rampelt",
         licenseName = "MIT License",
         licenseUrl = "https://github.com/drampelt/WeekSchedule/blob/main/LICENSE"
     )

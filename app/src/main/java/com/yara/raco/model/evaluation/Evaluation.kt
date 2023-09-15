@@ -24,6 +24,5 @@ data class Evaluation(
     val listOfGrade: ArrayList<Grade> = arrayListOf()
 ) {
     // Constructor for ksp to not fail building
-    @Suppress("unused")
     constructor(id: Int, subjectId: String, name: String) : this(id, subjectId, name, arrayListOf())
 }
