@@ -2,6 +2,9 @@ package com.yara.raco.ui.components
 
 import android.widget.Toast
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,7 +91,9 @@ fun RacoMainNavHost(
     NavHost(
         navController = navHostController,
         startDestination = RacoScreen.Notes.name,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = { fadeIn(animationSpec = tween(300)) },
+        exitTransition = { fadeOut(animationSpec = tween(300)) },
     ) {
         composable(RacoScreen.Notes.name) {
             Column {
