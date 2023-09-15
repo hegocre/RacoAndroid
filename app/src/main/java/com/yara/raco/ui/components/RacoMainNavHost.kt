@@ -12,7 +12,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,23 +22,23 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yara.raco.R
 import com.yara.raco.model.evaluation.EvaluationWithGrades
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
+import com.yara.raco.ui.components.pullrefresh.PullRefreshIndicator
+import com.yara.raco.ui.components.pullrefresh.pullRefresh
+import com.yara.raco.ui.components.pullrefresh.rememberPullRefreshState
 import com.yara.raco.ui.viewmodel.RacoViewModel
 import com.yara.raco.utils.Result
 import kotlinx.coroutines.launch
@@ -333,28 +332,25 @@ fun RacoMainNavHost(
     }
 }
 
-@Suppress("deprecation")
 @Composable
 fun RacoSwipeRefresh(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val refreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = onRefresh
+    )
 
-    SwipeRefresh(
-        state = refreshState,
-        onRefresh = onRefresh,
-        modifier = Modifier.fillMaxSize(),
-        indicator = { rState, refreshTrigger ->
-            SwipeRefreshIndicator(
-                state = rState,
-                refreshTriggerDistance = refreshTrigger,
-                contentColor = MaterialTheme.colorScheme.primary,
-                backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
-            )
-        }
-    ) {
+    Box(modifier = Modifier.pullRefresh(pullRefreshState)) {
         content()
+
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            contentColor = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
