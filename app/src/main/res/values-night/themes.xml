@@ -2,5 +2,6 @@
     <!-- Base application theme. -->
     <style name="Theme.Raco" parent="android:Theme.Material.NoActionBar">
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 </resources>
