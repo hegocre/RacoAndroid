@@ -15,11 +15,15 @@ import com.yara.raco.model.grade.Grade
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "evaluation")
-data class Evaluation @JvmOverloads constructor(
+data class Evaluation(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var subjectId: String,
     var name: String,
     @Ignore
     val listOfGrade: ArrayList<Grade> = arrayListOf()
-)
+) {
+    // Constructor for ksp to not fail building
+    @Suppress("unused")
+    constructor(id: Int, subjectId: String, name: String) : this(id, subjectId, name, arrayListOf())
+}

@@ -21,7 +21,7 @@ import kotlinx.serialization.Transient
  */
 @kotlinx.serialization.Serializable
 @Entity(tableName = "notices", primaryKeys = ["id"])
-data class Notice @JvmOverloads constructor(
+data class Notice(
     @SerialName("id")
     val id: Int,
     @SerialName("titol")
@@ -42,4 +42,28 @@ data class Notice @JvmOverloads constructor(
     @Transient
     @ColumnInfo(defaultValue = "1")
     var llegit: Boolean = false
-)
+) {
+    // Constructor for ksp to not fail building
+    @Suppress("unused")
+    constructor(
+        id: Int,
+        titol: String,
+        codiAssig: String,
+        text: String,
+        dataInsercio: String,
+        dataModificacio: String,
+        dataCaducitat: String,
+        llegit: Boolean
+    ) :
+            this(
+                id,
+                titol,
+                codiAssig,
+                text,
+                dataInsercio,
+                dataModificacio,
+                dataCaducitat,
+                arrayListOf(),
+                llegit
+            )
+}
