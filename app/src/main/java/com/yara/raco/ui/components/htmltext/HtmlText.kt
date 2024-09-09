@@ -23,6 +23,7 @@ import android.text.style.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.*
@@ -41,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.getSpans
 
 /**
@@ -85,9 +88,11 @@ fun HtmlText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val contentColor = if (color == Color.Unspecified) LocalContentColor.current else color
     val annotatedString = remember {
         Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
-            .toAnnotatedString(urlSpanStyle, colorMapping)
+            .toAnnotatedString(urlSpanStyle, colorMapping, contentColor, backgroundColor)
     }
 
     val uriHandler = LocalUriHandler.current
@@ -144,7 +149,9 @@ fun Spanned.toAnnotatedString(
         color = Color.Blue,
         textDecoration = TextDecoration.Underline
     ),
-    colorMapping: Map<Color, Color> = emptyMap()
+    colorMapping: Map<Color, Color> = emptyMap(),
+    contentColor: Color,
+    backgroundColor: Color
 ): AnnotatedString {
     return buildAnnotatedString {
         append(this@toAnnotatedString.toString())
@@ -160,12 +167,14 @@ fun Spanned.toAnnotatedString(
             addStringAnnotation("url", urlSpan.url, start, end) // NON-NLS
         }
         colorSpans.forEach { colorSpan ->
+            val originalColor = Color(colorSpan.foregroundColor)
+            val contrast = ColorUtils.calculateContrast(originalColor.toArgb(), backgroundColor.toArgb())
+            val definitiveColor = if (contrast < 4.5) contentColor else originalColor
+
             val start = getSpanStart(colorSpan)
             val end = getSpanEnd(colorSpan)
             addStyle(SpanStyle(color = colorMapping.getOrElse(Color(colorSpan.foregroundColor)) {
-                Color(
-                    colorSpan.foregroundColor
-                )
+                definitiveColor
             }), start, end)
         }
         styleSpans.forEach { styleSpan ->

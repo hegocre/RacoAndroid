@@ -3,7 +3,6 @@ package com.yara.raco.ui.components
 import android.text.Html
 import android.text.format.DateUtils
 import android.text.format.Formatter.formatShortFileSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
@@ -38,6 +37,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -69,14 +69,12 @@ import com.yara.raco.model.notices.Notice
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.ui.components.htmltext.HtmlText
-import com.yara.raco.ui.components.pager.pagerTabIndicatorOffset
 import com.yara.raco.ui.theme.RacoTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoNoticeTabs(
     subjects: List<Subject>,
@@ -86,7 +84,7 @@ fun RacoNoticeTabs(
     val indicator = @Composable { tabPositions: List<TabPosition> ->
         Spacer(
             Modifier
-                .pagerTabIndicatorOffset(pagerState, tabPositions)
+                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
                 .padding(horizontal = 12.dp)
                 .height(3.dp)
                 .background(
@@ -97,7 +95,7 @@ fun RacoNoticeTabs(
     }
 
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = BottomCenter) {
-        Divider(modifier = Modifier.fillMaxWidth())
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
@@ -134,7 +132,6 @@ fun RacoNoticeTabs(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoNoticePager(
     showAllNoticesSelected: Boolean,
@@ -166,7 +163,6 @@ fun RacoNoticePager(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoNoticeList(
     noticesWithFiles: List<NoticeWithFiles>,
@@ -190,12 +186,12 @@ fun RacoNoticeList(
                 key = { _, noticeWithFiles -> noticeWithFiles.notice.id }
             ) { index, noticeWithFiles ->
                 if (index != 0) {
-                    Divider()
+                    HorizontalDivider()
                 }
                 NoticeListEntry(
                     noticeWithFiles = noticeWithFiles,
                     onNoticeClick = onNoticeClick,
-                    modifier = Modifier.animateItemPlacement()
+                    modifier = Modifier.animateItem()
                 )
             }
         } else {

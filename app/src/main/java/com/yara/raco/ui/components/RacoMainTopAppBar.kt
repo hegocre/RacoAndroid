@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -12,17 +12,19 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RichTooltipBox
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.yara.raco.R
@@ -49,7 +51,7 @@ fun RacoMainTopAppBar(
             if (onBackPress != null) {
                 IconButton(onClick = onBackPress) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(
                             id = R.string.back
                         )
                     )
@@ -58,8 +60,12 @@ fun RacoMainTopAppBar(
         },
         actions = {
             iconActions?.forEach { (imageVector, function) ->
-                RichTooltipBox(text = { Text(text = imageVector.second) }) {
-                    IconButton(onClick = function, modifier = Modifier.tooltipAnchor()) {
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                    tooltip = {  PlainTooltip { Text(text = imageVector.second) } },
+                    state = rememberTooltipState()
+                ) {
+                    IconButton(onClick = function) {
                         Icon(
                             imageVector = imageVector.first,
                             contentDescription = imageVector.second
