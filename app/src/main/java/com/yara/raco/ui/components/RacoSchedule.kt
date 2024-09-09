@@ -1,6 +1,5 @@
 package com.yara.raco.ui.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -26,7 +25,7 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -513,7 +512,7 @@ fun Schedule(
                     )
                 }
             }
-            Divider()
+            HorizontalDivider()
             Row(
                 modifier = Modifier
                     .weight(1f)
@@ -781,7 +780,6 @@ fun ScheduleEventDetailsDialog(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoScheduleDay(
     schedules: List<Schedule>,
@@ -869,7 +867,6 @@ fun RacoScheduleDay(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoScheduleWeek(
     schedules: List<Schedule>,

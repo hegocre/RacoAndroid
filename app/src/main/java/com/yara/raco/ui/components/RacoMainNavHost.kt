@@ -5,7 +5,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +12,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,7 +26,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,9 +39,6 @@ import com.yara.raco.R
 import com.yara.raco.model.evaluation.EvaluationWithGrades
 import com.yara.raco.model.notices.NoticeWithFiles
 import com.yara.raco.ui.RacoScreen
-import com.yara.raco.ui.components.pullrefresh.PullRefreshIndicator
-import com.yara.raco.ui.components.pullrefresh.pullRefresh
-import com.yara.raco.ui.components.pullrefresh.rememberPullRefreshState
 import com.yara.raco.ui.viewmodel.RacoViewModel
 import com.yara.raco.utils.Result
 import kotlinx.coroutines.launch
@@ -52,7 +49,6 @@ data class DetailsUiState<T>(
     val throwError: Boolean = false
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RacoMainNavHost(
     navHostController: NavHostController,
@@ -337,25 +333,19 @@ fun RacoMainNavHost(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RacoSwipeRefresh(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
-        onRefresh = onRefresh
+    val pullRefreshState = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        state = pullRefreshState,
+        onRefresh = onRefresh,
+        isRefreshing = isRefreshing,
+        content = { content() }
     )
-
-    Box(modifier = Modifier.pullRefresh(pullRefreshState)) {
-        content()
-
-        PullRefreshIndicator(
-            refreshing = isRefreshing,
-            state = pullRefreshState,
-            contentColor = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-    }
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,17 +31,18 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -75,6 +75,7 @@ import com.yara.raco.model.grade.Grade
 import com.yara.raco.model.grade.MutableGrade
 import com.yara.raco.model.subject.Subject
 import com.yara.raco.utils.Json
+import java.util.Locale
 
 class EditableEvaluationState(private val evaluationWithGrades: EvaluationWithGrades) {
     private constructor(
@@ -188,7 +189,7 @@ fun RacoEvaluationList(
                             key = { _, evaluation -> evaluation.evaluation.id }
                         ) { index, evaluation ->
                             if (index != 0) {
-                                Divider()
+                                HorizontalDivider()
                             }
                             EvaluationListEntry(
                                 evaluation = evaluation,
@@ -212,7 +213,6 @@ fun RacoEvaluationList(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DetailedEvaluation(
     evaluation: EvaluationWithGrades,
@@ -301,7 +301,6 @@ fun DetailedEvaluation(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditableEvaluation(
     editableEvaluationState: EditableEvaluationState,
@@ -436,7 +435,7 @@ fun EditableGradeMark(
         },
         supportingContent = {
             Text(
-                text = "${String.format("%.0f", grade.weight)}%"
+                text = "${String.format(Locale.getDefault(), "%.0f", grade.weight)}%"
             )
         },
         trailingContent = {
@@ -452,7 +451,7 @@ fun EditableGradeMark(
                 },
                 placeholder = {
                     Text(
-                        text = String.format("%.2f", neededMark)
+                        text = String.format(Locale.getDefault(), "%.2f", neededMark)
                     )
                 },
                 modifier = Modifier.width(80.dp),
@@ -595,7 +594,7 @@ fun AddEvaluationDialog(
                         onExpandedChange = { subjectsMenuExpanded = !subjectsMenuExpanded }
                     ) {
                         OutlinedTextField(
-                            modifier = Modifier.menuAnchor(),
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
                             value = subjects.find { it.id == subjectId }?.nom ?: "",
                             onValueChange = {},
                             readOnly = true,
