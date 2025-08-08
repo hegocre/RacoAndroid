@@ -20,21 +20,21 @@ class EventsApi private constructor() {
 
         val status = response.code
         val body = withContext(Dispatchers.IO) {
-            response.body?.string()
+            response.body.string()
         }
 
         withContext(Dispatchers.IO) {
             response.close()
         }
 
-        if (status == 200 && body != null) {
+        if (status == 200) {
             val results = Json.decodeFromString<EventsResponse>(body).results
             Result.Success(results)
         } else {
             Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
         }
 
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 

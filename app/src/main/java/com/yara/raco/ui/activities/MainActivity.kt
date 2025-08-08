@@ -3,7 +3,6 @@ package com.yara.raco.ui.activities
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -75,7 +74,7 @@ class MainActivity : ComponentActivity() {
 
         //Dismiss existing notifications
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancelAll()
     }
 
@@ -85,7 +84,7 @@ class MainActivity : ComponentActivity() {
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(name, name, importance)
         val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
         notificationManager.cancelAll()
 
