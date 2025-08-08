@@ -309,7 +309,7 @@ fun RacoMainNavHost(
                                         try {
                                             racoViewModel.saveEvaluation(editableEvaluationState.getEvaluationWithGrades())
                                             navHostController.popBackStack()
-                                        } catch (e: IllegalArgumentException) {
+                                        } catch (_: IllegalArgumentException) {
                                             Toast.makeText(
                                                 context,
                                                 context.getString(R.string.evaluation_invalid_arguments),

@@ -21,21 +21,21 @@ class SemesterApi private constructor() {
 
         val statusCode = response.code
         val body = withContext(Dispatchers.IO) {
-            response.body?.string()
+            response.body.string()
         }
 
         withContext(Dispatchers.IO) {
             response.close()
         }
 
-        if (statusCode == 200 && body != null) {
+        if (statusCode == 200) {
             val id = Json.decodeFromString<CurrentSemesterResponse>(body).id
             Result.Success(id)
         } else {
             Result.Error(ResultCode.ERROR_API_BAD_RESPONSE)
         }
 
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
     }
 
@@ -59,21 +59,21 @@ class SemesterApi private constructor() {
 
                 val statusCode = response.code
                 val body = withContext(Dispatchers.IO) {
-                    response.body?.string()
+                    response.body.string()
                 }
 
                 withContext(Dispatchers.IO) {
                     response.close()
                 }
 
-                if (statusCode == 200 && body != null) {
+                if (statusCode == 200) {
                     val id = Json.decodeFromString<ExamsResponse>(body).results
                     Result.Success(id)
                 } else {
                     Result.Error(ResultCode.ERROR_API_BAD_RESPONSE)
                 }
 
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Result.Error(ResultCode.ERROR_API_BAD_REQUEST)
             }
         }

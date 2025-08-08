@@ -1,5 +1,6 @@
 package com.yara.raco.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -415,6 +416,7 @@ sealed class ScheduleSize {
     class Adaptive(val minSize: Dp) : ScheduleSize()
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun Schedule(
     scheduleEvents: List<ScheduleEvent>,

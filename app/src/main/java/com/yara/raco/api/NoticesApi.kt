@@ -3,7 +3,6 @@ package com.yara.raco.api
 import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.*
-import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.webkit.MimeTypeMap
@@ -19,6 +18,7 @@ import com.yara.raco.utils.ResultCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import androidx.core.net.toUri
 
 class NoticesApi private constructor() {
 
@@ -32,14 +32,14 @@ class NoticesApi private constructor() {
 
         val statusCode = response.code
         val body = withContext(Dispatchers.IO) {
-            response.body?.string()
+            response.body.string()
         }
 
         withContext(Dispatchers.IO) {
             response.close()
         }
 
-        if (statusCode == 200 && body != null) {
+        if (statusCode == 200) {
             val aux = Json.decodeFromString<NoticeResponse>(body).results
             Result.Success(aux)
         } else {
@@ -53,7 +53,7 @@ class NoticesApi private constructor() {
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     fun getAttachment(context: Context, file: File, accessToken: String) {
-        val request = DownloadManager.Request(Uri.parse(file.url))
+        val request = DownloadManager.Request(file.url.toUri())
             .setTitle(file.nom)
             .setMimeType(file.nom.getMime() ?: file.tipusMime)
             .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, file.nom)
@@ -81,7 +81,7 @@ class NoticesApi private constructor() {
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         columIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
                         if (columIndex < 0) return
-                        val filePath = Uri.parse(cursor.getString(columIndex))
+                        val filePath = cursor.getString(columIndex).toUri()
 
                         columIndex = cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)
                         if (columIndex < 0) return
@@ -100,7 +100,7 @@ class NoticesApi private constructor() {
 
                         try {
                             context.startActivity(intent)
-                        } catch (e: ActivityNotFoundException) {
+                        } catch (_: ActivityNotFoundException) {
                             Toast.makeText(
                                 context,
                                 context.getString(R.string.cannot_open_file),

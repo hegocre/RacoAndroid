@@ -21,14 +21,14 @@ class ScheduleApi private constructor() {
 
         val statusCode = response.code
         val body = withContext(Dispatchers.IO) {
-            response.body?.string()
+            response.body.string()
         }
 
         withContext(Dispatchers.IO) {
             response.close()
         }
 
-        if (statusCode == 200 && body != null) {
+        if (statusCode == 200) {
             val aux = Json.decodeFromString<ScheduleResponse>(body).results
             Result.Success(aux)
         } else {

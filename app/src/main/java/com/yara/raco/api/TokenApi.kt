@@ -26,20 +26,20 @@ class TokenApi private constructor() {
 
         val code = tokenResponse.code
         val body = withContext(Dispatchers.IO) {
-            tokenResponse.body?.string()
+            tokenResponse.body.string()
         }
 
         withContext(Dispatchers.IO) {
             tokenResponse.close()
         }
 
-        if (code == 200 && body != null) {
+        if (code == 200) {
             Result.Success(Json.decodeFromString(body))
         } else {
             Result.Error(0)
         }
 
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         Result.Error(1)
     }
 
@@ -60,19 +60,23 @@ class TokenApi private constructor() {
 
         val code = tokenResponse.code
         val body = withContext(Dispatchers.IO) {
-            tokenResponse.body?.string()
+            tokenResponse.body.string()
         }
 
         withContext(Dispatchers.IO) {
             tokenResponse.close()
         }
 
-        if (code == 200 && body != null) {
-            Result.Success(Json.decodeFromString(body))
-        } else if (code == 400) {
-            Result.Error(400)
-        } else {
-            Result.Error(0)
+        when (code) {
+            200 -> {
+                Result.Success(Json.decodeFromString(body))
+            }
+            400 -> {
+                Result.Error(400)
+            }
+            else -> {
+                Result.Error(0)
+            }
         }
 
     } catch (e: Exception) {

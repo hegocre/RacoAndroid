@@ -1,10 +1,17 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'com.google.devtools.ksp' version "$kotlin_version-$ksp_version"
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
+    id 'org.jetbrains.kotlin.plugin.compose' version "$kotlin_version"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 def apiKeyPropertiesFile = rootProject.file("apikey.properties")
@@ -12,19 +19,19 @@ def apiKeyProperties = new Properties()
 apiKeyProperties.load(new FileInputStream(apiKeyPropertiesFile))
 
 android {
-    namespace 'com.yara.raco'
-    compileSdk 34
+    namespace = 'com.yara.raco'
+    compileSdk = 36
 
     defaultConfig {
         applicationId "com.yara.raco"
         minSdk 26
-        targetSdk 34
-        versionCode 34
-        versionName "1.0.7"
+        targetSdk 36
+        versionCode 36
+        versionName "1.0.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
         resourceConfigurations += ['ca', 'es', 'en']
 
@@ -50,7 +57,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            shrinkResources true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -58,18 +65,9 @@ android {
             applicationIdSuffix ".debug"
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = '17'
-    }
     buildFeatures {
-        compose true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.5.15'
+        compose = true
+        buildConfig = true
     }
     packagingOptions {
         resources {
@@ -81,42 +79,42 @@ android {
 dependencies {
 
     //Android dependencies
-    implementation 'androidx.core:core-ktx:1.13.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.5'
-    implementation 'androidx.datastore:datastore-preferences:1.1.1'
+    implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.2'
+    implementation 'androidx.datastore:datastore-preferences:1.1.7'
 
     //Compose dependencies
-    implementation platform('androidx.compose:compose-bom:2024.09.00')
+    implementation platform('androidx.compose:compose-bom:2025.07.00')
     implementation "androidx.compose.ui:ui"
     implementation "androidx.compose.runtime:runtime-livedata"
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation 'androidx.compose.material:material-icons-extended'
     implementation 'androidx.compose.material3:material3'
 
-    implementation 'androidx.activity:activity-compose:1.9.2'
-    implementation 'androidx.navigation:navigation-compose:2.8.0'
+    implementation 'androidx.activity:activity-compose:1.10.1'
+    implementation 'androidx.navigation:navigation-compose:2.9.3'
 
     //Room dependencies
     implementation "androidx.room:room-ktx:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
 
-    implementation 'androidx.work:work-runtime-ktx:2.9.1'
+    implementation 'androidx.work:work-runtime-ktx:2.10.3'
 
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.1.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0'
 
     //Debug and test implementations
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.7.0'
-    debugImplementation "androidx.compose.ui:ui-tooling:1.7.0"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.7.0"
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.8.3'
+    debugImplementation "androidx.compose.ui:ui-tooling:1.8.3"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.8.3"
 }
 
 // Compiler flag to use experimental Compose APIs
-tasks.withType(KotlinCompilationTask).configureEach {
+tasks.withType(KotlinCompile).configureEach {
     compilerOptions {
         freeCompilerArgs.addAll("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all-compatibility")
     }

@@ -55,7 +55,7 @@ abstract class RacoDatabase : RoomDatabase() {
                         RacoDatabase::class.java,
                         "raco.db"
                     )
-                        .fallbackToDestructiveMigration()
+                        .fallbackToDestructiveMigration(false)
                         .build()
 
                     INSTANCE = instance

@@ -6,9 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat.getInsetsController
@@ -98,12 +96,10 @@ fun RacoTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Color.Transparent.toArgb()
             val insetsController = getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = colorScheme.isLight()
 
             insetsController.isAppearanceLightNavigationBars = colorScheme.isLight()
-            window.navigationBarColor = Color.Transparent.toArgb()
         }
     }
 
